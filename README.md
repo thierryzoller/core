@@ -1,6 +1,7 @@
 
 
 # LUX Smart Home
-# Lit déi Lut elo?
+A Jeedom fork - <a href="LICENSE">Licensing Information</a>
+
 
 
