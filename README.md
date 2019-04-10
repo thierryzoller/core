@@ -4,4 +4,4 @@
 # Lit déi Lut elo?
 
 
-<a href=""LICENSE">Licencing Information</a>
+<a href="LICENSE">Licensing Information</a>
