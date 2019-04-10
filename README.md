@@ -1,6 +1,6 @@
-<img align="right" src="https://www.jeedom.com/site/logo.png" width="100">
 
-# Jeedom - La domotique innovante #
+
+# Peedom 
 <p align="center">
 <a href="https://www.jeedom.com/site">Site</a>  - 
 <a href="https://www.jeedom.com/blog">Blog</a>  - 
