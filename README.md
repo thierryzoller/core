@@ -1,7 +1,7 @@
 
 
 # LUX Smart Home
-<a href="LICENSE">Licensing Information</a>
+A Jeedom fork - <a href="LICENSE">Licensing Information</a>
 
 
 
