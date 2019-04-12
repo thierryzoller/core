@@ -68,7 +68,7 @@ $loadExtensions = get_loaded_extensions();
 </head>
 <body>
 	<center>
-		<img src="../core/img/logo-jeedom-grand-nom-couleur-460x320.png" class="img-responsive" />
+		<img src="../core/img/lsh-460x320.png" class="img-responsive" />
 	</center>
 	<?php
 $error = false;
