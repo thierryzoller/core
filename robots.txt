@@ -1,3 +1,3 @@
 User-agent: *
 Disallow: /
-Me: MeandMyself
+ME:ME2018
