@@ -104,9 +104,6 @@ user::isBan();
 							<span class="label label-info" style="font-size : 1em;"><?php echo $lastKnowDate ?></span>
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
-						</div>
-						<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_resetHour"><i class="fas fa-refresh"></i> {{Remise à zéro}}</a>
 						</div>
 					</div>
@@ -223,6 +220,9 @@ user::isBan();
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Indique à}} <?php echo config::byKey('product_name'); ?> {{de ne pas prendre en compte l'heure du système}}">{{Ignorer la vérification de l'heure}}</label>
 						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 							<input type="checkbox" class="configKey" data-l1key="ignoreHourCheck" />
+						</div>
+												<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
 						</div>
 					</div>
 				</fieldset>

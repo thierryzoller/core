@@ -447,7 +447,7 @@
         "Rafraîchir": "Aktualisieren",
         "Clef d'installation qui permet d'identifier votre Jeedom quand il communique avec le market": "Der Installationsschlüssel identifiziert Ihr Jeedom, wenn es mit dem Markt kommuniziert",
         "Clef d'installation": "Installationsschlüssel",
-		"GitReset":"Manual Core Synchronisieren",
+		"GitReset":"Manual Core Sync Forcieren",
 	    "Remise à zéro": "Zurücksetzen",
         "Langue de votre Jeedom": "Ihre Jeedom Sprache",
         "Langue": "Sprache",
