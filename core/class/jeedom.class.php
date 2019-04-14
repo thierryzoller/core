@@ -1190,6 +1190,10 @@ class jeedom {
 		shell_exec(system::getCmdSudo() . 'service ntp stop;' . system::getCmdSudo() . 'ntpdate -s ' . config::byKey('ntp::optionalServer', 'core', '0.debian.pool.ntp.org') . ';' . system::getCmdSudo() . 'service ntp start');
 	}
 	
+	public static function resetGit() {
+		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
+	}
+	
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
