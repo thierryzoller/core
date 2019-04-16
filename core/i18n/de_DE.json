@@ -320,7 +320,7 @@
         "Plan 3d inconnu. Verifier l'id": "Unbekannter 3D-Plan. Überprüfen Sie die ID",
         "Design 3D": "3D Design",
         "Note": "Hinweis",
-        "Jeedom est en cours de démarrage, veuillez patienter. La page se rechargera automatiquement une fois le démarrage terminé.": "Jeedom wird gestartet, bitte warten Sie. Die Seite wird automatisch nach Abschluss der Inbetriebnahme neu geladen."
+        "LUX Smart home est en cours de démarrage, veuillez patienter. La page se rechargera automatiquement une fois le démarrage terminé.": "LUX Smart Home wird gestartet, bitte etwas Geduld. Die Seite wird automatisch neu geladen."
     },
     "desktop/php/message.php": {
         "Vider": "leeren",
