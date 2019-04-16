@@ -221,6 +221,9 @@ user::isBan();
 						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 							<input type="checkbox" class="configKey" data-l1key="ignoreHourCheck" />
 						</div>
+							<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
+						</div>
 					</div>
 				</fieldset>
 			</form>

@@ -112,6 +112,18 @@ $('#bt_forceSyncHour').on('click', function () {
     });
 });
 
+$('#bt_resetGit').on('click', function () {
+    $.hideAlert();
+    jeedom.resetGit({
+        error: function (error) {
+            $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        },
+        success: function (data) {
+            $('#div_alert').showAlert({message: '{{Commande réalisée avec succès}}', level: 'success'});
+        }
+    });
+});
+
 $('#bt_restartDns').on('click', function () {
    $.hideAlert();
    jeedom.config.save({
