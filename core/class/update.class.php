@@ -466,7 +466,7 @@ class update {
 	
 	public static function getLastAvailableVersion() {
 		try {
-			$url = 'https://raw.githubusercontent.com/thierryzoller/core/' . config::byKey('core::branch', 'core', 'master') . '/core/config/version';
+			$url = 'https://raw.githubusercontent.com/thierryzoller/core/' . config::byKey('core::branch', 'core', 'release') . '/core/config/version';
 			$request_http = new com_http($url);
 			return trim($request_http->exec());
 		} catch (Exception $e) {
