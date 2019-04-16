@@ -252,10 +252,10 @@ class jeedom {
 		$value = shell_exec('sudo dmesg | grep "CRC error" | grep "mmcblk0" | grep "card status" | wc -l');
 		$value += shell_exec('sudo dmesg | grep "I/O error" | wc -l');
 		$return[] = array(
-			'name' => __('Erreur disque', __FILE__),
+			'name' => __('Erreur I/O', __FILE__),
 			'state' => ($value == 0),
 			'result' => $value,
-			'comment' => ($value == 0) ? '' : __('Il y a des erreurs disque, cela peut indiquer un soucis avec le disque ou un problème d\'alimentation', __FILE__),
+			'comment' => ($value == 0) ? '' : __('Il y a des erreurs I/O.', __FILE__),
 		);
 		
 		if ($values['SwapTotal'] != 0 && $values['SwapTotal'] !== null) {
@@ -1190,6 +1190,10 @@ class jeedom {
 		shell_exec(system::getCmdSudo() . 'service ntp stop;' . system::getCmdSudo() . 'ntpdate -s ' . config::byKey('ntp::optionalServer', 'core', '0.debian.pool.ntp.org') . ';' . system::getCmdSudo() . 'service ntp start');
 	}
 	
+	public static function resetGit() {
+		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
+	}
+	
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
@@ -1240,7 +1244,7 @@ class jeedom {
 			if (file_exists('/.dockerinit')) {
 				$result = 'docker';
 			} else if (file_exists('/usr/bin/raspi-config')) {
-				$result = 'rpi';
+				$result = 'LUX SmartHome Platform';
 			} else if (strpos($uname, 'cubox') !== false || strpos($uname, 'imx6') !== false || file_exists('/media/boot/multiboot/meson64_odroidc2.dtb.linux')) {
 				$result = 'miniplus';
 			}

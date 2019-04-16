@@ -250,6 +250,13 @@ try {
 		ajax::success(jeedom::forceSyncHour());
 	}
 	
+		
+	if (init('action') == 'resetGit') {
+		unautorizedInDemo();
+		ajax::success(jeedom::resetGit());
+	}
+	
+	
 	if (init('action') == 'saveCustom') {
 		unautorizedInDemo();
 		$path = __DIR__ . '/../../';

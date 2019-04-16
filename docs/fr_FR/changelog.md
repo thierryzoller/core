@@ -2,12 +2,27 @@
 Changelog
 =========
 
+3.3.21
+=====
+
+- Correction d'un bug ou l'affichage de l'heure pouvait dépasser 24h
+- Correction d'un bug sur la mise à jour des résumés en design
+- Correction d'un bug sur la gestion des niveaux d'alertes sur certains widgets lors de la mise à jour de la valeur
+- Correction de l'affichage des équipements désactivés sur certains plugins
+- Correction d'un bug lors de l'indication de changement de pile à Jeedom
+- Amélioration de l'affichage des logs lors de la mise à jour de Jeedom
+- Correction de bug lors de la mise à jour de variable (qui ne lançait pas toujours les scénarios ou ne déclenchait pas une mise à jour des commandes dans tous les cas)
+- Correction d'un bug sur les backups Cloud, ou duplicity ne s'installait pas correctement
+- Amélioration du TTS interne à Jeedom
+- Amélioration du système de vérification de syntaxe cron
+
+
 3.3.20
 =====
 
-- Correction d'un bug sur les scénario ou ceux-ci pouvez rester bloqués à "en cours" alors qu'ils sont désactivé
-- Correction d'un soucis de lancement de scénario non planifié
-- Correction de bug liée au fueseau horraire
+- Correction d'un bug sur les scénarios ou ceux-ci pouvaient rester bloqués à "en cours" alors qu'ils sont désactivés
+- Correction d'un souci de lancement de scénario non planifié
+- Correction de bug lié au fuseau horaire
 
 3.3.19
 =====
