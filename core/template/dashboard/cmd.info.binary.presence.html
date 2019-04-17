@@ -7,7 +7,7 @@
         jeedom.cmd.update['#id#'] = function(_options){
             $('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate)
             if (_options.display_value == '1') {
-               $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<i class="fa fa-check"></i>');
+               $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<i class="icon jeedom-mouvement2"></i>');
            }else {
             $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<i class="icon jeedom-mouvement"></i>');
         }
