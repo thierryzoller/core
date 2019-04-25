@@ -1280,7 +1280,7 @@ class jeedom {
 			if (file_exists('/.dockerinit')) {
 				$result = 'docker';
 			} else if (file_exists('/usr/bin/raspi-config')) {
-				$result = 'LUX SmartHome Platform';
+				$result = 'rpi';
 			} else if (strpos($uname, 'cubox') !== false || strpos($uname, 'imx6') !== false || file_exists('/media/boot/multiboot/meson64_odroidc2.dtb.linux')) {
 				$result = 'miniplus';
 			}
