@@ -6,6 +6,10 @@ Changelog
 =====
 
 - Correction d'un bug sur l'affichage du nombre de mise à jour
+- Suppression de l'édition du code html depuis la configuration avancée des commandes du à de trop nombreux bugs
+- Corrections de bugs
+- Amélioration de la fenetre de choix des icones
+- Mise à jour automatique de la date de changement de batterie si la baterrie est à plus de 90% et superieure de 10% à la valeur précedente
 
 3.3.22
 =====
