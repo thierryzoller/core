@@ -359,7 +359,7 @@ class repo_market {
 		return array_reverse($return);
 	}
 	
-	public static function backup_restore($_backup) {
+public static function backup_restore($_backup) {
 		$backup_dir = calculPath(config::byKey('backup::path'));
 		if (!file_exists($backup_dir)) {
 			mkdir($backup_dir, 0770, true);
