@@ -2,6 +2,13 @@
 Changelog
 =========
 
+3.3.26
+=====
+
+- Correction de bug
+- Correction d'un bug sur le multi-lancement de scénario
+- Correction d'un bug sur les alertes sur la valeur des commandes
+
 3.3.25
 =====
 
