@@ -40,7 +40,7 @@ class jeedom {
 			'theme_end_day_hour',
 			'theme_changeAccordingTime',
 			'mobile_theme_useAmbientLight',
-			'hideBackgroundImg',
+			'showBackgroundImg',
 			'widget::step::width',
 			'widget::step::height',
 			'widget::margin',
@@ -973,6 +973,7 @@ class jeedom {
 			report::clean();
 			DB::optimize();
 			cache::clean();
+			listener::clean();
 		} catch (Exception $e) {
 			log::add('jeedom', 'error', $e->getMessage());
 		} catch (Error $e) {
