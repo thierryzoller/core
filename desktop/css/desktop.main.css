@@ -1500,10 +1500,6 @@ textarea {
   padding-top: 0px !important;
 }
 
-.checkbox-inline {
-  margin-left: 5px;
-  margin-right: 5px !important;
-}
 .checkbox-inline > input[type=checkbox] {
   margin-top: -2px;
 }
@@ -1691,7 +1687,7 @@ ul.nav.nav-tabs li,
 }
 .nav-tabs > li > a {
   padding: 10px 6px;
-  
+
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:focus,
@@ -3091,43 +3087,6 @@ input:invalid {
   height: 100% !important;
 }
 
-.elfinder-dialog-title {
-  color: rgb(var(--bg-color)) !important;
-  font-weight: bold;
-}
-.elfinder-contextmenu-item {
-  color: var(--sc-formTxt-color) !important;
-  font-size: 14px;
-}
-
-
-.elfinder-cwd-wrapper {
-  color: var(--txt-color) !important;
-}
-.elfinder-cwd-view-list table {
-  background-color: var(--sc-formTxt-color)  !important;
-  color: var(--sc-lightTxt-color);
-}
-.elfinder-cwd-view-list table tbody.elfinder-cwd-fixheader tr:hover {
-  background-color: var(--placeholder-color)  !important;
-}
-.elfinder-cwd-view-list table tbody.elfinder-cwd-fixheader tr:nth-child(2n) {
-  background-color: var(--sc-formTxt-color)  !important;
-}
-.elfinder-cwd-view-list table tbody.elfinder-cwd-fixheader tr:nth-child(2n):hover {
-  background-color: var(--placeholder-color)  !important;
-}
-.elfinder-cwd-view-list table .elfinder-cwd-file.ui-selected,
-.elfinder-cwd-view-list table .elfinder-cwd-file.ui-selected:nth-child(2n) {
-  background-color: var(--placeholder-color) !important;
-}
-
-#elfinder,
-.ui-widget-content.elfinder-buttonset {
-  background-image: none !important;
-  background: none !important;
-}
-
 /* hihgly special */
 div[id^=__lpform_] { /*lastpass*/
   display: none;
@@ -3280,11 +3239,11 @@ ul.dropdown-menu {
   :root {
     --lineheight: 1.4em;
   }
-  
+
   body {
     font-size: 14px !important;
   }
-  
+
   [data-page="administration"] ul.nav-tabs.nav-primary li i:after {
     content:'';
     position:absolute;
@@ -3293,7 +3252,7 @@ ul.dropdown-menu {
     left:-4px;
     right:-4px;
   }
-  
+
   [data-page="administration"] ul.nav-tabs.nav-primary li a > span {
     display: none;
   }
@@ -3302,12 +3261,12 @@ ul.dropdown-menu {
     max-width: 60px;
     text-align: center;
   }
-  
+
   .btn,
   tbody > tr > td{
     font-size: 12px !important;
   }
-  
+
   .expression .col-xs-1 {
     width: 6.5em !important;
   }
@@ -3315,11 +3274,11 @@ ul.dropdown-menu {
     width: 55% !important;
     align-content: right !important;
   }
-  
+
   #div_editScenario ul.nav.nav-tabs {
     margin-top: 30px !important;
   }
-  
+
   .form-control,
   .btn,
   .label {
@@ -3365,5 +3324,5 @@ ul.dropdown-menu {
   .hidden-xs {
     display: none !important;
   }
-  
+
 }
