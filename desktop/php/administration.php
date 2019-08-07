@@ -224,6 +224,14 @@ user::isBan();
 							<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
 						</div>
+												</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-refresh"></i> {{enableWifi}}</a>
+						</div>
+												</div>
+							<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-refresh"></i> {{disableWifi}}</a>
+						</div>
 					</div>
 				</fieldset>
 			</form>
