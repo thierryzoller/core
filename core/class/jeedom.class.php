@@ -1237,6 +1237,20 @@ class jeedom {
 		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
 	}
 	
+	/* Adding enabling Wifi over Control Panel TZO 07082019 */
+
+	public static function enableWifi() {
+		shell_exec(system::getCmdSudo() . '/var/www/wifion.sh');
+		
+	}
+
+	public static function disableWifi() {
+		shell_exec(system::getCmdSudo() . '/var/www/wifioff.sh');
+	}
+	
+   /* ==================================== */
+		
+		
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
