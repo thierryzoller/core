@@ -126,19 +126,19 @@ $('#bt_resetGit').on('click', function () {
 
 $('#bt_enableWifi').on('click', function () {
     $.hideAlert();
-    jeedom.resetGit({
+    jeedom.enableWifi({
         error: function (error) {
             $('#div_alert').showAlert({message: error.message, level: 'danger'});
         },
         success: function (data) {
-            $('#div_alert').showAlert({message: '{{Success! You need to reboot in order to have Wifi enabled.}}', level: 'success'});
+            $('#div_alert').showAlert({message: '{{Success - You may need to reboot in order to have Wifi enabled.}}', level: 'success'});
         }
     });
 });
 
 $('#bt_disableWifi').on('click', function () {
     $.hideAlert();
-    jeedom.resetGit({
+    jeedom.disableWifi({
         error: function (error) {
             $('#div_alert').showAlert({message: error.message, level: 'danger'});
         },
