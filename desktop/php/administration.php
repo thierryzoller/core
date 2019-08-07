@@ -224,6 +224,7 @@ user::isBan();
 							<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
 						</div>
+<<<<<<< HEAD
 
 						<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-refresh"></i> {{enableWifi}}</a>
@@ -232,6 +233,8 @@ user::isBan();
 							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-refresh"></i> {{disableWifi}}</a>
 						</div>
 												</div>
+=======
+>>>>>>> parent of 5ced4ebdb... Wifi features
 					</div>
 				</fieldset>
 			</form>
