@@ -228,14 +228,14 @@ user::isBan();
 						
 						
 					<div class="form-group">
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable WiFi">{{Wireless LAN Settings}}</label>
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable WiFi">{{Wireless Access Point}}</label>
 						
 						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{enableWifi}}</a>
+							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi}}</a>
 						</div>
 						
 						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{disableWifi}}</a>
+							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi}}</a>
 						</div>
 					</div>
 
