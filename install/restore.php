@@ -14,6 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * CHANGES 
+ * - Adding decompression and decryption - Thierry ZOLLER / 08082019
  */
 
 if (php_sapi_name() != 'cli' || isset($_SERVER['REQUEST_METHOD']) || !isset($_SERVER['argc'])) {
@@ -64,7 +67,7 @@ try {
 		$backup = null;
 		$mtime = null;
 		foreach (scandir($backup_dir) as $file) {
-			if ($file != "." && $file != ".." && $file != ".htaccess" && strpos($file, '.tar.gz') !== false) {
+			if ($file != "." && $file != ".." && $file != ".htaccess" && strpos($file, '.7z') !== false) {
 				$s = stat($backup_dir . '/' . $file);
 				if ($backup === null || $mtime === null) {
 					$backup = $backup_dir . '/' . $file;
@@ -128,7 +131,21 @@ try {
 		$exclude .= ' --exclude="' . $folder . '"';
 	}
 	$rc = 0;
-	system('cd ' . $jeedom_dir . '; tar xfz "' . $backup . '" ' . $exclude);
+
+    $exclude7z = '';
+    foreach ($excludes as $folder) {
+        $exclude7z .= ' -xr!"' . $folder . '"';
+    }
+
+
+	/* Adding decompression */	
+	/*system('cd ' . $jeedom_dir . '; tar xfz "' . $backup . '" ' . $sexclude);*/
+	
+	system('cd ' . $jeedom_dir . '; 7z x \'-pRWEFSGDGEG\' "' . $backup . '" ' . $exclude7z . ' -aoa' );
+
+
+	/* Adding decompression */
+	
 	echo "OK\n";
 	if (!file_exists($jeedom_dir . "/DB_backup.sql")) {
 		throw new Exception('Impossible de trouver le fichier de la base de données de la sauvegarde : DB_backup.sql');

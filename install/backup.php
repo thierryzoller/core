@@ -14,6 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * CHANGES
+ * - 08082019 - Added 7z compression for better compression ratio and security.
  */
 
 if (php_sapi_name() != 'cli' || isset($_SERVER['REQUEST_METHOD']) || !isset($_SERVER['argc'])) {
@@ -75,6 +78,7 @@ try {
 	);
 	$jeedom_name = str_replace(array_keys($replace_name), $replace_name, config::byKey('name', 'core', 'Jeedom'));
 	$backup_name = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.tar.gz');
+	$backup_name2 = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.7z');
 
 	global $NO_PLUGIN_BACKUP;
 	if (!isset($NO_PLUGIN_BACKUP) || $NO_PLUGIN_BACKUP === false) {
@@ -147,15 +151,32 @@ try {
 		$excludes[] = config::byKey('recordDir', 'camera');
 	}
 
-	$exclude = '';
+	/*$exclude = '';
 	foreach ($excludes as $folder) {
 		$exclude .= ' --exclude="' . $folder . '"';
+	}*/
+	
+	$exclude7z = '';
+	foreach ($excludes as $folder) {
+		$exclude7z .= ' --xr!"' . $folder . '"';
 	}
-	system('cd ' . $jeedom_dir . ';tar cfz "' . $backup_dir . '/' . $backup_name . '" ' . $exclude . ' . > /dev/null');
-	echo "OK" . "\n";
+	
+	echo 'Chiffrement en cours...';
+	
+	/* Adding 7zip with Password and strong compression 08082019*/
+	
+	system('cd ' . $jeedom_dir . ';7z a \'-pRWEFSGDGEG\'"' . $backup_dir . '/' . $backup_name2 . '" ' . $exclude7z . );
+	echo "7z OK" . "\n";
 
-	if (!file_exists($backup_dir . '/' . $backup_name)) {
-		throw new Exception('Echec du backup. Impossible de trouver : ' . $backup_dir . '/' . $backup_name);
+    /* =========================================================*/
+	
+	/* system('cd ' . $jeedom_dir . ';tar cfz "' . $backup_dir . '/' . $backup_name . '" ' . $exclude . ' . > /dev/null');
+	echo "OK" . "\n";*/
+	
+
+	
+	if (!file_exists($backup_dir . '/' . $backup_name2)) {
+		throw new Exception('Echec du backup. Impossible de trouver : ' . $backup_dir . '/' . $backup_name2);
 	}
 
 	echo 'Nettoyage de l\'ancienne sauvegarde...';
@@ -233,7 +254,7 @@ try {
 			echo "OK" . "\n";
 		}
 	}
-	echo "Nom de la sauvegarde : " . $backup_dir . '/' . $backup_name . "\n";
+	echo "Nom de la sauvegarde : " . $backup_dir . '/' . $backup_name2 . "\n";
 
 	try {
 		echo 'Vérification des droits sur les fichiers...';

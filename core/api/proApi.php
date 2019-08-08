@@ -675,7 +675,7 @@ try {
 			}
 			$_file = $_FILES['file'];
 			$extension = strtolower(strrchr($_file['name'], '.'));
-			if (!in_array($extension, array('.tar.gz', '.gz', '.tar'))) {
+			if (!in_array($extension, array('7z','.tar.gz', '.gz', '.tar'))) {
 				throw new Exception(__('Extension du fichier non valide (autorisé .tar.gz, .tar et .gz) : ', __FILE__) . secureXSS($extension));
 			}
 			if (filesize($_file['tmp_name']) > 50000000) {
@@ -706,7 +706,7 @@ try {
 			}
 			$_file = $_FILES['file'];
 			$extension = strtolower(strrchr($_file['name'], '.'));
-			if (!in_array($extension, array('.tar.gz', '.gz', '.tar'))) {
+			if (!in_array($extension, array('7z','.tar.gz', '.gz', '.tar'))) {
 				throw new Exception(__('Extension du fichier non valide (autorisé .tar.gz, .tar et .gz) : ', __FILE__) . secureXSS($extension));
 			}
 			if (filesize($_file['tmp_name']) > 50000000) {
