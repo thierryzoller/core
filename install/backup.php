@@ -149,10 +149,7 @@ try {
 		$excludes[] = config::byKey('recordDir', 'camera');
 	}
 	
-	$exclude = '';
-	foreach ($excludes as $folder) {
-		$exclude .= ' --exclude="' . $folder . '"';
-	}*/
+	
 	
 	$exclude7z = '';
 	foreach ($excludes as $folder) {
