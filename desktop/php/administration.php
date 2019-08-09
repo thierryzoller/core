@@ -1701,7 +1701,7 @@ user::isBan();
 													<div class="col-lg-4 col-xs-6">
 														<select class="form-control configKey" data-l1key="core::branch">
 															<option value="master">{{Stable}}</option>
-															<option value="">{{Stable}}</option>
+															<option value="V4-release">{{LuxSmartHomev4}}</option>
 															
 															<!--<option value="release">{{Release (Pas de support)}}</option>
 															<option value="v4-release">{{V4 Release (Pas de support)}}</option>
