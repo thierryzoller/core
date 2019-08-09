@@ -10,7 +10,7 @@ $licenceText = file_get_contents('/var/www/html/desktop/modal/about.txt');
     <br/>
     <center>
       <a class="cursor" href="https://www.jeedom.com" target="_blank">
-        <img src="core/img/logo-jeedom-grand-nom-couleur.svg" style="position: relative; top:-5px;" height="50">
+        <img src="core/img/lsh.svg" style="position: relative; top:-5px;" height="50">
       </a><br>
       <br>
     </center>
@@ -20,7 +20,8 @@ $licenceText = file_get_contents('/var/www/html/desktop/modal/about.txt');
       </center>
       <center>
         <br>
-        <span>Jeedom SAS</span>
+        <span>Liit dei Lut elo SARLS</span>
+		<span>Jeedom SAS</span>
         <br><br>
       </center>
     </div>
