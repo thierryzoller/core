@@ -20,6 +20,8 @@ function jeedom() {
 jeedom.cache = [];
 jeedom.display = {};
 jeedom.connect = 0;
+jeedom.theme = {};
+jeedom.changes_timeout = null;
 
 if (!isset(jeedom.cache.getConfiguration)) {
   jeedom.cache.getConfiguration = null;
@@ -65,15 +67,14 @@ jeedom.changes = function(){
       if(object_summary_update.length > 0){
         $('body').trigger('jeeObject::summary::update',[object_summary_update]);
       }
-      
-      setTimeout(jeedom.changes, 1);
+      jeedom.changes_timeout = setTimeout(jeedom.changes, 1);
     },
     error: function(_error){
       if(typeof(user_id) != "undefined" && jeedom.connect == 100){
         notify('{{Erreur de connexion}}','{{Erreur lors de la connexion à Jeedom}} : '+_error.message);
       }
       jeedom.connect++;
-      setTimeout(jeedom.changes, 1);
+      jeedom.changes_timeout = setTimeout(jeedom.changes, 1);
     }
   };
   try {
@@ -165,10 +166,12 @@ jeedom.init = function () {
         $('#div_alert').showAlert({message: _options.message, level: _options.level});
       }
     }
-    
   });
   $('body').on('jeedom::alertPopup', function (_event,_message) {
     alert(_message);
+  });
+  $('body').on('jeedom::coloredIcons', function (_event,_state) {
+    $('body').attr('data-coloredIcons',_state);
   });
   $('body').on('message::refreshMessageNumber', function (_event,_options) {
     refreshMessageNumber();
@@ -739,6 +742,43 @@ jeedom.emptyRemoveHistory = function(_params) {
   $.ajax(paramsAJAX);
 };
 
+jeedom.version = function(_params) {
+  var paramsRequired = [];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/jeedom.ajax.php';
+  paramsAJAX.data = {
+    action: 'version'
+  };
+  $.ajax(paramsAJAX);
+};
+
+jeedom.removeImageIcon = function(_params) {
+  var paramsRequired = ['filename'];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/jeedom.ajax.php';
+  paramsAJAX.data = {
+    action: 'removeImageIcon',
+    filename : _params.filename
+  };
+  $.ajax(paramsAJAX);
+};
+
 jeedom.cleanFileSystemRight = function(_params) {
   var paramsRequired = [];
   var paramsSpecifics = {};
@@ -771,6 +811,24 @@ jeedom.consistency = function(_params) {
   paramsAJAX.url = 'core/ajax/jeedom.ajax.php';
   paramsAJAX.data = {
     action: 'consistency'
+  };
+  $.ajax(paramsAJAX);
+};
+
+jeedom.cleanDatabase = function(_params) {
+  var paramsRequired = [];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/jeedom.ajax.php';
+  paramsAJAX.data = {
+    action: 'cleanDatabase'
   };
   $.ajax(paramsAJAX);
 };

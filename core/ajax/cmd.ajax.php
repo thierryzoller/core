@@ -52,6 +52,20 @@ try {
 		}
 	}
 	
+	if (init('action') == 'setIsVisibles') {
+		unautorizedInDemo();
+		$cmds = json_decode(init('cmds'), true);
+		foreach ($cmds as $id) {
+			$cmd = cmd::byId($id);
+			if (!is_object($cmd)) {
+				throw new Exception(__('Cmd inconnu. Vérifiez l\'ID', __FILE__) . ' ' . $id);
+			}
+			$cmd->setIsVisible(init('isVisible'));
+			$cmd->save(true);
+		}
+		ajax::success();
+	}
+	
 	if (init('action') == 'execCmd') {
 		$cmd = cmd::byId(init('id'));
 		if (!is_object($cmd)) {
@@ -204,7 +218,7 @@ try {
 					continue;
 				}
 				utils::a2o($cmd, $cmd_ajax);
-				$cmd->save();
+				$cmd->save(true);
 			}
 			ajax::success();
 		}

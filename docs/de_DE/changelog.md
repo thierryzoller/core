@@ -8,7 +8,7 @@
 -   Möglichkeit, eine Variable zu löschen.
 -   3D-Anzeige hinzugefügt (beta)
 -   Überholung des Cloud-Backup-Systems (inkrementelles und verschlüsseltes Backup).
--    Integriertes Notizsystem hinzugefügt (in Analyse -> Notiz).
+-    Integriertes Notizsystem hinzugefügt (in Analyse -> Notiz).
 -   Der Begriff Tag wurde auf dem Gerät hinzugefügt (befindet sich in der erweiterten Konfiguration des Geräts).
 -   Ajout d'un système d'historique sur la suppression des commandes, équipements, objets, vue, design, design 3d, scénario et utilisateur.
 -   Ajout de l'action jeedom_reboot pour lancer un redémarrage de Jeedom.

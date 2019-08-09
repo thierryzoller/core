@@ -28,7 +28,7 @@ Here is the URL =
 [Http: // \ #IP \ _JEEDOM \ # / core / api / jeeApi.php apikey = \ #APIKEY \ # & type = scenario & id = \ #ID \ # & action = \ #ACTION \ #?] (Http: // # # IP_JEEDOM / core / api / jeeApi.php? apikey aPIKEY = # # & type = scenario & id = # ID # & action = ACTION # #)
 
 -   **id**: corresponds to the id of your scenario. The ID is on the
-    page of the scenario concerned, in "tools" → "Scenarios", once the
+    page du scénario concerné, dans "Outils" → "Scénarios", une fois le
     selected scenario, next to the name of the "General" tab. Other
     way to find it: in "Tools" → "Scenarios", click on
     "Overview".
@@ -39,7 +39,7 @@ Here is the URL =
     activate the scenario.
 
 -   **tags** \ [optional]: if the action is "start", you can pass
-    tags to the scenario (see the documentation on the scenarios) under
+    des tags au scénario (voir la documentation sur les scénarios) sous
     the form tags = foo% 3D1%20tata% 3D2 (note that% 20 corresponds to a
     space and% 3D to =)
 
@@ -52,18 +52,18 @@ Here is the URL =
 -   **id**: is the id of what you want to drive or which
     you want to receive information
 
-Le plus simple pour avoir cette URL est d’aller sur la page Outils →
-Résumé domotique, de chercher la commande puis d’ouvrir sa configuration
-avancée (l’icône "engrenage") et là, vous allez voir une URL qui contient
-déjà tout ce qu’il faut en fonction du type et du sous-type de la
-commande.
+The easiest way to get this URL is to go to the Tools page →
+Home Automation Summary, search for the command and open its configuration
+advanced (the "gear" icon) and there you will see a URL that contains
+already all that is needed depending on the type and subtype of the
+command.
 
 > **Note**
 >
-> Il est possible pour le champs \#ID\# de passer plusieurs commandes
-> d’un coup. Pour cela, il faut passer un tableau en json (ex
-> %5B12,58,23%5D, à noter que \[ et \] doivent être encodés d’où les %5B
-> et %5D). Le retour de Jeedom sera un json
+> It is possible for the \ #ID \ # field to pass several commands
+> all of a sudden. For that you have to pass a array in json (ex
+>% 5B12,58,23% 5D, note that \ [and \] must be encoded hence the% 5B
+> and% 5D). The return of Jeedom will be a json
 
 > **Note**
 >

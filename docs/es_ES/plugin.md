@@ -1,5 +1,5 @@
-El submenú Administración de Plugin permite manipular a los plugins
-a saber: descargar, actualizar y activar ...
+Le sous-menu Gestion des plugins permet de manipuler les plugins, à
+savoir : les télécharger, les mettre à jour et les activer,…​
 
 Plugin de gestión
 ===================
@@ -40,20 +40,20 @@ Arriba a la derecha, un par de botones:
 -   **Supprimer** : Supprime le plugin de votre Jeedom. Attention, cela
     También elimina de forma permanente todas las instalaciones de este plugin
 
-En dessous à gauche, on retrouve une zone état avec :
+Abajo a la izquierda, hay una zona estado con :
 
 -   ** ** Estado: muestra el estado del plugin (activo / inactivo)
 
 -   ** ** Versión: la versión del plug-in instalado
 
--   ** ** Autor: El autor del plugin
+-   **Auteur** : l’auteur du plugin
 
--   ** ** Acción: Activar o desactivar el plugin
+-   **Action** : Permet d’activer ou désactiver le plugin
 
--   ** ** jeedom Versión: Indica la versión del mínimo requerido Jeedom
-    para el plugin
+-   **Version jeedom** : Indique la version de Jeedom minimum requise
+    pour le plugin
 
--   ** ** Licencia: Indica la licencia plugin para ser generalmente
+-   **Licence** : Indique la licence du plugin qui sera généralement
     AGPL
 
 A droite, on retrouve la zone Log qui permet de définir 
@@ -83,7 +83,7 @@ Dépendances :
 -   **Dernière installation** : date de la dernière installation des
     dépendances
 
-Démon :
+Deamon : 
 
 -   **Nom** : généralement sera local
 

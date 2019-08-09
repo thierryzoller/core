@@ -39,6 +39,9 @@ $('#bt_configureCalculHistory').on('click',function(){
 });
 
 $('#bt_clearGraph').on('click',function(){
+  if (jeedom.history.chart['div_graph'] === undefined) {
+    return
+  }
   while(jeedom.history.chart['div_graph'].chart.series.length > 0){
     jeedom.history.chart['div_graph'].chart.series[0].remove(true);
   }
@@ -94,7 +97,7 @@ $(".li_history .export").on('click', function () {
   window.open('core/php/export.php?type=cmdHistory&id=' + $(this).closest('.li_history').attr('data-cmd_id'), "_blank", null);
 });
 
-$('#bt_openCmdHistoryConfigure').on('click',function(){
+$('#bt_openCmdHistoryConfigure, #bt_openCmdHistoryConfigure2').on('click',function(){
   $('#md_modal').dialog({title: "{{Configuration de l'historique des commandes}}"});
   $("#md_modal").load('index.php?v=d&modal=cmd.configureHistory').dialog('open');
 });
@@ -215,7 +218,7 @@ function initHistoryTrigger() {
 
 $('#bt_validChangeDate').on('click',function(){
   $(jeedom.history.chart['div_graph'].chart.series).each(function(i, serie){
-    if(!isNaN(serie.options.id)){
+    if(serie.options && !isNaN(serie.options.id)){
       var cmd_id = serie.options.id;
       addChart(cmd_id, 0);
       addChart(cmd_id, 1);
@@ -224,6 +227,7 @@ $('#bt_validChangeDate').on('click',function(){
 });
 
 function addChart(_cmd_id, _action,_options) {
+  
   if (_action == 0) {
     if (isset(jeedom.history.chart['div_graph']) && isset(jeedom.history.chart['div_graph'].chart) && isset(jeedom.history.chart['div_graph'].chart.series)) {
       $(jeedom.history.chart['div_graph'].chart.series).each(function(i, serie){
@@ -237,7 +241,7 @@ function addChart(_cmd_id, _action,_options) {
     }
     return;
   }
-  lastId = _cmd_id;
+  lastId = _cmd_id
   jeedom.history.drawChart({
     cmd_id: _cmd_id,
     el: 'div_graph',
@@ -270,30 +274,19 @@ function addChart(_cmd_id, _action,_options) {
 /**************TIMELINE********************/
 
 $('#bt_tabTimeline').on('click',function(){
-  $('#div_visualization').empty();
   displayTimeline();
 });
 
-$('#bt_configureTimelineCommand').on('click',function(){
-  $('#md_modal').dialog({title: "{{Configuration de l'historique des commandes}}"});
-  $("#md_modal").load('index.php?v=d&modal=cmd.configureHistory').dialog('open');
-});
-
-$('#bt_configureTimelineScenario').on('click',function(){
-  $('#md_modal').dialog({title: "{{Résumé scénario}}"});
-  $("#md_modal").load('index.php?v=d&modal=scenario.summary').dialog('open');
-});
-
-$('#div_visualization').on('click','.bt_scenarioLog',function(){
+$('#table_timeline').on('click','.bt_scenarioLog',function(){
   $('#md_modal').dialog({title: "{{Log d'exécution du scénario}}"});
   $("#md_modal").load('index.php?v=d&modal=scenario.log.execution&scenario_id=' + $(this).closest('.scenario').attr('data-id')).dialog('open');
 });
 
-$('#div_visualization').on('click','.bt_gotoScenario',function(){
+$('#table_timeline').on('click','.bt_gotoScenario',function(){
   loadPage('index.php?v=d&p=scenario&id='+ $(this).closest('.scenario').attr('data-id'));
 });
 
-$('#div_visualization').on('click','.bt_configureCmd',function(){
+$('#table_timeline').on('click','.bt_configureCmd',function(){
   $('#md_modal').dialog({title: "{{Configuration de la commande}}"});
   $('#md_modal').load('index.php?v=d&modal=cmd.configure&cmd_id=' + $(this).closest('.cmd').attr('data-id')).dialog('open');
 });
@@ -305,25 +298,47 @@ $('#bt_refreshTimeline').on('click',function(){
 function displayTimeline(){
   jeedom.getTimelineEvents({
     error: function (error) {
-      $('#div_alert').showAlert({message: error.message, level: 'danger'});
+      $('#div_alert').showAlert({message: error.message, level: 'danger'})
     },
     success: function (data) {
       data = data.reverse()
-      var tr = '';
+      var tr = ''
       for(var i in data){
-        tr += '<tr>';
-        tr += '<td>';
+        tr += '<tr>'
+        tr += '<td>'
         tr += data[i].date
-        tr += '</td>';
-        tr += '<td>';
+        tr += '</td>'
+        tr += '<td>'
         tr += data[i].type
-        tr += '</td>';
-        tr += '<td>';
+        tr += '</td>'
+        tr += '<td>'
         tr += data[i].html
-        tr += '</td>';
-        tr += '</tr>';
+        tr += '</td>'
+        tr += '</tr>'
       }
-      $('#table_timeline tbody').empty().append(tr).trigger('update');
+      $('#table_timeline tbody').empty().append(tr).trigger('update')
+      $('#table_timeline').on('sortEnd', function(){
+        sepDays()
+	  })
+      $('#timelinetab #table_timeline').find('th[data-column="0"]').trigger('sort').trigger('sort')
     }
   });
+}
+
+
+
+function sepDays() {
+  doIt = false
+  if ($('#table_timeline [data-column="0"]').is('[data-sortedby]')) doIt = true
+    
+  prevDate = ''
+  $('#table_timeline tbody tr').each(function() {
+    thisDate = $(this).text().substring(0,10)
+    if (doIt && thisDate != prevDate) {
+      $(this).style('border-top', '1px dotted var(--txt-color)', 'important')
+    } else {
+      $(this).removeAttr('style')
+    }
+    prevDate = thisDate
+  })
 }

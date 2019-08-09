@@ -85,19 +85,19 @@ Parámetros:
 API JSON Objet
 ==============
 
-object::all
+jeeObject::all
 -----------
 
 Devuelve una lista de todos los objetos
 
-object::full
+jeeObject::full
 ------------
 
 Devuelve una lista de todos los objetos, con cada objeto de todo
 instalaciones y equipos para cada uno de todos los mandos y la
 declaraciones de éstos (por comandos de información de tipo)
 
-object::fullById
+jeeObject::fullById
 ----------------
 
 Devuelve un objeto con todas sus instalaciones y equipos para cada
@@ -108,7 +108,7 @@ Parámetros:
 
 -   int id
 
-object::byId
+jeeObject::byId
 ------------
 
 Devuelve el objeto especificado
@@ -117,14 +117,14 @@ Parámetros:
 
 -   int id
 
-object::fullById
+jeeObject::fullById
 ----------------
 
 Devuelve un objeto, instalaciones y equipos para cada todo
 órdenes y las declaraciones de cellse que (para los comandos de tipo
 info)
 
-object::save
+jeeObject::save
 ------------
 
 Devuelve el objeto especificado
@@ -184,7 +184,7 @@ eqLogic::fullById
 Devuelve un equipo y sus controles y las declaraciones de éstos
 (Para los comandos de información de tipo)
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -193,7 +193,7 @@ eqLogic::byId
 
 Retourne l’équipement spécifié
 
-Paramètres:
+Parámetros: 
 
 -   int id
 
@@ -202,7 +202,7 @@ eqLogic::byType
 
 Retourne tous les équipements appartenant au type (plugin) spécifié
 
-Paramètres:
+Parámetros:
 
 -   string type
 
@@ -211,7 +211,7 @@ eqLogic::byObjectId
 
 Retourne tous les équipements appartenant à l’objet spécifié
 
-Paramètres:
+Parámetros:
 
 -   int object\_id
 
@@ -224,7 +224,7 @@ array(…​.)),'eqType2' ⇒array( 'id'⇒…​,'cmds' ⇒ array(…​.))…�
 array( 'id'⇒…​,'cmds' ⇒ array(…​.)),id2 ⇒ array( 'id'⇒…​,'cmds' ⇒
 array(…​.))..)
 
-Paramètres:
+Parámetros:
 
 -   string\[\] eqType = tableau des types d’équipements voulus
 
@@ -235,7 +235,7 @@ eqLogic::save
 
 Retourne l’équipement enregistré/créé
 
-Paramètres:
+Parámetros:
 
 -   int id (vide si c’est une création)
 
@@ -272,7 +272,7 @@ cmd::byId
 
 Retourne la commande spécifiée
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -281,7 +281,7 @@ cmd::byEqLogicId
 
 Retourne toutes les commandes appartenant à l’équipement spécifié
 
-Paramètres:
+Parámetros:
 
 -   int eqLogic\_id
 
@@ -290,7 +290,7 @@ cmd::execCmd
 
 Exécute la commande spécifiée
 
-Paramètres:
+Parámetros:
 
 -   int id : id d’une commande ou tableau d’id si vous voulez executer
     plusieurs commande d’un coup
@@ -304,7 +304,7 @@ cmd::getStatistique
 Retourne les statistiques sur la commande (ne marche que sur les
 commandes de type info et historisées)
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -318,7 +318,7 @@ cmd::getTendance
 Retourne la tendance sur la commande (ne marche que sur les commandes de
 type info et historisées)
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -332,7 +332,7 @@ cmd::getHistory
 Retourne l’historique de la commande (ne marche que sur les commandes de
 type info et historisées)
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -345,11 +345,11 @@ cmd::save
 
 Retourne l’objet spécifié
 
-Paramètres:
+Parámetros:
 
 -   int id (vide si c’est une création)
 
--   string name
+-   string name
 
 -   string logicalId
 
@@ -386,7 +386,7 @@ cmd::event
 
 Permet d'envoyer une valeur à une commande
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -407,7 +407,7 @@ scenario::byId
 
 Retourne le scénario spécifié
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -416,16 +416,16 @@ scenario::export
 
 Retourne l’export du scénario ainsi que le nom humain du scénario
 
-Paramètres:
+Parámetros:
 
 -   int id
 
-scenario::import
+scenario::import 
 ----------------
 
-Permet d’importer un scénario.
+Permite importar un escenario.
 
-Paramètres:
+Parámetros:
 
 -   int id : id du scénario dans lequel importer (vide si création)
 
@@ -436,9 +436,9 @@ Paramètres:
 scenario::changeState
 ---------------------
 
-Change l’état du scénario spécifié.
+Cambia el estado del escenario especificado.
 
-Paramètres:
+Parámetros:
 
 -   int id
 
@@ -450,9 +450,9 @@ API JSON Log
 log::get
 --------
 
-Permet de récuperer un log
+Permite recuperar un log
 
-Paramètres:
+Parámetros:
 
 -   string log : nom du log à recuperer
 
@@ -465,25 +465,25 @@ log::list
 
 Permet de récuperer la list des logs de Jeedom
 
-Paramètres:
+Parámetros:
 
 -   string filtre : (optionnel) filtre sur le nom des logs à recuperer
 
 log::empty
 ----------
 
-Permet de vider un log
+Permite vaciar un registro
 
-Paramètres:
+Parámetros:
 
 -   string log : nom du log à vider
 
 log::remove
 -----------
 
-Permet de supprimer un log
+Permite eliminar un registro
 
-Paramètres:
+Parámetros:
 
 -   string log : nom du log a supprimer
 
@@ -495,10 +495,10 @@ datastore::byTypeLinkIdKey
 
 Récupère la valeur d’une variable stockée dans le datastore
 
-Paramètres:
+Parámetros:
 
 -   string type : type de la valeur stockée (pour les scénarios
-    c’est scenario)
+    es escenario)
 
 -   id linkId : -1 pour le global (valeur pour les scénarios par défaut,
     ou l’id du scénario)
@@ -510,10 +510,10 @@ datastore::save
 
 Enregistre la valeur d’une variable dans le datastore
 
-Paramètres:
+Parámetros:
 
 -   string type : type de la valeur stockée (pour les scénarios
-    c’est scenario)
+    es escenario)
 
 -   id linkId : -1 pour le global (valeur pour les scénarios par défaut,
     ou l’id du scénario)
@@ -533,7 +533,7 @@ Retourne la liste de tous les messages
 message::removeAll
 ------------------
 
-Supprime tous les messages
+Borra todos los mensajes
 
 API JSON Interaction
 ====================
@@ -544,7 +544,7 @@ interact::tryToReply
 Essaie de faire correspondre une demande avec une interaction, exécute
 l’action et répond en conséquence
 
-Paramètres:
+Parámetros:
 
 -   query (phrase de la demande)
 
@@ -562,14 +562,14 @@ API JSON System
 jeedom::halt
 ------------
 
-Permet d’arrêter Jeedom
+Permite detener a Jeedom
 
 jeedom::reboot
 --------------
 
-Permet de redémarrer Jeedom
+Permite reiniciar a Jeedom
 
-jeedom::isOk
+jeedom::isok
 ------------
 
 Permet de savoir si l’état global de Jeedom est OK
@@ -579,7 +579,7 @@ jeedom::update
 
 Permet de lancer un update de Jeedom
 
-jeedom::backup
+jeedom::copia de seguridad
 --------------
 
 Permet de lancer un backup de Jeedom
@@ -597,7 +597,7 @@ plugin::install
 
 Installation/Mise à jour d’un plugin donné
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
@@ -606,7 +606,7 @@ plugin::remove
 
 Suppression d’un plugin donné
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
@@ -615,7 +615,7 @@ plugin::dependancyInfo
 
 Renvoi les informations sur le status des dépendances du plugins
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
@@ -624,7 +624,7 @@ plugin::dependancyInstall
 
 Force l’installation des dépendances du plugin
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
@@ -633,34 +633,34 @@ plugin::deamonInfo
 
 Renvoi les informations sur le status du démon du plugin
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
 plugin::deamonStart
 -------------------
 
-Force le démarrage du démon
+Forzar el inicio del deamon
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
 plugin::deamonStop
 ------------------
 
-Force l’arret du démon
+Forzar la parada del deamon
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
 plugin::deamonChangeAutoMode
 ----------------------------
 
-Change le mode de gestion du démon
+Cambiar el modo de gestión del daemon
 
-Paramètres:
+Parámetros:
 
 -   string plugin\_id : nom du plugin (nom logique)
 
@@ -696,14 +696,14 @@ Force le (re)démarrage du DNS Jeedom
 network::stopDns
 ----------------
 
-Force l’arret du DNS Jeedom
+Forzar la parada del DNS Jeedom
 
 network::dnsRun
 ---------------
 
-Renvoi le status du DNS Jeedom
+Devuelve el estado de DNS Jeedom
 
-API JSON Exemples
+API JSON Ejemplos
 =================
 
 Voici un exemple d’utilisation de l’API. Pour l’exemple ci-dessous
@@ -715,7 +715,7 @@ Récupération de la liste des objets :
 
 ``` {.php}
 $jsonrpc = new jsonrpcClient('#URL_JEEDOM#/core/api/jeeApi.php', #API_KEY#);
-if($jsonrpc->sendRequest('object::all', array())){
+if($jsonrpc->sendRequest('jeeObject::all', array())){
     print_r($jsonrpc->getResult());
 }else{
     echo $jsonrpc->getError();

@@ -8,15 +8,15 @@ Management
 
 It's easy to reach it, simply go to Tools -> Scenarios. You will find the list of scenarios in Jeedom and some features to manage them:
 
--   **Ajouter** : Permet de créer un scénario. La procédure est décrite
-    dans le chapitre suivant.
+-   **Add** : Allow to create a scenario. The procedure is described
+    in the following chapter.
 
--   **Désactiver scénarios** : Permet de désactiver tous les scénarios.
+-   **Disable Scenarios**: Allow to disables all scenarios.
 
--   **Voir variables** : Permet de voir les variables, leur valeur ainsi
-    que l’endroit où elle sont utilisées. Vous pouvez également y en
-    créer une. Les variables sont décrites dans un chapitre de
-    cette page.
+-   **View variables** : Allows you to see the variables, their value and
+    que l’endroit où elles sont utilisées. Vous pouvez également y en
+    create one. The variables are described in a chapter of
+    this page.
 
 -   **Vue d’ensemble** : Permet d’avoir une vue d’ensemble de tous
     les scénarios. Vous pouvez changer les valeurs **actif**,
@@ -25,7 +25,7 @@ It's easy to reach it, simply go to Tools -> Scenarios. You will find the list o
     Vous pouvez également accéder aux logs de chaque scénario et les
     démarrer individuellement.
 
--   **Testeur d’expression** : Permet d’executer un test sur une
+-   **Testeur d’expression** : Permet d’exécuter un test sur une
     expression de votre choix et d’en afficher le résultat.
 
 My scenarios
@@ -37,17 +37,14 @@ définis pour chacun d’eux. Chaque scénario est affiché avec son **nom**
 et son **objet parent**. Les **scénarios grisés** sont ceux qui sont
 désactivés.
 
-Comme dans de nombreuses pages de Jeedom, mettre la souris à gauche de
-l’écran permet de faire apparaître un menu d’accès rapide (à partir de
-votre profil, vous pouvez le laisser toujours visible). Vous pourrez
-alors **chercher**votre scénario, mais aussi en**ajouter** un par ce
-menu.
+La nouvelle barre de recherche vous permet de trouver facilement un scénario
+ou un ensemble de scénarios commençant par les même lettres.
 
 Edition of scenario
 ================
 
 Après avoir cliqué sur **Ajouter**, vous devez choisir le nom de votre
-scénario et vous êtes redirigés vers la page de ses paramètres généraux.
+scénario, vous êtes ensuite redirigé vers la page de ses paramètres généraux.
 En haut, on retrouve quelques fonctions utiles pour gérer notre scénario
 :
 
@@ -61,7 +58,7 @@ En haut, on retrouve quelques fonctions utiles pour gérer notre scénario
 
 -   **Exécuter** : Permet de lancer le scénario manuellement (N’oubliez
     pas de sauvegarder au préalable !). Les déclencheurs ne sont donc
-    pas pris en compte.
+    pas pris en compte. 
 
 -   **Supprimer** : Permet de supprimer le scénario.
 
@@ -79,6 +76,11 @@ En haut, on retrouve quelques fonctions utiles pour gérer notre scénario
 
 -   **Liens** : Permet de visualiser le graphique des éléments en lien
     avec le scénario.
+
+> **Tip**
+>
+> Un Ctrl+Click sur le bouton exécuter vous permet de sauvegarder, exécuter et afficher le log du scénario (si le niveau de log n'est pas sur Aucun)
+
 
 Onglet Général
 --------------
@@ -109,15 +111,16 @@ notre scénario :
 
 -   **Log** : Le type de log souhaité pour le scénario.
 
--   **Suivre dans la timeline** : Permet de garder un suivi du scénario
-    dans la timeline.
+-   **Timeline** : Permet de garder un suivi du scénario dans la timeline.
 
--   **Description** : Permet d’écrire un petit texte pour décrire
-    votre scénario.
+-   **Icone** : Permet de choisir une icone pour le scénario en lieu et place de l'icone standard.
+
+-   **Description** : Permet d’écrire un petit texte pour décrire votre scénario.
 
 -   **Mode du scénario** : Le scénario peut être programmé, déclenché ou
     les deux à la fois. Vous aurez ensuite le choix d’indiquer le(s)
     déclencheur(s) (attention, il y a une limite au nombre de déclencheurs possibles par scénario de 15) et la/les programmation(s).
+    En mode déclenché, des conditions peuvent à présent être saisies.
 
 > **Tip**
 >
@@ -134,6 +137,8 @@ créé, vous pourrez y ajouter un autre **bloc**ou une**action**.
 > **Tip**
 >
 > Dans les conditions et actions, il vaut mieux privilégier les guillemets simples (') au lieu des doubles (")
+>
+> Pour éviter la confirmation de suppression d'un bloc, faites Ctrl+Click 
 
 ### Les blocs
 
@@ -164,7 +169,7 @@ Voici les différents types de blocs disponibles :
 
 -   **Commentaire** : Permet d’ajouter des commentaires à son scénario.
 
-Chacun de ces blocs a ces options pour mieux les manipuler :
+Chacun de ces blocs a ses options pour mieux les manipuler :
 
 -   La case à cocher, à gauche, permet de désactiver complètement le
     bloc sans pour autant le supprimer.
@@ -173,6 +178,13 @@ Chacun de ces blocs a ces options pour mieux les manipuler :
     bloc par glisser/déposer.
 
 -   Le bouton, tout à droite, permet de supprimer le bloc entier.
+
+> **Tip**
+>
+> Possibilité de condenser les blocs.
+> L'action 'Ajouter bloc' bascule sur l'onglet Scénario si nécessaire.
+> Nouvelles fonctions copier/coller de bloc. Ctrl+Click sur coller remplace le bloc par le bloc copié.
+> Un nouveau bloc n'est plus ajouté à la fin du scénario, mais après le bloc où vous étiez avant de cliquer, déterminé par le dernier champ dans lequel vous aviez cliqué.
 
 #### Blocs Si/Alors/Sinon , Boucle, Dans et A
 
@@ -211,6 +223,10 @@ sélectionner un élément à tester :
 Une fois la condition renseignée, vous devez utiliser le bouton
 "ajouter", à gauche, afin d’ajouter un nouveau **bloc** ou une
 **action** dans le bloc actuel.
+
+> **Tip**
+>
+> Il ne faut SURTOUT PAS utiliser des [ ] dans les tests de condition, seules les parenthèses () sont possibles
 
 #### Bloc Code
 
@@ -252,6 +268,10 @@ Scénario :
 -   $scenario->removeData($key); : Supprime une donnée.
 -   $scenario->setLog($message); : Ecrit un message dans le log du scénario.
 -   $scenario->persistLog(); : Force l’écriture du log (sinon il est écrit seulement à la fin du scénario). Attention, ceci peut un peu ralentir le scénario.
+
+> **Tip**
+>
+> Ajout d'une fonction recherche dans le bloc Code : Rechercher : Ctrl + F puis Enter, Résultat suivant : Ctrl + G, Résultat précédent : Ctrl + Shift + G
 
 ### Les Actions
 
@@ -720,6 +740,8 @@ En plus des commandes domotiques, vous avez accès aux actions suivantes :
 -   **Evènement** (event) : Permet de pousser une valeur dans une commande de type information de manière arbitraire
 
 -   **Tag** (tag) : Permet d'ajouter/modifier un tag (le tag n'existe que pendant l'exécution en cours du scénario à la difference des variables qui survivent à la fin du scénario)
+
+- **Coloration des icones du dashboard** (setColoredIcon) : permet d'activer ou non la coloration des icones sur le dashboard
 
 Template de scénario
 ====================
