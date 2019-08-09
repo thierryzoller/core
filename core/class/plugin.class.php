@@ -151,17 +151,6 @@ class plugin {
 		}
 	}
 	
-	public static function forceDisablePlugin($_id){
-		config::save('active', 0, $_id);
-		$values = array(
-			'eqType_name' => $_id,
-		);
-		$sql = 'UPDATE eqLogic
-		SET isEnable=0
-		WHERE eqType_name=:eqType_name';
-		DB::Prepare($sql, $values);
-	}
-	
 	public static function listPlugin($_activateOnly = false, $_orderByCaterogy = false, $_translate = true, $_nameOnly = false) {
 		$listPlugin = array();
 		if ($_activateOnly) {
