@@ -161,6 +161,7 @@ try {
 	/* Adding 7zip with Password and strong compression 08082019*/
 	
 	system('cd ' . $jeedom_dir . ';7z a \'-pRWEFSGDGEG\' "' . $backup_dir . '/' . $backup_name2 . '" ' . $exclude7z);
+
 	echo "7z OK" . "\n";
     /* =========================================================*/
 	
