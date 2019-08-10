@@ -32,7 +32,10 @@ user::isBan();
 	
 	<ul class="nav nav-tabs nav-primary" role="tablist">
 		<li role="presentation" class="active"><a href="#generaltab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-wrench" title="{{Général}}"></i><span> {{Général}}</span></a></li>
-		<li role="presentation"><a href="#interfacetab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-laptop" title="{{Interface}}"></i><span> {{Interface}}</span></a></li>
+	    <!-- CHANGES -->
+		<li role="presentation"><a href="#luxsmarthome" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-wrench" title="{{LUX Smart Home}}"></i><span> {{LUX Smart Home}}</span></a></li>
+	    <!-- ====== -->		
+     	<li role="presentation"><a href="#interfacetab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-laptop" title="{{Interface}}"></i><span> {{Interface}}</span></a></li>
 		<li role="presentation"><a href="#networktab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-rss" title="{{Réseaux}}"></i><span> {{Réseaux}}</span></a></li>
 		<li role="presentation"><a href="#logtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="far fa-file" title="{{Logs}}"></i><span> {{Logs}}</span></a></li>
 		<li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="icon divers-table29" title="{{Commandes}}"></i><span> {{Commandes}}</span></a></li>
@@ -48,6 +51,25 @@ user::isBan();
 		<li role="presentation"><a href="#ostab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-terminal" title="{{OS/DB}}"></i><span> {{OS/DB}}</span></a></li>
 	</ul>
 	<div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
+	
+	<div role="tabpanel" class="tab-pane active" id="luxsmarthome">
+	<br/>
+	<form class="form-horizontal">
+	<fieldset>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
+						</div>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+	</div>
 		<div role="tabpanel" class="tab-pane active" id="generaltab">
 			<br/>
 			<form class="form-horizontal">
@@ -218,17 +240,7 @@ user::isBan();
 						</div>
 						
 						
-					<div class="form-group">
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
-						</div>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
-						</div>
-					</div>
+
 					<hr class="hrPrimary">
 					<div class="form-group">
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Système}}
