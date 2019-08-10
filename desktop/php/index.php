@@ -431,7 +431,7 @@ function setTheme() {
 					<div class="container-fluid">
 						<div class="navbar-header">
 							<a class="navbar-brand" href="<?php echo $homeLink; ?>">
-								<img src="core/img/logo-jeedom-grand-nom-couleur.svg" height="30" style="position: relative; top:-5px;"/>
+								<img src="core/img/lsh.svg" height="30" style="position: relative; top:-5px;"/>
 							</a>
 							<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
 								<span class="sr-only">{{Toggle navigation}}</span>
