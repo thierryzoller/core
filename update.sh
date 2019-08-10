@@ -14,6 +14,6 @@ sudo chown -R www-data:www-data /var/www/html >> /var/www/html/log/gitreset.log
 sudo chmod +x update.sh >> /var/www/html/log/gitreset.log
 sudo chmod +x wifion.sh >> /var/www/html/log/gitreset.log
 sudo chmod +x wifioff.sh >> /var/www/html/log/gitreset.log
-echo "\n" >> /var/www/html/log/gitreset.log
-echo - Finished. >> /var/www/html/log/gitreset.log
+echo "\n\n" >> /var/www/html/log/gitreset.log
+echo Finished. >> /var/www/html/log/gitreset.log
 echo ==================================== >> /var/www/html/log/gitreset.log
