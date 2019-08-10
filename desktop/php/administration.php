@@ -57,10 +57,12 @@ user::isBan();
 	<form class="form-horizontal">
 	<fieldset>
 					<div class="form-group">
+								<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
+
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 						
 						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
+							<a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
 						</div>
 						
 						<div class="col-lg-3 col-md-3 col-sm-3">
@@ -71,7 +73,7 @@ user::isBan();
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
 										
 						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i>{{Reset Update}}</a>
+							<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
 						</div>
 						
 					</div>
