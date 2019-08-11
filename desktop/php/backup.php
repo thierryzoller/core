@@ -69,7 +69,7 @@ echo '</script>';
 					<hr class="hrPrimary">
 				</fieldset>
 			</form>
-			<?php/*
+			<?php
 			foreach (update::listRepo() as $rkey => $value) {
 				if ($value['scope']['backup'] == false) {
 					continue;
@@ -111,7 +111,7 @@ echo '</script>';
 				echo '</fieldset>';
 				echo '</form>';
 			}
-			?> */
+			?>
 		</div>
 		<div class="col-sm-6">
 			<legend><i class="fas fa-info-circle"></i>  {{Informations}}</legend>
