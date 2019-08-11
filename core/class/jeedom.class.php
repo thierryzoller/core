@@ -1265,18 +1265,18 @@ class jeedom {
 	}
 	
 	public static function resetGit() {
-		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/update.sh');
 	}
 	
 	/* Adding enabling Wifi over Control Panel TZO 07082019 */
 
 	public static function enableWifi() {
-		shell_exec(system::getCmdSudo() . '/var/www/wifion.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/wifion.sh');
 		
 	}
 
 	public static function disableWifi() {
-		shell_exec(system::getCmdSudo() . '/var/www/wifioff.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/wifioff.sh');
 	}
 	
    /* ==================================== */
