@@ -47,7 +47,8 @@ user::isBan();
 
 <div role="tabpanel" class="tab-pane" id="luxsmarthome">
 	<br/>
-	<form class="form-horizontal">
+
+<form class="form-horizontal">
 	<fieldset>
 
 <div class="form-group">
@@ -84,13 +85,14 @@ if (!$status){
 	</div>
 </div>					
 
-<legend><i class="fas fa-first-aid"></i> {{Recovery}}</legend>
+
 
 <div class="form-group">
+<legend><i class="fas fa-first-aid"></i> {{Recovery}}</legend>
     <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
-		<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
+	<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
 		<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
-		</div>
+	</div>
 </div>
 
 </fieldset>
