@@ -57,7 +57,7 @@ $status = shell_exec('sudo ifconfig | grep wlan0');
 if (!$status){
     echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
 	echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>';
-else {
+} else {
     echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
     echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>';
 }
