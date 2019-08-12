@@ -56,7 +56,7 @@ user::isBan();
 
 <legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
 
-<label class="col-lg-1 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
+<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 
 
 <?php
@@ -86,8 +86,8 @@ if (!$status){
 	</div>					
 
 <div class="form-group">
-	<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
-		<div class="col-lg-3 col-md-3 col-sm-3 col-sm-4 col-xs-6">
+    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
+		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
 		<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
 		</div>
 		</div>
