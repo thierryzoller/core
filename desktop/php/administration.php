@@ -47,64 +47,45 @@ user::isBan();
 	<br/>
 	<form class="form-horizontal">
 	<fieldset>
-					<div class="form-group">
-								<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
-
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
-						</div>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
-						</div>
-					</div>
-					
-<!--  CHANGES 12082019 ZOLLER -->					
-						<div class="form-group">
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Connect to Wireless Access Point">{{Step by Step process to use your existing Access Point}}</label>
-						<!--<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Scan for Access Points">{{Scan Wireless Access Points then REFRESH the page}}</label>-->
-
-
-<div class="col-lg-3 col-md-3 col-sm-3">				
+<!--  CHANGES 12082019 ZOLLER -->			
+<div class="form-group">
+	<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
+	<legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
+    <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 <?php
 $status = shell_exec('sudo ifconfig | grep wlan0');
 if (!$status){
-    echo 'Wifi is currently <b>disabled</b>, please enable Wifi.';
-	echo '<a class="btn btn-primary form-control" id="bt_scanWifi" disabled><i class="fas fa-check"></i> {{Scan for Access Points}}</a></div><div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" disabled id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div></div>';
-}
+    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
+	echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>'
 else {
-	echo '<a class="btn btn-primary form-control" id="bt_scanWifi"><i class="fas fa-check"></i> {{Scan for Access Points}}</a></div><div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div></div>';
+    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
+    echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>'
 }
 ?>
+</div>
 
-
+					
+<div class="form-group">
+    <div class="col-lg-3 col-md-3">				
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{Nom/SSID de votre Access Point}} <?php echo config::byKey('product_name'); ?></label>
-						
-						<?php #config::save('SSID',WOLLEK12a); ?>
-						<?php #echo config::byKey('SSID'); ?>
-						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
-							<input type="text" class="configKey form-control" data-l1key="name" />
-							<input type="text" class="configKey form-control" data-l1key="SSID2" />
-						</div>
-						
-
 	
-			
-					
-					
-					<div class="form-group">
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
-										
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
-						</div>
-						
-					</div>
-				</fieldset>
-			</form>
+	<div class="col-lg-2 col-md-3 ">
+		<input type="text" class="configKey form-control" data-l1key="SSID" />
 	</div>
+	
+	<div class="col-lg-2 col-md-3">
+		<input type="text" class="configKey form-control" data-l1key="Password" />
+	</div>
+						
+    <div class="form-group">
+		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
+		<div class="col-lg-3 col-md-3 col-sm-3">
+			<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
+	</div>
+	</div>
+</fieldset>
+</form>
+</div>
 	
 		<div role="tabpanel" class="tab-pane active" id="generaltab">
 			<br/>
