@@ -67,7 +67,7 @@ if (!$status){
 					
 <div class="form-group">
     <div class="col-lg-3 col-md-3">				
-		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{Nom/SSID de votre Access Point}} <?php echo config::byKey('product_name'); ?></label>
+		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{SSID / MTP}} <?php echo config::byKey('product_name'); ?></label>
 	
 	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 		<input type="text" class="configKey form-control" data-l1key="SSID" />
@@ -79,7 +79,7 @@ if (!$status){
 						
     <div class="form-group">
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
-		<div class="col-lg-3 col-md-3 col-sm-3">
+		<div class="col-lg-3 col-md-3 col-sm-3 col-sm-4 col-xs-6">
 			<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
 		</div>
 		</div>
