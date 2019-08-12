@@ -61,7 +61,7 @@ user::isBan();
 						</div>
 					</div>
 					
-					
+<!--  CHANGES 12082019 ZOLLER -->					
 						<div class="form-group">
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Connect to Wireless Access Point">{{Step by Step process to use your existing Access Point}}</label>
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Scan for Access Points">{{Scan Wireless Access Points then REFRESH the page}}</label>
@@ -79,8 +79,15 @@ else {
 }
 ?>
 
+
+		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{Nom/SSID de votre point daccess}} <?php echo config::byKey('product_sda,,test'); ?></label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="name" />
+						</div>
+						
+
 	
-					
+			
 					
 					
 					<div class="form-group">
