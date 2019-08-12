@@ -18,6 +18,10 @@ user::isBan();
 <div id="config">
 	<ul class="nav nav-tabs nav-primary" role="tablist">
 		<li role="presentation" class="active"><a href="#generaltab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-wrench"></i> {{Général}}</a></li>
+			    <!-- CHANGES -->
+		<li role="presentation"><a href="#luxsmarthome" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-wrench" title="{{LUX Smart Home}}"></i><span> {{LUX Smart Home}}</span></a></li>
+	    <!-- ====== -->	
+		
 		<li role="presentation"><a href="#apitab" aria-controls="profile" role="tab" data-toggle="tab" style="padding:10px 5px !important"><i class="fas fa-key"></i> {{API}}</a></li>
 		<li role="presentation"><a href="#ostab" aria-controls="profile" role="tab" data-toggle="tab" style="padding:10px 5px !important"><i class="fas fa-terminal"></i> {{OS/DB}}</a></li>
 		<li role="presentation"><a href="#securitytab" aria-controls="profile" role="tab" data-toggle="tab" style="padding:10px 5px !important"><i class="fas fa-shield-alt"></i> {{Securité}}</a></li>
@@ -34,7 +38,40 @@ user::isBan();
 		<li role="presentation"><a href="#updatetab" aria-controls="profile" role="tab" data-toggle="tab" style="padding:10px 5px !important"><i class="fas fa-credit-card"></i> {{Mises à jour}}</a></li>
 	</ul>
 	<div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
+	
+	
+	
 		<br/><a class="btn btn-success pull-right" id="bt_saveGeneraleConfig"><i class="far fa-check-circle"></i> {{Sauvegarder}}</a><br/>
+		
+		<div role="tabpanel" class="tab-pane" id="luxsmarthome">
+	<br/>
+	<form class="form-horizontal">
+	<fieldset>
+					<div class="form-group">
+								<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
+
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
+						</div>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
+										
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
+						</div>
+						
+					</div>
+				</fieldset>
+			</form>
+	</div>
+	
 		<div role="tabpanel" class="tab-pane active" id="generaltab">
 			<br/>
 			<form class="form-horizontal">
