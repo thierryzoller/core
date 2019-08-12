@@ -56,24 +56,24 @@ user::isBan();
 
 <legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
 
-<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
+<label class="col-lg-1 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 
 
 <?php
 $status = shell_exec('sudo ifconfig | grep wlan0');
 if (!$status){
-    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
-	echo '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>';
+    echo '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6"><span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
+	echo '<a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>';
 } else {
-    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
-    echo '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>';
+    echo '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
+    echo '<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>';
 }
 ?>
 </div>
 
 					
 <div class="form-group">
-    <div class="col-lg-3 col-md-3">				
+    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">			
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{SSID / MTP}} <?php echo config::byKey('product_name'); ?></label>
 	
 	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
