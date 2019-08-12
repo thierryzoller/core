@@ -82,8 +82,7 @@ else {
 
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{Nom/SSID de votre Access Point}} <?php echo config::byKey('product_nme,,"bla"'); ?></label>
 						
-						<?php config::save('SSID,BLA'); ?>
-						<?php config::save('SSID','BLA'); ?>
+						<?php config::save('SSID',BLA); ?>
 						
 						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 							<input type="text" class="configKey form-control" data-l1key="name" />
