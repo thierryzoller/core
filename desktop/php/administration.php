@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
@@ -56,14 +53,14 @@ user::isBan();
 	<legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
     <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 <?php
-#$status = shell_exec('sudo ifconfig | grep wlan0');
-#if (!$status){
-#    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
-#	echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>'
-#else {
-#    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
-#    echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>'
-#}
+$status = shell_exec('sudo ifconfig | grep wlan0');
+if (!$status){
+    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span>';
+	echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>';
+else {
+    echo '	<span class="label label-info" style="font-size : 1em;">Wifi is currently <b>enabled</b></span>';
+    echo '<div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div>';
+}
 ?>
 </div>
 
@@ -72,11 +69,11 @@ user::isBan();
     <div class="col-lg-3 col-md-3">				
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{Nom/SSID de votre Access Point}} <?php echo config::byKey('product_name'); ?></label>
 	
-	<div class="col-lg-2 col-md-3 ">
+	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 		<input type="text" class="configKey form-control" data-l1key="SSID" />
 	</div>
 	
-	<div class="col-lg-2 col-md-3">
+	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 		<input type="text" class="configKey form-control" data-l1key="Password" />
 	</div>
 						
@@ -84,8 +81,8 @@ user::isBan();
 		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
 		<div class="col-lg-3 col-md-3 col-sm-3">
 			<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
-	</div>
-	</div>
+		</div>
+		</div>
 </fieldset>
 </form>
 </div>
