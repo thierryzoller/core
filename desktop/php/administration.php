@@ -84,6 +84,8 @@ if (!$status){
 	</div>
 </div>					
 
+<legend><i class="fas fa-first-aid"</i> {{Recovery}}</legend>
+
 <div class="form-group">
     <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
 		<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
