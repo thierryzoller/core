@@ -73,24 +73,24 @@ if (!$status){
 
 					
 <div class="form-group">
-    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">			
-		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{SSID / MTP}}></label>
+	<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Nom/SSID de votre Access Point)}}">{{SSID / MTP}}></label>
 	
 	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 		<input type="text" class="configKey form-control" data-l1key="SSID" />
 	</div>
 	
-	<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+	<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
 		<input type="text" class="configKey form-control" data-l1key="Password" />
 	</div>
-	</div>					
+</div>					
 
 <div class="form-group">
-    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
-		<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
+    <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
+		<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
 		<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
 		</div>
-		</div>
+</div>
+
 </fieldset>
 </form>
 </div>
