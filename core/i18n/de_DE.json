@@ -2823,11 +2823,11 @@
     "desktop/modal/object.summary.php": {
         "ID": "ID",
         "Objet": "Objekt",
-        "Père": "Vater",
+        "Père": "Haupt Gerät",
         "Visible": "Sichtbar",
         "Masqué": "Versteckt",
-        "Résumé Défini": "Zusammenfassung definiert",
-        "Résumé Dashboard Masqué": "Armaturenbrett Zusammenfassung, veresteckte",
+        "Résumé Défini": "Zusammenfassung",
+        "Résumé Dashboard Masqué": "Dashboard versteckt",
         "Résumé Mobile Masqué": "Mobil Zusammenfassung, versteckte",
         "Oui": "Ja",
         "Non": "Nein"

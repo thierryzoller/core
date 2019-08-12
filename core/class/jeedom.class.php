@@ -1237,6 +1237,7 @@ class jeedom {
 		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
 	}
 	
+
 	/* Adding enabling Wifi over Control Panel TZO 07082019 */
 
 	public static function enableWifi() {
@@ -1250,7 +1251,7 @@ class jeedom {
 	
    /* ==================================== */
 		
-		
+
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
@@ -1301,7 +1302,7 @@ class jeedom {
 			if (file_exists('/.dockerinit')) {
 				$result = 'docker';
 			} else if (file_exists('/usr/bin/raspi-config')) {
-				$result = 'rpi';
+				$result = 'LUX SmartHome Platform';
 			} else if (strpos($uname, 'cubox') !== false || strpos($uname, 'imx6') !== false || file_exists('/media/boot/multiboot/meson64_odroidc2.dtb.linux')) {
 				$result = 'miniplus';
 			}
