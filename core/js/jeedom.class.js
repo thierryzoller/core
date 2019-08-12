@@ -409,6 +409,7 @@ jeedom.resetGit = function (_params) {
   $.ajax(paramsAJAX);
 };
 
+
 jeedom.enableWifi = function (_params) {
   var paramsRequired = [];
   var paramsSpecifics = {};
@@ -445,6 +446,7 @@ jeedom.disableWifi = function (_params) {
   };
   $.ajax(paramsAJAX);
 };
+
 
 
 jeedom.getCronSelectModal = function(_options,_callback) {

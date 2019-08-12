@@ -148,6 +148,7 @@ $('#bt_disableWifi').on('click', function () {
     });
 });
 
+
 $('#bt_restartDns').on('click', function () {
    $.hideAlert();
    jeedom.config.save({

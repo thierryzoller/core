@@ -256,6 +256,7 @@ try {
 		ajax::success(jeedom::resetGit());
 	}
 	
+
 	if (init('action') == 'enableWifi') {
 		unautorizedInDemo();
 		ajax::success(jeedom::enableWifi());
@@ -265,6 +266,7 @@ try {
 		unautorizedInDemo();
 		ajax::success(jeedom::disableWifi());
 	}
+
 	
 	if (init('action') == 'saveCustom') {
 		unautorizedInDemo();

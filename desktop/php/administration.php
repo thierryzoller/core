@@ -224,6 +224,7 @@ user::isBan();
 							<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
 						</div>
+
 						</div>
 						
 						
@@ -237,6 +238,7 @@ user::isBan();
 						<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
 						</div>
+
 					</div>
 
 				</fieldset>
