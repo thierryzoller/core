@@ -14,6 +14,7 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 jeedom.cmd = function() {};
+jeedom.cmd.disableExecute = false;
 jeedom.cmd.cache = Array();
 if (!isset(jeedom.cmd.cache.byId)) {
   jeedom.cmd.cache.byId = Array();
@@ -25,6 +26,9 @@ if (!isset(jeedom.cmd.update)) {
   jeedom.cmd.update = Array();
 }
 jeedom.cmd.execute = function(_params) {
+  if(jeedom.cmd.disableExecute){
+    return;
+  }
   var notify = _params.notify || true;
   if (notify) {
     var eqLogic = $('.cmd[data-cmd_id=' + _params.id + ']').closest('.eqLogic');
@@ -332,7 +336,8 @@ jeedom.cmd.refreshByEqLogic = function(_params) {
   var cmds = $('.cmd[data-eqLogic_id=' + _params.eqLogic_id + ']');
   if(cmds.length > 0){
     $(cmds).each(function(){
-      if($(this).closest('.eqLogic[data-eqLogic_id='+ _params.eqLogic_id+']').html() != undefined){
+      var cmd = $(this);
+      if(cmd.closest('.eqLogic[data-eqLogic_id='+ _params.eqLogic_id+']').html() != undefined){
         return true;
       }
       jeedom.cmd.toHtml({
@@ -340,7 +345,13 @@ jeedom.cmd.refreshByEqLogic = function(_params) {
         id : $(this).attr('data-cmd_id'),
         version : $(this).attr('data-version'),
         success : function(data){
-          $('.cmd[data-cmd_id=' + data.id + ']').replaceWith(data.html);
+          var html = $(data.html);
+          var uid = html.attr('data-cmd_uid');
+          if(uid != 'undefined'){
+            cmd.attr('data-cmd_uid',uid);
+          }
+          cmd.empty().html(html.children());
+          cmd.attr("class", html.attr("class"));
         }
       })
     });
@@ -790,43 +801,37 @@ jeedom.cmd.displayActionsOption = function(_params) {
 };
 
 jeedom.cmd.normalizeName = function(_tagname) {
-  var arrayOn = ['on', 'marche', 'go', 'lock'];
-  var arrayOff = ['off', 'arret', 'arrêt', 'stop', 'unlock'];
-  var name = $.trim(_tagname.toLowerCase().replace('<br/>','').replace('<br>',''));
-  if (arrayOn.indexOf(name) >= 0) {
-    return 'on';
-  } else if (arrayOff.indexOf(name) >= 0) {
-    return 'off';
+  cmdName = _tagname.toLowerCase().trim()
+  var cmdTests = []
+  var cmdType = null
+  var cmdList = {
+    'on':'on',
+    'off':'off',
+    'monter':'on',
+    'descendre':'off',
+    'ouvrir':'on',
+    'ouvrirStop':'on',
+    'ouvert':'on',
+    'fermer':'off',
+    'activer':'on',
+    'desactiver':'off',
+    'désactiver':'off',
+    'lock':'on',
+    'unlock':'off',
+    'marche':'on',
+    'arret':'off',
+    'arrêt':'off',
+    'stop':'off',
+    'go':'on'
   }
-  if (name.indexOf("lock") == 0) {
-    return 'on';
+  var cmdTestsList = [' ', '-', '_']
+  for(var i in cmdTestsList){
+    cmdTests = cmdTests.concat(cmdName.split(cmdTestsList[i]))
   }
-  if (name.indexOf("unlock") == 0) {
-    return 'off';
-  }
-  if (name.indexOf("descendre") == 0) {
-    return 'off';
-  }
-  if (name.indexOf("on") != -1) {
-    return 'on';
-  }
-  if (name.indexOf("off") != -1) {
-    return 'off';
-  }
-  if (name.indexOf("désactiver") != -1) {
-    return 'off';
-  }
-  if (name.indexOf("desactiver") != -1) {
-    return 'off';
-  }
-  if (name.indexOf("activer") != -1) {
-    return 'on';
-  }
-  if (name.indexOf("ouvrir") != -1) {
-    return 'ouvrir';
-  }
-  if (name.indexOf("fermer") != -1) {
-    return 'fermer';
+  for(var j in cmdTests){
+    if(cmdList[cmdTests[j]]){
+      return cmdList[cmdTests[j]];
+    }
   }
   return _tagname;
 }

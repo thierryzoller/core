@@ -36,7 +36,6 @@ class cmd {
 	protected $configuration;
 	protected $template;
 	protected $display;
-	protected $html;
 	protected $value = null;
 	protected $isVisible = 1;
 	protected $alert;
@@ -305,7 +304,9 @@ class cmd {
 			'value' => $_value,
 			'search' => '%#' . $_value . '#%',
 		);
-		
+		if(strpos($_value,'variable(') !== false){
+			$values['search'] = '%#' . $_value . '%';
+		}
 		if ($_onlyEnable) {
 			$sql = 'SELECT ' . DB::buildField(__CLASS__, 'c') . '
 			FROM cmd c
@@ -830,9 +831,12 @@ class cmd {
 		if ($this->getEqType() == '') {
 			$this->setEqType($this->getEqLogic()->getEqType_name());
 		}
-		if ($this->getDisplay('generic_type') !== '' && $this->getGeneric_type() == '') {
+		if ($this->getDisplay('generic_type') != '' && $this->getGeneric_type() == '') {
 			$this->setGeneric_type($this->getDisplay('generic_type'));
-			$this->setDisplay('generic_type', '');
+			$this->setDisplay('generic_type', null);
+		}
+		if($this->getType() == 'action' && $this->getIsHistorized() == 1){
+			$this->setIsHistorized(0);
 		}
 		DB::save($this);
 		if ($this->_needRefreshWidget) {
@@ -1021,9 +1025,6 @@ class cmd {
 	
 	public function getWidgetTemplateCode($_version = 'dashboard', $_noCustom = false) {
 		$version = jeedom::versionAlias($_version);
-		if (!$_noCustom && $this->getHtml('enable', 0) == 1 && $this->getHtml($_version) != '') {
-			return $this->getHtml($_version);
-		}
 		$template_name = 'cmd.' . $this->getType() . '.' . $this->getSubType() . '.' . $this->getTemplate($version, 'default');
 		$template = '';
 		if (!isset(self::$_templateArray[$version . '::' . $template_name])) {
@@ -1187,6 +1188,9 @@ class cmd {
 				$replace['#state#'] = $cmdValue->execCmd();
 				$replace['#valueName#'] = $cmdValue->getName();
 				$replace['#unite#'] = $cmdValue->getUnite();
+				$replace['#valueDate#'] = $cmdValue->getValueDate();
+				$replace['#collectDate#'] = $cmdValue->getCollectDate();
+				$replace['#alertLevel#'] = $cmdValue->getCache('alertLevel', 'none');
 				if (trim($replace['#state#']) === '' && ($cmdValue->getSubtype() == 'binary' || $cmdValue->getSubtype() == 'numeric')) {
 					$replace['#state#'] = 0;
 				}
@@ -1263,7 +1267,7 @@ class cmd {
 			return;
 		}
 		$oldValue = $this->execCmd();
-		$repeat = ($oldValue == $value && $oldValue !== '' && $oldValue !== null);
+		$repeat = ($oldValue === $value && $oldValue !== '' && $oldValue !== null);
 		$this->setCollectDate(($_datetime !== null) ? $_datetime : date('Y-m-d H:i:s'));
 		$this->setCache('collectDate', $this->getCollectDate());
 		$this->setValueDate(($repeat) ? $this->getValueDate() : $this->getCollectDate());
@@ -1431,11 +1435,7 @@ class cmd {
 				}
 			}
 		}
-		$level = $this->getEqLogic()->getAlert();
-		if (is_array($level) && isset($level['name']) && $currentLevel == strtolower($level['name'])) {
-			return $currentLevel;
-		}
-		if ($_allowDuring && $this->getAlert($currentLevel . 'during') != '' && $this->getAlert($currentLevel . 'during') > 0) {
+		if ($_allowDuring && $currentLevel != 'none' && $this->getAlert($currentLevel . 'during') != '' && $this->getAlert($currentLevel . 'during') > 0) {
 			$cron = cron::byClassAndFunction('cmd', 'duringAlertLevel', array('cmd_id' => intval($this->getId())));
 			$next = strtotime('+ ' . $this->getAlert($currentLevel . 'during', 1) . ' minutes ' . date('Y-m-d H:i:s'));
 			if (!is_object($cron)) {
@@ -1915,7 +1915,7 @@ class cmd {
 	* @return $this
 	*/
 	public function setName($_name) {
-		$_name = str_replace(array('&', '#', ']', '[', '%', "'"), '', $_name);
+		$_name = cleanComponanteName($_name);
 		$this->_changed = utils::attrChanged($this->_changed,$this->name,$_name);
 		$this->name = $_name;
 		return $this;
@@ -1953,22 +1953,6 @@ class cmd {
 	
 	public function setEventOnly($eventOnly) {
 		trigger_error('This method is deprecated', E_USER_DEPRECATED);
-	}
-	
-	public function getHtml($_key = '', $_default = '') {
-		return utils::getJsonAttr($this->html, $_key, $_default);
-	}
-	
-	public function setHtml($_key, $_value) {
-		if (in_array($_key, array('dashboard', 'mobile', 'dview', 'mview', 'dplan')) && $this->getWidgetTemplateCode($_key, true) == $_value) {
-			$_value = '';
-		}
-		if ($this->getHtml($_key) != $_value) {
-			$this->_needRefreshWidget = true;
-			$this->_changed = true;
-		}
-		$this->html = utils::setJsonAttr($this->html, $_key, $_value);
-		return $this;
 	}
 	
 	public function getTemplate($_key = '', $_default = '') {

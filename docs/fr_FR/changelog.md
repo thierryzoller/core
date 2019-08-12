@@ -2,10 +2,65 @@
 Changelog
 =========
 
+3.3.29
+=====
+
+- Correction de la disparition de la date de derniere verification des mises à jour
+- Correction d'un bug pouvant bloquer les backups cloud
+- Correction d'un bugs sur le calcul d'utilisation des variable si c'est de la forme variable(toto,mavaleur)
+
+
+3.3.28
+=====
+
+- Correction d'un bug de roue infini sur la page des mises à jour
+- Corrections et optimisations diverse
+
+3.3.27
+=====
+
+- Correction d'un bug sur la traduction des jours en français
+- Amélioration de la stabilité (redémarrage auto du service MySql et watchdog de vérification de l'heure au démarrage)
+- Correction de bugs
+- Désactivation des actions sur les commandes lors de l'édition des designs, vue ou dashboard
+
+3.3.26
+=====
+
+- Correction de bugs
+- Correction d'un bug sur le multi-lancement de scénario
+- Correction d'un bug sur les alertes sur la valeur des commandes
+
+3.3.25
+=====
+
+- Correction de bugs
+- Passage de la timeline en mode tableau (du à des erreurs dans la lib independante de Jeedom)
+- Ajout des classes pour les supports de la couleur dans le plugin mode
+
+
+3.3.24
+=====
+
+-   Correction d'un bug sur l'affichage du nombre de mise à jour
+-	Suppression de l'édition du code html depuis la configuration avancée des commandes dû à de trop nombreux bugs
+-	Corrections de bugs
+-	Amélioration de la fenêtre de choix des icônes
+-	Mise à jour automatique de la date de changement de batterie si la batterie est à plus de 90% et supérieure de 10% à la valeur précédente
+-	Ajout de bouton sur l'administration pour remettre à plat les droits et lancer une vérification de Jeedom (droit, cron, base de données...)
+-	Suppression des choix de visibilité avancé des équipements sur dashboard/vue/design/mobile. Maintenant si vous voulez voir ou pas l'équipements sur dashboard/mobile il suffit de cocher ou pas la case de visibilité général. Pour les vues et design il suffit de mettre ou pas l'équipement dessus
+
+3.3.22
+=====
+
+- Corrections de bugs
+- Amélioration du remplacement des commandes (dans les vues, plan et plan3d)
+- Correction d'un bug pouvant empêcher d'ouvrir certains équipements de plugins (type alarme ou virtuel)
+
 3.3.21
 =====
 
-- Correction d'un bug ou l'affichage de l'heure pouvait dépasser 24h
+- Correction d'un bug où l'affichage de l'heure pouvait dépasser 24h
 - Correction d'un bug sur la mise à jour des résumés en design
 - Correction d'un bug sur la gestion des niveaux d'alertes sur certains widgets lors de la mise à jour de la valeur
 - Correction de l'affichage des équipements désactivés sur certains plugins

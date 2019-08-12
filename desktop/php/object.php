@@ -31,7 +31,7 @@ $allObject = jeeObject::buildTree(null, false);
 		<div class="objectListContainer">
 			<?php
 			foreach ($allObject as $object) {
-				echo '<div class="objectDisplayCard cursor" data-object_id="' . $object->getId() . '" data-object_name="' . $object->getName() . '" data-object_icon=\'' . $object->getDisplay('icon', '<i class="fas fa-lemon-o"></i>') . '\' style=" height : 160px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >';
+				echo '<div class="objectDisplayCard cursor w-icons" data-object_id="' . $object->getId() . '" data-object_name="' . $object->getName() . '" data-object_icon=\'' . $object->getDisplay('icon', '<i class="fas fa-lemon-o"></i>') . '\' style=" height : 160px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >';
 				echo "<center style='margin-top:10px;'>";
 				echo str_replace('></i>', ' style="font-size : 5em;color:#767676;"></i>', $object->getDisplay('icon', '<i class="fas fa-lemon-o"></i>'));
 				echo "</center>";
@@ -118,12 +118,6 @@ $allObject = jeeObject::buildTree(null, false);
 							<label class="col-lg-2 col-md-3 col-sm-4 col-xs-6 control-label">{{Couleur du texte du tag}}</label>
 							<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
 								<input type="color" class="objectAttr form-control" data-l1key="display" data-l2key="tagTextColor" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-lg-2 col-md-3 col-sm-4 col-xs-6 control-label">{{Couleur du texte du résumé}}</label>
-							<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-								<input type="color" class="objectAttr form-control" data-l1key="display" data-l2key="desktop::summaryTextColor" />
 							</div>
 						</div>
 						<div class="form-group">

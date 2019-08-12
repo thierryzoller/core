@@ -249,6 +249,18 @@ if(method_exists('utils','attrChanged')){
 	$cron->setDeamon(0);
 	$cron->save();
 	
+	$cron = cron::byClassAndFunction('plugin', 'cron10');
+	if (!is_object($cron)) {
+		echo "Create plugin::cron10\n";
+		$cron = new cron();
+	}
+	$cron->setClass('plugin');
+	$cron->setFunction('cron10');
+	$cron->setSchedule('*/10 * * * * *');
+	$cron->setTimeout(10);
+	$cron->setDeamon(0);
+	$cron->save();
+	
 	$cron = cron::byClassAndFunction('plugin', 'cron15');
 	if (!is_object($cron)) {
 		echo "Create plugin::cron15\n";
@@ -352,25 +364,42 @@ if(method_exists('utils','attrChanged')){
 		}
 	}
 	
-	try {
-		foreach (object::all() as $object) {
-			$object->save();
-		}
-	} catch (Exception $exc) {
 		
+	foreach (jeeObject::all() as $object) {
+		try {
+			$object->save();
+		} catch (Exception $exc) {
+
+		}
 	}
 	
+	
 	foreach (cmd::all() as $cmd) {
-		if ($cmd->getConfiguration('jeedomCheckCmdCmdActionId') != '') {
-			$cmd->setConfiguration('jeedomCheckCmdCmdActionId', '');
+		try {
+			if ($cmd->getConfiguration('jeedomCheckCmdCmdActionId') != '') {
+				$cmd->setConfiguration('jeedomCheckCmdCmdActionId', '');
+				$cmd->save();
+			}
+		} catch (Exception $exc) {
+		
 		}
-		$cmd->save();
 	}
+	
 }
-
-
 if (!file_exists(__DIR__ . '/../data/php/user.function.class.php')) {
 	copy(__DIR__ . '/../data/php/user.function.class.sample.php', __DIR__ . '/../data/php/user.function.class.php');
+}
+	if (!file_exists(__DIR__ . '/../data/php/user.function.class.php')) {
+	copy(__DIR__ . '/../data/php/user.function.class.sample.php', __DIR__ . '/../data/php/user.function.class.php');
+}
+if(!file_exists('/etc/systemd/system/mariadb.service.d/jeedom.conf')){
+	if(!file_exists('/etc/systemd/system/mariadb.service.d')){
+		exec('sudo mkdir /etc/systemd/system/mariadb.service.d');
+	}
+	exec('sudo chmod 777 -R /etc/systemd/system/mariadb.service.d');
+	exec('sudo echo "[Service]" > /etc/systemd/system/mariadb.service.d/jeedom.conf');
+	exec('sudo echo "Restart=always" >> /etc/systemd/system/mariadb.service.d/jeedom.conf');
+	exec('sudo systemctl daemon-reload');
 }
 } catch (Exception $e) {
 	echo "Error : ";

@@ -10,6 +10,8 @@ if (!isConnect('admin')) {
 </style>
 <div id="div_rowSystemCommand" class="row row-overflow">
   <div class="col-lg-2 col-md-3 col-sm-4" style="overflow-y:auto;overflow-x:hidden;">
+    <a class="btn btn-warning" style="width:100%;margin-bottom:4px" id="bt_consitency"><i class="fas fa-check"></i> {{Consistance}}</a>
+    <a class="btn btn-warning" style="width:100%" id="bt_cleanFileSystemRight"><i class="fas fa-check"></i> {{Droit}}</a>
     <div class="bs-sidebar">
       <ul class="nav nav-list bs-sidenav list-group" id='ul_listSystemHistory'></ul>
       <ul class="nav nav-list bs-sidenav list-group">
@@ -28,6 +30,7 @@ if (!isConnect('admin')) {
         <li class="cursor list-group-item list-group-item-success"><a class="bt_systemCommand" data-command="ps ax">ps ax</a></li>
         <?php if (jeedom::isCapable('sudo')) {?>
           <li class="cursor list-group-item list-group-item-success"><a class="bt_systemCommand" data-command="sudo cat /var/log/mysql/error.log">MySQL log</a></li>
+          <li class="cursor list-group-item list-group-item-success"><a class="bt_systemCommand" data-command='sudo fdtput -t s /media/boot/multiboot/meson64_odroidc2.dtb.linux /i2c@c1108500/pcf8563@51 status "okay"'>RTC Jeedom Pro</a></li>
         <?php }?>
         <li class="cursor list-group-item list-group-item-success"><a class="bt_systemCommand" data-command="df -h">df -h</a></li>
         <li class="cursor list-group-item list-group-item-success"><a class="bt_systemCommand" data-command="w">w</a></li>

@@ -106,8 +106,8 @@ class dataStore {
 	}
 	
 	public function postSave() {
-		scenario::check('variable(' . $this->getKey() . ')');
-		$value_cmd = cmd::byValue('variable(' . $this->getKey() . ')', null, true);
+		scenario::check('variable(' . $this->getKey().')');
+		$value_cmd =	cmd::byValue('variable(' . $this->getKey(), null, true);
 		if (is_array($value_cmd)) {
 			foreach ($value_cmd as $cmd) {
 				if ($cmd->getType() != 'action') {
@@ -153,13 +153,14 @@ class dataStore {
 		return $_data;
 	}
 	
-	public function getUsedBy($_array = false) {
+		public function getUsedBy($_array = false) {
 		$return = array('cmd' => array(), 'eqLogic' => array(), 'scenario' => array());
-		$return['cmd'] = cmd::searchConfiguration(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
-		$return['eqLogic'] = eqLogic::searchConfiguration(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
-		$return['interactDef'] = interactDef::searchByUse(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
+		$return['cmd'] = cmd::searchConfiguration(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', 'variable(' . $this->getKey() . ',', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
+		$return['eqLogic'] = eqLogic::searchConfiguration(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', 'variable(' . $this->getKey() . ',', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
+		$return['interactDef'] = interactDef::searchByUse(array('"cmd":"variable"%"name":"' . $this->getKey() . '"', 'variable(' . $this->getKey() . ')', 'variable(' . $this->getKey() . ',', '"name":"' . $this->getKey() . '"%"cmd":"variable"'));
 		$return['scenario'] = scenario::searchByUse(array(
 			array('action' => 'variable(' . $this->getKey() . ')', 'option' => 'variable(' . $this->getKey() . ')'),
+			array('action' => 'variable(' . $this->getKey() . ',', 'option' => 'variable(' . $this->getKey() . ','),
 			array('action' => 'variable', 'option' => $this->getKey(), 'and' => true),
 			array('action' => 'ask', 'option' => $this->getKey(), 'and' => true),
 		));

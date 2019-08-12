@@ -454,7 +454,7 @@ class eqLogic {
 	}
 	
 	public static function byString($_string) {
-		$eqLogic = self::byId(str_replace('#', '', self::fromHumanReadable($_string)));
+		$eqLogic = self::byId(str_replace(array('#','eqLogic'), '', self::fromHumanReadable($_string)));
 		if (!is_object($eqLogic)) {
 			throw new Exception(__('L\'équipement n\'a pas pu être trouvé : ', __FILE__) . $_string . __(' => ', __FILE__) . self::fromHumanReadable($_string));
 		}
@@ -574,7 +574,7 @@ class eqLogic {
 			return false;
 		}
 		$oldValue = $cmd->execCmd();
-		if (($oldValue != $cmd->formatValue($_value)) || $oldValue === '') {
+		if (($oldValue !== $cmd->formatValue($_value)) || $oldValue === '') {
 			$cmd->event($_value, $_updateTime);
 			return true;
 		}
@@ -634,17 +634,10 @@ class eqLogic {
 		if ($_version == '') {
 			throw new Exception(__('La version demandée ne peut pas être vide (mobile, dashboard ou scénario)', __FILE__));
 		}
-		if (!$this->hasRight('r')) {
-			return '';
-		}
-		if (!$this->getIsEnable()) {
+		if (!$this->hasRight('r') || !$this->getIsEnable()) {
 			return '';
 		}
 		$version = jeedom::versionAlias($_version, false);
-		if ($this->getDisplay('showOn' . $version, 1) == 0) {
-			return '';
-		}
-		
 		$user_id = '';
 		if (isset($_SESSION) && isset($_SESSION['user']) && is_object($_SESSION['user'])) {
 			$user_id = $_SESSION['user']->getId();
@@ -866,9 +859,11 @@ class eqLogic {
 		foreach (array('dashboard', 'mobile', 'mview', 'dview', 'dplan', 'view', 'plan') as $version) {
 			$mc = cache::byKey('widgetHtml' . $this->getId() . $version);
 			$mc->remove();
-			foreach ($users as $user) {
-				$mc = cache::byKey('widgetHtml' . $this->getId() . $version . $user->getId());
-				$mc->remove();
+			if(count($users) > 0){
+				foreach ($users as $user) {
+					$mc = cache::byKey('widgetHtml' . $this->getId() . $version . $user->getId());
+					$mc->remove();
+				}
 			}
 		}
 	}
@@ -1099,6 +1094,10 @@ class eqLogic {
 		if ($_pourcent < 0) {
 			$_pourcent = 0;
 		}
+		if($_pourcent > 90 && $_pourcent > ($this->getStatus('battery',0)*1.1)){
+			$this->setConfiguration('batterytime',date('Y-m-d H:i:s'));
+			$this->save();
+		}
 		$warning_threshold = $this->getConfiguration('battery_warning_threshold', config::byKey('battery::warning'));
 		$danger_threshold = $this->getConfiguration('battery_danger_threshold', config::byKey('battery::danger'));
 		if ($_pourcent != '' && $_pourcent < $danger_threshold) {
@@ -1153,12 +1152,8 @@ class eqLogic {
 				}
 			}
 		} else {
-			foreach (message::byPluginLogicalId($this->getEqType_name(), 'warningBattery' . $this->getId()) as $message) {
-				$message->remove();
-			}
-			foreach (message::byPluginLogicalId($this->getEqType_name(), 'lowBattery' . $this->getId()) as $message) {
-				$message->remove();
-			}
+			message::removeByPluginLogicalId($this->getEqType_name(), 'warningBattery' . $this->getId());
+			message::removeByPluginLogicalId($this->getEqType_name(), 'lowBattery' . $this->getId());
 			$this->setStatus('batterydanger', 0);
 			$this->setStatus('batterywarning', 0);
 		}
@@ -1194,7 +1189,7 @@ class eqLogic {
 		return false;
 	}
 	
-	public function import($_configuration) {
+	public function import($_configuration,$_dontRemove = false) {
 		$cmdClass = $this->getEqType_name() . 'Cmd';
 		if (isset($_configuration['configuration'])) {
 			foreach ($_configuration['configuration'] as $key => $value) {
@@ -1222,11 +1217,13 @@ class eqLogic {
 					$arrayToRemove[] = $eqLogic_cmd;
 				}
 			}
-			foreach ($arrayToRemove as $cmdToRemove) {
-				try {
-					$cmdToRemove->remove();
-				} catch (Exception $e) {
-					
+			if(!$_dontRemove){
+				foreach ($arrayToRemove as $cmdToRemove) {
+					try {
+						$cmdToRemove->remove();
+					} catch (Exception $e) {
+						
+					}
 				}
 			}
 			foreach ($_configuration['commands'] as $command) {
@@ -1566,7 +1563,7 @@ class eqLogic {
 	}
 	
 	public function setName($_name) {
-		$_name = str_replace(array('&', '#', ']', '[', '%', "'", "\\", "/"), '', $_name);
+		$_name = cleanComponanteName($_name);
 		if($_name != $this->name){
 			$this->_needRefreshWidget = true;
 			$this->_changed = true;

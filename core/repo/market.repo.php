@@ -280,7 +280,8 @@ class repo_market {
 			}
 			system::kill('duplicity');
 			shell_exec(system::getCmdSudo() . ' rm -rf '.$base_dir . '/tmp/duplicity*');
-			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity/*');
+			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity');
+			shell_exec(system::getCmdSudo() . ' rm -rf /root/.cache/duplicity');
 			com_shell::execute($cmd);
 		}
 	}
@@ -347,7 +348,8 @@ class repo_market {
 		try {
 			$results = explode("\n", com_shell::execute($cmd));
 		} catch (\Exception $e) {
-			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity/*');
+			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity');
+			shell_exec(system::getCmdSudo() . ' rm -rf /root/.cache/duplicity');
 			$results = explode("\n", com_shell::execute($cmd));
 		}
 		foreach ($results as $line) {
@@ -359,7 +361,7 @@ class repo_market {
 		return array_reverse($return);
 	}
 	
-	public static function backup_restore($_backup) {
+public static function backup_restore($_backup) {
 		$backup_dir = calculPath(config::byKey('backup::path'));
 		if (!file_exists($backup_dir)) {
 			mkdir($backup_dir, 0770, true);
@@ -372,15 +374,19 @@ class repo_market {
 			com_shell::execute(system::getCmdSudo() . ' rm -rf ' . $restore_dir);
 		}
 		self::backup_install();
-		$base_dir = realpath(__DIR__ . '/../../');
+		$base_dir =  '/usr/jeedom_duplicity';
+		if(!file_exists($base_dir)){
+			com_shell::execute(system::getCmdSudo() .' mkdir '.$base_dir);
+		}
+		com_shell::execute(system::getCmdSudo() .' chmod 777 -R '.$base_dir);
 		mkdir($restore_dir);
-		$timestamp = strtotime(trim(str_replace(array('Full', 'Incremental'), '', $_backup)));
+		$timestamp = strtotime(trim(str_replace(array('Full','Incremental','Incrémental','Complète'), '', $_backup)));
 		$backup_name = str_replace(' ', '_', 'backup-cloud-' . config::byKey('market::cloud::backup::name') . '-' . date("Y-m-d-H\hi", $timestamp) . '.tar.gz');
 		$cmd = system::getCmdSudo() . ' PASSPHRASE="' . config::byKey('market::cloud::backup::password') . '"';
 		$cmd .= ' duplicity --file-to-restore /';
 		$cmd .= ' --time ' . $timestamp;
 		$cmd .= ' --num-retries 1';
-		$cmd .= ' --tempdir '.$base_dir . '/tmp';
+		$cmd .= ' --tempdir '.$base_dir;
 		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
 		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
 		$cmd .= ' ' . $restore_dir;
@@ -392,7 +398,7 @@ class repo_market {
 			}
 			throw new Exception('[restore cloud] ' . $e->getMessage());
 		}
-		return;
+		shell_exec(system::getCmdSudo() . ' rm -rf '.$base_dir);
 		system('cd ' . $restore_dir . ';tar cfz "' . $backup_dir . '/' . $backup_name . '" . > /dev/null');
 		if (file_exists($restore_dir)) {
 			com_shell::execute(system::getCmdSudo() . ' rm -rf ' . $restore_dir);
@@ -763,6 +769,10 @@ class repo_market {
 			}
 			if (isset($_result['register::dnsNumber']) && config::byKey('dns::number') != $_result['register::dnsNumber']) {
 				config::save('dns::number', $_result['register::dnsNumber']);
+				$restart_dns = true;
+			}
+			if (isset($_result['register::vpnurl']) && config::byKey('dns::vpnurl') != $_result['register::vpnurl']) {
+				config::save('dns::vpnurl', $_result['register::vpnurl']);
 				$restart_dns = true;
 			}
 			if (isset($_result['register::vpnPort']) && config::byKey('vpn::port') != $_result['register::vpnPort']) {
