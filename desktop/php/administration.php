@@ -65,15 +65,21 @@ user::isBan();
 						<div class="form-group">
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Connect to Wireless Access Point">{{Step by Step process to use your existing Access Point}}</label>
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Scan for Access Points">{{Scan Wireless Access Points then REFRESH the page}}</label>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Scan for Access Points}}</a>
-						</div>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
-						</div>
-					</div>
+
+
+<div class="col-lg-3 col-md-3 col-sm-3">				
+<?php
+$status = shell_exec('sudo ifconfig | grep wlan0');
+if (!$status){
+    echo 'Wifi is currenltly <b>disabled</b>, please enable Wifi.';
+	echo '<a class="btn btn-primary form-control" id="bt_scanWifi" disabled><i class="fas fa-check"></i> {{Scan for Access Points}}</a></div><div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" disabled id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div></div>';
+}
+else {
+	echo '<a class="btn btn-primary form-control" id="bt_scanWifi"><i class="fas fa-check"></i> {{Scan for Access Points}}</a></div><div class="col-lg-3 col-md-3 col-sm-3"><a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a></div></div>';
+}
+?>
+
+	
 					
 					
 					
