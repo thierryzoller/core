@@ -124,6 +124,31 @@ $('#bt_resetGit').on('click', function () {
     });
 });
 
+$('#bt_enableWifi').on('click', function () {
+    $.hideAlert();
+    jeedom.enableWifi({
+        error: function (error) {
+            $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        },
+        success: function (data) {
+            $('#div_alert').showAlert({message: '{{Success - You may need to reboot in order to have Wifi enabled.}}', level: 'success'});
+        }
+    });
+});
+
+$('#bt_disableWifi').on('click', function () {
+    $.hideAlert();
+    jeedom.disableWifi({
+        error: function (error) {
+            $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        },
+        success: function (data) {
+            $('#div_alert').showAlert({message: '{{Commande réalisée avec succès}}', level: 'success'});
+        }
+    });
+});
+
+
 $('#bt_restartDns').on('click', function () {
    $.hideAlert();
    jeedom.config.save({

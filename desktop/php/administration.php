@@ -224,7 +224,23 @@ user::isBan();
 							<div class="col-lg-3 col-md-3 col-sm-3">
 							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
 						</div>
+
+						</div>
+						
+						
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
+						</div>
+						
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
+						</div>
+
 					</div>
+
 				</fieldset>
 			</form>
 		</div>
@@ -1422,6 +1438,7 @@ user::isBan();
 										<option value="beta">{{Beta (Plus d'accès au support)}}</option>
 										<option value="release">{{Release (Plus d'accès au support)}}</option>
 										<option value="master">{{Stable}}</option>
+										<option value="V4-stable">{{Stable V4}}</option>
 									</select>
 								</div>
 							</div>

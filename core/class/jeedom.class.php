@@ -564,7 +564,7 @@ class jeedom {
 		} else {
 			$backup_dir = config::byKey('backup::path');
 		}
-		$backups = ls($backup_dir, '*.tar.gz', false, array('files', 'quiet', 'datetime_asc'));
+		$backups = ls($backup_dir, '*.7z', false, array('files', 'quiet', 'datetime_asc'));
 		$return = array();
 		foreach ($backups as $backup) {
 			$return[$backup_dir . '/' . $backup] = $backup;
@@ -1237,6 +1237,21 @@ class jeedom {
 		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
 	}
 	
+
+	/* Adding enabling Wifi over Control Panel TZO 07082019 */
+
+	public static function enableWifi() {
+		shell_exec(system::getCmdSudo() . '/var/www/wifion.sh');
+		
+	}
+
+	public static function disableWifi() {
+		shell_exec(system::getCmdSudo() . '/var/www/wifioff.sh');
+	}
+	
+   /* ==================================== */
+		
+
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
