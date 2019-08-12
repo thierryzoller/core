@@ -86,6 +86,7 @@ else {
 						<?php echo config::byKey('SSID'); ?>
 						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 							<input type="text" class="configKey form-control" data-l1key="name" />
+							<input type="text" class="configKey form-control" data-l1key="SSID" />
 						</div>
 						
 
