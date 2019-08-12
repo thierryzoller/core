@@ -45,7 +45,15 @@ try {
 }
 try {
 	require_once __DIR__ . '/../core/php/core.inc.php';
-	
+	if(method_exists ('DB','compareAndFix')){
+		try {
+			echo "Check jeedom database...";
+			DB::compareAndFix(json_decode(file_get_contents(__DIR__.'/database.json'),true),'all',true);
+			echo "OK\n";
+		} catch (Exception $ex) {
+			echo "***ERREUR*** " . $ex->getMessage() . "\n";
+		}
+	}
 	if (config::byKey('object:summary') == '' || !is_array(config::byKey('object:summary'))) {
 		config::save('object:summary',
 		array('security' => array('key' => 'security', 'name' => 'Alerte', 'calcul' => 'sum', 'icon' => '<i class="icon jeedom-alerte2"></i>', 'unit' => '', 'count' => 'binary', 'allowDisplayZero' => false),
@@ -67,7 +75,7 @@ $crons = cron::all();
 if (is_array($crons)) {
 	if (class_exists('Cron\CronExpression')) {
 		foreach ($crons as $cron) {
-			$c = new Cron\CronExpression($cron->getSchedule(), new Cron\FieldFactory);
+			$c = new Cron\CronExpression(checkAndFixCron($cron->getSchedule()), new Cron\FieldFactory);
 			try {
 				if (!$c->isDue()) {
 					$c->getNextRunDate();
@@ -355,41 +363,52 @@ if(method_exists('utils','attrChanged')){
 	if (file_exists(__DIR__ . '/../script/ngrok')) {
 		shell_exec(system::getCmdSudo() . 'rm -rf ' . __DIR__ . '/../script/ngrok');
 	}
-	
-	foreach (eqLogic::all() as $eqLogic) {
-		try {
-			$eqLogic->emptyCacheWidget();
-		} catch (Exception $e) {
-			
+	try {
+		if(method_exists('cache','flushWidget')){
+			cache::flushWidget();
 		}
+	} catch (Exception $e) {
+		
+	} catch (Error $e) {
+		
 	}
 	
-		
+	
+	
 	foreach (jeeObject::all() as $object) {
 		try {
 			$object->save();
 		} catch (Exception $exc) {
-
+			
 		}
 	}
 	
 	
 	foreach (cmd::all() as $cmd) {
 		try {
+			$changed = false;
 			if ($cmd->getConfiguration('jeedomCheckCmdCmdActionId') != '') {
 				$cmd->setConfiguration('jeedomCheckCmdCmdActionId', '');
+				$changed = true;
+			}
+			if(trim($cmd->getTemplate('dashboard')) != '' && strpos($cmd->getTemplate('dashboard'),'::') === false){
+				$cmd->setTemplate('dashboard','core::'.$cmd->getTemplate('dashboard'));
+				$changed = true;
+			}
+			if(trim($cmd->getTemplate('mobile')) != '' && strpos($cmd->getTemplate('mobile'),'::') === false){
+				$cmd->setTemplate('mobile','core::'.$cmd->getTemplate('mobile'));
+				$changed = true;
+			}
+			if($changed){
 				$cmd->save();
 			}
 		} catch (Exception $exc) {
-		
+			
 		}
 	}
 	
 }
 if (!file_exists(__DIR__ . '/../data/php/user.function.class.php')) {
-	copy(__DIR__ . '/../data/php/user.function.class.sample.php', __DIR__ . '/../data/php/user.function.class.php');
-}
-	if (!file_exists(__DIR__ . '/../data/php/user.function.class.php')) {
 	copy(__DIR__ . '/../data/php/user.function.class.sample.php', __DIR__ . '/../data/php/user.function.class.php');
 }
 if(!file_exists('/etc/systemd/system/mariadb.service.d/jeedom.conf')){
@@ -402,7 +421,7 @@ if(!file_exists('/etc/systemd/system/mariadb.service.d/jeedom.conf')){
 	exec('sudo systemctl daemon-reload');
 }
 } catch (Exception $e) {
-	echo "Error : ";
+	echo "\nError : ";
 	echo $e->getMessage();
 }
 echo "[END CONSISTENCY]\n";

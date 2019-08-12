@@ -230,9 +230,13 @@ class network {
 		}
 		$data = curl_exec($ch);
 		if (curl_errno($ch)) {
-			log::add('network', 'debug', 'Erreur sur ' . $url . ' => ' . curl_errno($ch));
-			curl_close($ch);
-			return false;
+			usleep(rand(1000,100000));
+			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('network', 'debug', 'Erreur sur ' . $url . ' => ' . curl_errno($ch));
+				curl_close($ch);
+				return false;
+			}
 		}
 		curl_close($ch);
 		if (trim($data) != 'ok') {

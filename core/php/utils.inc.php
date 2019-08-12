@@ -107,13 +107,12 @@ function init($_name, $_default = '') {
 }
 
 function sendVarToJS($_varName, $_value) {
-	$_value = (is_array($_value))
-	? 'jQuery.parseJSON("' . addslashes(json_encode($_value, JSON_UNESCAPED_UNICODE)) . '")'
-	: '"' . $_value . '"'
-	;
-	echo '<script>'
-	. 'var ' . $_varName . ' = ' . $_value . ';'
-	. '</script>';
+	$_value = (is_array($_value)) ? 'jQuery.parseJSON("' . addslashes(json_encode($_value, JSON_UNESCAPED_UNICODE)) . '")'	: '"' . $_value . '"';
+	if(strpos($_varName,'.') === false){
+		echo '<script>var ' . $_varName . ' = ' . $_value . ';</script>';
+	}else{
+		echo '<script>' . $_varName . ' = ' . $_value . ';</script>';
+	}
 }
 
 function resizeImage($contents, $width, $height) {
@@ -896,25 +895,6 @@ function getNtpTime() {
 function cast($sourceObject, $destination) {
 	$obj_in = serialize($sourceObject);
 	return unserialize('O:' . strlen($destination) . ':"' . $destination . '":' . substr($obj_in, $obj_in[2] + 7));
-	/*if (is_string($destination)) {
-	$destination = new $destination();
-}
-$sourceReflection = new ReflectionObject($sourceObject);
-$destinationReflection = new ReflectionObject($destination);
-$sourceProperties = $sourceReflection->getProperties();
-foreach ($sourceProperties as $sourceProperty) {
-$sourceProperty->setAccessible(true);
-$name = $sourceProperty->getName();
-$value = $sourceProperty->getValue($sourceObject);
-if ($destinationReflection->hasProperty($name)) {
-$propDest = $destinationReflection->getProperty($name);
-$propDest->setAccessible(true);
-$propDest->setValue($destination, $value);
-} else {
-$destination->$name = $value;
-}
-}
-*/
 }
 
 function getIpFromString($_string) {
@@ -940,18 +920,18 @@ function evaluate($_string) {
 	if (!isset($GLOBALS['ExpressionLanguage'])) {
 		$GLOBALS['ExpressionLanguage'] = new ExpressionLanguage();
 	}
-	$_string = str_ireplace(array(' et ', ' and ', ' ou ', ' or '), array(' && ', ' && ', ' || ', ' || '), $_string);
-	if (strpos($_string, '"') !== false || strpos($_string, '\'') !== false) {
+	$string = str_ireplace(array(' et ', ' and ', ' ou ', ' or '), array(' && ', ' && ', ' || ', ' || '), $_string);
+	if (strpos($string, '"') !== false || strpos($string, '\'') !== false) {
 		$regex = "/(?:(?:\"(?:\\\\\"|[^\"])+\")|(?:'(?:\\\'|[^'])+'))/is";
-		$r = preg_match_all($regex, $_string, $matches);
+		$r = preg_match_all($regex, $string, $matches);
 		$c = count($matches[0]);
 		for ($i = 0; $i < $c; $i++) {
-			$_string = str_replace($matches[0][$i], '--preparsed' . $i . '--', $_string);
+			$string = str_replace($matches[0][$i], '--preparsed' . $i . '--', $string);
 		}
 	} else {
 		$c = 0;
 	}
-	$expr = str_replace('==', '=', $_string);
+	$expr = str_replace('==', '=', $string);
 	$expr = str_replace('=', '==', $expr);
 	$expr = str_replace('<==', '<=', $expr);
 	$expr = str_replace('>==', '>=', $expr);
@@ -969,39 +949,7 @@ function evaluate($_string) {
 		//log::add('expression', 'debug', '[Parser 1] Expression : ' . $_string . ' tranformé en ' . $expr . ' => ' . $e->getMessage());
 	}
 	try {
-		$expr = str_replace('""', '"', $expr);
-		return $GLOBALS['ExpressionLanguage']->evaluate($expr);
-	} catch (Exception $e) {
-		//log::add('expression', 'debug', '[Parser 2] Expression : ' . $_string . ' tranformé en ' . $expr . ' => ' . $e->getMessage());
-	}
-	if ($c > 0) {
-		for ($i = 0; $i < $c; $i++) {
-			$_string = str_replace('--preparsed' . $i . '--', $matches[0][$i], $_string);
-		}
-	}
-	return $_string;
-}
-
-function evaluate_old($_string) {
-	if (!isset($GLOBALS['ExpressionLanguage'])) {
-		$GLOBALS['ExpressionLanguage'] = new ExpressionLanguage();
-	}
-	$expr = str_replace(array(' et ', ' ET ', ' AND ', ' and ', ' ou ', ' OR ', ' or ', ' OU '), array(' && ', ' && ', ' && ', ' && ', ' || ', ' || ', ' || ', ' || '), $_string);
-	$expr = str_replace('==', '=', $expr);
-	$expr = str_replace('=', '==', $expr);
-	$expr = str_replace('<==', '<=', $expr);
-	$expr = str_replace('>==', '>=', $expr);
-	$expr = str_replace('!==', '!=', $expr);
-	$expr = str_replace('!===', '!==', $expr);
-	$expr = str_replace('====', '===', $expr);
-	try {
-		return $GLOBALS['ExpressionLanguage']->evaluate($expr);
-	} catch (Exception $e) {
-		//log::add('expression', 'debug', '[Parser 1] Expression : ' . $_string . ' tranformé en ' . $expr . ' => ' . $e->getMessage());
-	}
-	try {
-		$expr = str_replace('""', '"', $expr);
-		return $GLOBALS['ExpressionLanguage']->evaluate($expr);
+		return $GLOBALS['ExpressionLanguage']->evaluate(str_replace('""', '"', $expr));
 	} catch (Exception $e) {
 		//log::add('expression', 'debug', '[Parser 2] Expression : ' . $_string . ' tranformé en ' . $expr . ' => ' . $e->getMessage());
 	}
@@ -1208,13 +1156,14 @@ function sanitizeAccent($_message) {
 	}
 	
 	function findCodeIcon($_icon) {
-		$icon = trim(str_replace(array('fa ', 'icon ', '></i>', '<i', 'class="', '"'), '', trim($_icon)));
+		$icon = trim(str_replace(array('fa ','fas ','fab ','far ', 'icon ', '></i>', '<i', 'class="', '"'), '', trim($_icon)));
+		
 		$re = '/.' . $icon . ':.*\n.*content:.*"(.*?)";/m';
 		
-		$css = file_get_contents(__DIR__ . '/../../3rdparty/font-awesome/css/font-awesome.css');
+		$css = file_get_contents(__DIR__ . '/../../3rdparty/font-awesome5/css/all.css');
 		preg_match($re, $css, $matches);
 		if (isset($matches[1])) {
-			return array('icon' => trim($matches[1], '\\'), 'fontfamily' => 'FontAwesome');
+			return array('icon' => trim($matches[1], '\\'), 'fontfamily' => 'Font Awesome 5 Free');
 		}
 		
 		foreach (ls(__DIR__ . '/../css/icon', '*') as $dir) {
@@ -1350,6 +1299,7 @@ function sanitizeAccent($_message) {
 		return $return;
 	}
 	
+	
 	function deleteSession($_id) {
 		$cSsid = session_id();
 		@session_start();
@@ -1388,7 +1338,7 @@ function sanitizeAccent($_message) {
 		}
 		return $return;
 	}
-
+	
 	function getTZoffsetMin() {
 		$tz = date_default_timezone_get();
 		date_default_timezone_set( "UTC" );
@@ -1396,8 +1346,95 @@ function sanitizeAccent($_message) {
 		date_default_timezone_set($tz);
 		return($seconds/60);
 	}
-
+	
+	function pageTitle($_page){
+		switch ($_page) {
+			case 'view':
+			$return = __('Vues',__FILE__);
+			break;
+			case 'plan':
+			$return = __('Designs',__FILE__);
+			break;
+			case 'plan3d':
+			$return = __('Designs 3D',__FILE__);
+			break;
+			case 'eqAnalyse':
+			$return = __('Equipements',__FILE__);
+			break;
+			case 'display':
+			$return = __('Résumé',__FILE__);
+			break;
+			case 'history':
+			$return = __('Historique',__FILE__);
+			break;
+			case 'report':
+			$return = __('Rapports',__FILE__);
+			break;
+			case 'health':
+			$return = __('Santé',__FILE__);
+			break;
+			case 'object':
+			$return = __('Objets',__FILE__);
+			break;
+			case 'scenario':
+			$return = __('Scénarios',__FILE__);
+			break;
+			case 'interact':
+			$return = __('Interactions',__FILE__);
+			break;
+			case 'widgets':
+			$return = __('Widgets',__FILE__);
+			break;
+			case 'plugin':
+			$return = __('Gestion Plugins',__FILE__);
+			break;
+			case 'administration':
+			$return = __('Configuration',__FILE__);
+			break;
+			case 'backup':
+			$return = __('Sauvegardes',__FILE__);
+			break;
+			case 'cron':
+			$return = __('Moteur de tâches',__FILE__);
+			break;
+			case 'custom':
+			$return = __('Personnalisation',__FILE__);
+			break;
+			case 'user':
+			$return = __('Utilisateurs',__FILE__);
+			break;
+			case 'profils':
+			$return = __('Préférences',__FILE__);
+			break;
+			case 'log':
+			$return = __('Logs',__FILE__);
+			break;
+			case 'update':
+			$return = __('Mises à jour',__FILE__);
+			break;
+			case 'panel':
+			try {
+				if(isset($_SERVER['REQUEST_URI'])){
+					$url = $_SERVER['REQUEST_URI'];
+					$plugin = explode('m=', $url)[1];
+					$plugin = explode('&', $plugin)[0];
+					$return = __('Panel '.ucfirst($plugin),__FILE__);
+				}else{
+					$return = __('Panel',__FILE__);
+				}
+				break;
+			} catch(Exception $e) {
+				$return = __('Panel',__FILE__);
+				break;
+			}
+			default:
+			$return = $_page;
+			break;
+		}
+		return ucfirst($return);
+	}
 	
 	function cleanComponanteName($_name){
 		return str_replace(array('&', '#', ']', '[', '%', "\\", "/", "'", '"'), '', $_name);
 	}
+	

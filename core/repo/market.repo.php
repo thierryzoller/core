@@ -281,7 +281,6 @@ class repo_market {
 			system::kill('duplicity');
 			shell_exec(system::getCmdSudo() . ' rm -rf '.$base_dir . '/tmp/duplicity*');
 			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity');
-			shell_exec(system::getCmdSudo() . ' rm -rf /root/.cache/duplicity');
 			com_shell::execute($cmd);
 		}
 	}
@@ -322,9 +321,9 @@ class repo_market {
 			com_shell::execute($cmd);
 		} catch (Exception $e) {
 			if (self::backup_errorAnalyzed($e->getMessage()) != null) {
-				throw new Exception('[restore cloud] ' . self::backup_errorAnalyzed($e->getMessage()));
+				throw new Exception('[backup clean] ' . self::backup_errorAnalyzed($e->getMessage()));
 			}
-			throw new Exception('[restore cloud] ' . $e->getMessage());
+			throw new Exception('[backup clean] ' . $e->getMessage());
 		}
 	}
 	
@@ -349,7 +348,6 @@ class repo_market {
 			$results = explode("\n", com_shell::execute($cmd));
 		} catch (\Exception $e) {
 			shell_exec(system::getCmdSudo() . ' rm -rf ~/.cache/duplicity');
-			shell_exec(system::getCmdSudo() . ' rm -rf /root/.cache/duplicity');
 			$results = explode("\n", com_shell::execute($cmd));
 		}
 		foreach ($results as $line) {
@@ -457,6 +455,12 @@ public static function backup_restore($_backup) {
 	}
 	
 	public static function monitoring_status() {
+		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
+			return false;
+		}
+		if(exec('grep "jeedom.com" /etc/zabbix/zabbix_agentd.conf | wc -l') == 0){
+			return false;
+		}
 		return (count(system::ps('zabbix')) > 0);
 	}
 	

@@ -39,18 +39,55 @@ class jeedom {
 			'theme_start_day_hour',
 			'theme_end_day_hour',
 			'theme_changeAccordingTime',
-			'hideBackgroundImg',
+			'mobile_theme_useAmbientLight',
+			'showBackgroundImg',
 			'widget::step::width',
 			'widget::step::height',
-			'widget::margin'
+			'widget::margin',
+			'widget::shadow',
+			'interface::advance::enable',
+			'interface::advance::coloredIcons'
+		);
+		$css_convert = array(
+			'url-logo-svg' => '--url-logo-svg',
 		);
 		$return = config::byKeys($key);
-		if(date('Gi')>$return['theme_start_day_hour'] && date('Gi')<$return['theme_end_day_hour']){
-			$return['current_desktop_theme'] = $return['default_bootstrap_theme'];
-			$return['current_mobile_theme'] = $return['mobile_theme_color'];
-		}else{
+		$return['current_desktop_theme'] = $return['default_bootstrap_theme'];
+		$return['current_mobile_theme'] = $return['mobile_theme_color'];
+		if($return['theme_changeAccordingTime'] == 1 && (date('Gi')<intval(str_replace(':','',$return['theme_start_day_hour'])) || date('Gi')>intval(str_replace(':','',$return['theme_end_day_hour'])))){
 			$return['current_desktop_theme'] = $return['default_bootstrap_theme_night'];
 			$return['current_mobile_theme'] = $return['mobile_theme_color_night'];
+		}
+		$return['css'] = array();
+		if($return['interface::advance::enable'] == 1){
+			$css_convert['css::background-opacity'] = '--opacity';
+			$css_convert['css::border-radius'] = '--border-radius';
+		}
+		$css = config::byKeys(array_keys($css_convert));
+		foreach ($css as $key => $value) {
+			if($value == ''){
+				continue;
+			}
+			if(isset($css_convert[$key])){
+				$return['css'][$css_convert[$key]] = $value;
+			}
+		}
+		if(count($return['css']) > 0){
+			foreach ($return['css'] as $key => &$value) {
+				switch ($key) {
+					case '--url-logo-svg':
+					$value = 'url('.$value.')';
+					break;
+					case '--border-radius':
+					if($value == ''){
+						$value=0;
+					}else if($value > 1){
+						$value = 1;
+					}
+					$value.='rem';
+					break;
+				}
+			}
 		}
 		return $return;
 	}
@@ -130,7 +167,7 @@ class jeedom {
 			'name' => __('Cron actif', __FILE__),
 			'state' => $state,
 			'result' => ($state) ? __('OK', __FILE__) : __('NOK', __FILE__),
-			'comment' => ($state) ? '' : __('Erreur cron : les crons sont désactivés. Allez dans Administration -> Moteur de tâches pour les réactiver', __FILE__),
+			'comment' => ($state) ? '' : __('Erreur cron : les crons sont désactivés. Allez dans Réglages -> Système -> Moteur de tâches pour les réactiver', __FILE__),
 		);
 		
 		$state = (config::byKey('enableScenario') == 0 && count(scenario::all()) > 0) ? false : true;
@@ -282,7 +319,7 @@ class jeedom {
 			'name' => __('Configuration réseau interne', __FILE__),
 			'state' => $state,
 			'result' => ($state) ? __('OK', __FILE__) : __('NOK', __FILE__),
-			'comment' => ($state) ? '' : __('Allez sur Administration -> Configuration -> Réseaux, puis configurez correctement la partie réseau', __FILE__),
+			'comment' => ($state) ? '' : __('Allez sur Réglages -> Système -> Configuration -> Onglet Réseaux, puis configurez correctement la partie réseau', __FILE__),
 		);
 		
 		$state = network::test('external');
@@ -290,7 +327,7 @@ class jeedom {
 			'name' => __('Configuration réseau externe', __FILE__),
 			'state' => $state,
 			'result' => ($state) ? __('OK', __FILE__) : __('NOK', __FILE__),
-			'comment' => ($state) ? '' : __('Allez sur Administration -> Configuration -> Réseaux, puis configurez correctement la partie réseau', __FILE__),
+			'comment' => ($state) ? '' : __('Allez sur Réglages -> Système -> Configuration -> Onglet Réseaux, puis configurez correctement la partie réseau', __FILE__),
 		);
 		
 		$cache_health = array('comment' => '', 'name' => __('Persistance du cache', __FILE__));
@@ -939,6 +976,7 @@ class jeedom {
 			report::clean();
 			DB::optimize();
 			cache::clean();
+			listener::clean();
 		} catch (Exception $e) {
 			log::add('jeedom', 'error', $e->getMessage());
 		} catch (Error $e) {
@@ -1003,6 +1041,7 @@ class jeedom {
 			$datas = array_merge($datas, viewData::searchByConfiguration($key));
 			$datas = array_merge($datas, plan::searchByConfiguration($key));
 			$datas = array_merge($datas, plan3d::searchByConfiguration($key));
+			$datas = array_merge($datas, listener::searchEvent($key));
 		}
 		if (count($datas) > 0) {
 			foreach ($datas as $data) {
@@ -1064,21 +1103,13 @@ class jeedom {
 	/******************************************UTILS******************************************************/
 	
 	public static function versionAlias($_version, $_lightMode = true) {
-		if (!$_lightMode) {
-			if ($_version == 'dplan') {
-				return 'plan';
-			} else if ($_version == 'dview') {
-				return 'view';
-			} else if ($_version == 'mview') {
-				return 'view';
-			}
+		if($_version == 'mview'){
+			return 'mobile';
 		}
-		$alias = array(
-			'mview' => 'mobile',
-			'dview' => 'dashboard',
-			'dplan' => 'dashboard',
-		);
-		return (isset($alias[$_version])) ? $alias[$_version] : $_version;
+		if($_version == 'dview' || $_version == 'dplan' || $_version == 'plan' || $_version == 'view'){
+			return 'dashboard';
+		}
+		return $_version;
 	}
 	
 	public static function toHumanReadable($_input) {
@@ -1234,24 +1265,31 @@ class jeedom {
 	}
 	
 	public static function resetGit() {
-		shell_exec(system::getCmdSudo() . '/var/www/update.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/update.sh');
 	}
 	
 
 	/* Adding enabling Wifi over Control Panel TZO 07082019 */
 
 	public static function enableWifi() {
-		shell_exec(system::getCmdSudo() . '/var/www/wifion.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/wifion.sh');
 		
 	}
 
 	public static function disableWifi() {
-		shell_exec(system::getCmdSudo() . '/var/www/wifioff.sh');
+		shell_exec(system::getCmdSudo() . '/var/www/html/tools/wifioff.sh');
 	}
 	
    /* ==================================== */
 		
-
+		
+	public static function cleanDatabase() {
+		log::clear('cleaningdb');
+		$cmd = __DIR__ . '/../../install/cleaning.php';
+		$cmd .= ' >> ' . log::getPathToLog('cleaningdb') . ' 2>&1 &';
+		system::php($cmd, true);
+	}
+	
 	public static function cleanFileSytemRight() {
 		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
 		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';

@@ -20,7 +20,7 @@ if [ ! -z ${APACHE_PORT} ]; then
 else
 	echo "Listen 80" > /etc/apache2/ports.conf
 	sed -i -E "s/\<VirtualHost \*:(.*)\>/VirtualHost \*:80/" /etc/apache2/sites-enabled/000-default.conf
-fi	
+fi
 
 if [ ! -z ${SSH_PORT} ]; then
 	echo 'Change SSH listen port to : '${APACHE_PORT}
@@ -54,7 +54,7 @@ chown -R www-data:www-data /var/www/html
 
 echo 'Start apache2'
 systemctl restart apache2
-service apache2 restart 
+service apache2 restart
 
 echo 'Start sshd'
 systemctl restart sshd

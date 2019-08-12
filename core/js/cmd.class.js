@@ -57,7 +57,7 @@ jeedom.cmd.execute = function(_params) {
                 });
               }
               if (notify) {
-                eqLogic.find('.statusCmd').empty().append('<i class="fa fa-times"></i>');
+                eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
                 setTimeout(function() {
                   eqLogic.find('.statusCmd').empty();
                 }, 3000);
@@ -78,7 +78,7 @@ jeedom.cmd.execute = function(_params) {
                   });
                 }
                 if (notify) {
-                  eqLogic.find('.statusCmd').empty().append('<i class="fa fa-times"></i>');
+                  eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
                   setTimeout(function() {
                     eqLogic.find('.statusCmd').empty();
                   }, 3000);
@@ -90,7 +90,7 @@ jeedom.cmd.execute = function(_params) {
           }
         }else if(data.code == -32006){
           if ($.mobile) {
-            var result = confirm("{{Etes-vous sûr de vouloir faire cette action ?}}")
+            var result = confirm("{{Êtes-vous sûr de vouloir faire cette action ?}}")
             if(result){
               _params.confirmAction = 1;
               jeedom.cmd.execute(_params);
@@ -103,7 +103,7 @@ jeedom.cmd.execute = function(_params) {
                 });
               }
               if (notify) {
-                eqLogic.find('.statusCmd').empty().append('<i class="fa fa-times"></i>');
+                eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
                 setTimeout(function() {
                   eqLogic.find('.statusCmd').empty();
                 }, 3000);
@@ -111,7 +111,7 @@ jeedom.cmd.execute = function(_params) {
               return data;
             }
           }else{
-            bootbox.confirm("{{Etes-vous sûr de vouloir faire cette action ?}}", function (result) {
+            bootbox.confirm("{{Êtes-vous sûr de vouloir faire cette action ?}}", function (result) {
               if(result){
                 _params.confirmAction = 1;
                 jeedom.cmd.execute(_params);
@@ -124,7 +124,7 @@ jeedom.cmd.execute = function(_params) {
                   });
                 }
                 if (notify) {
-                  eqLogic.find('.statusCmd').empty().append('<i class="fa fa-times"></i>');
+                  eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
                   setTimeout(function() {
                     eqLogic.find('.statusCmd').empty();
                   }, 3000);
@@ -142,7 +142,7 @@ jeedom.cmd.execute = function(_params) {
             });
           }
           if (notify) {
-            eqLogic.find('.statusCmd').empty().append('<i class="fa fa-times"></i>');
+            eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
             setTimeout(function() {
               eqLogic.find('.statusCmd').empty();
             }, 3000);
@@ -187,6 +187,9 @@ jeedom.cmd.execute = function(_params) {
 };
 
 jeedom.cmd.test = function(_params) {
+  if(typeof _params.alert == 'undefined'){
+    _params.alert = '#div_alert';
+  }
   var paramsRequired = ['id'];
   var paramsSpecifics = {
     global: false,
@@ -198,7 +201,7 @@ jeedom.cmd.test = function(_params) {
           cache: 0,
           notify: false,
           success: function(result) {
-            bootbox.confirm('{{Résultat de la commande : }}' + result, function() {});
+            $(_params.alert).showAlert({message: '{{Résultat de la commande : }}' + result,level: 'success'});
           }
         });
         break;
@@ -209,16 +212,10 @@ jeedom.cmd.test = function(_params) {
             id: _params.id,
             cache: 0,
             error: function(error) {
-              $('#div_alert').showAlert({
-                message: error.message,
-                level: 'danger'
-              });
+              $(_params.alert).showAlert({message: error.message,level: 'danger'});
             },
             success: function() {
-              $('#div_alert').showAlert({
-                message: '{{Action exécutée avec succès}}',
-                level: 'success'
-              });
+              $(_params.alert).showAlert({message: '{{Action exécutée avec succès}}',level: 'success'});
             }
           });
           break;
@@ -234,16 +231,10 @@ jeedom.cmd.test = function(_params) {
             },
             cache: 0,
             error: function(error) {
-              $('#div_alert').showAlert({
-                message: error.message,
-                level: 'danger'
-              });
+              $(_params.alert).showAlert({message: error.message,level: 'danger'});
             },
             success: function() {
-              $('#div_alert').showAlert({
-                message: '{{Action exécutée avec succès}}',
-                level: 'success'
-              });
+              $(_params.alert).showAlert({message: '{{Action exécutée avec succès}}',level: 'success'});
             }
           });
           break;
@@ -255,16 +246,10 @@ jeedom.cmd.test = function(_params) {
             },
             cache: 0,
             error: function(error) {
-              $('#div_alert').showAlert({
-                message: error.message,
-                level: 'danger'
-              });
+              $(_params.alert).showAlert({message: error.message,level: 'danger'});
             },
             success: function() {
-              $('#div_alert').showAlert({
-                message: '{{Action exécutée avec succès}}',
-                level: 'success'
-              });
+              $(_params.alert).showAlert({message: '{{Action exécutée avec succès}}',level: 'success'});
             }
           });
           break;
@@ -276,16 +261,10 @@ jeedom.cmd.test = function(_params) {
             },
             cache: 0,
             error: function(error) {
-              $('#div_alert').showAlert({
-                message: error.message,
-                level: 'danger'
-              });
+              $(_params.alert).showAlert({message: error.message,level: 'danger'});
             },
             success: function() {
-              $('#div_alert').showAlert({
-                message: '{{Action exécutée avec succès}}',
-                level: 'success'
-              });
+              $(_params.alert).showAlert({message: '{{Action exécutée avec succès}}',level: 'success'});
             }
           });
           break;
@@ -304,10 +283,7 @@ jeedom.cmd.test = function(_params) {
               });
             },
             success: function() {
-              $('#div_alert').showAlert({
-                message: '{{Action exécutée avec succès}}',
-                level: 'success'
-              });
+              $(_params.alert).showAlert({message: '{{Action exécutée avec succès}}',level: 'success'});
             }
           });
           break;
@@ -337,7 +313,7 @@ jeedom.cmd.refreshByEqLogic = function(_params) {
   if(cmds.length > 0){
     $(cmds).each(function(){
       var cmd = $(this);
-      if(cmd.closest('.eqLogic[data-eqLogic_id='+ _params.eqLogic_id+']').html() != undefined){
+      if($(this).closest('.eqLogic[data-eqLogic_id='+ _params.eqLogic_id+']').html() != undefined){
         return true;
       }
       jeedom.cmd.toHtml({
@@ -436,6 +412,26 @@ jeedom.cmd.save = function(_params) {
   paramsAJAX.data = {
     action: 'save',
     cmd: json_encode(_params.cmd)
+  };
+  $.ajax(paramsAJAX);
+};
+
+jeedom.cmd.setIsVisibles = function(_params) {
+  var paramsRequired = ['cmds','isVisible'];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/cmd.ajax.php';
+  paramsAJAX.data = {
+    action: 'setIsVisibles',
+    cmds: json_encode(_params.cmds),
+    isVisible : _params.isVisible
   };
   $.ajax(paramsAJAX);
 };
@@ -851,28 +847,59 @@ jeedom.cmd.displayDuration = function(_date,_el){
     var j = Math.floor(d / 86400);
     var h = Math.floor(d % 86400 / 3600);
     var m = Math.floor(d % 3600 / 60);
-    _el.empty().append(((j > 0 ? j + " j " : "") + (h > 0 ? h + " h " : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + " min" : "0 min")));
+    var s = Math.floor( d - (j*86400 + h*3600 + m*60) );
+    if (d > 86399) {
+      var interval = 3600000;
+      _el.empty().append(((j + " j ") + ((h < 10 ? "0" : "") + h + " h")));
+    } else if (d > 3599 && d < 86400) {
+      var interval = 60000;
+      _el.empty().append(((h + " h ") + ((m < 10 ? "0" : "") + m + " m")));
+    } else {
+      var interval = 10000;
+      _el.empty().append(((m > 0 ? m + " m " : "") + (s > 0 ? (m > 0 && s < 10 ? "0" : "") + s + " s " : "0 s")));
+    }
     var myinterval = setInterval(function(){
       var d = ((Date.now() + clientServerDiffDatetime) - _el.attr('data-time')) / 1000;
       var j = Math.floor(d / 86400);
       var h = Math.floor(d % 86400 / 3600);
       var m = Math.floor(d % 3600 / 60);
-      _el.empty().append(((j > 0 ? j + " j " : "") + (h > 0 ? h + " h " : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + " min" : "0 min")));
-    }, 60000);
+      var s = Math.floor( d - (j*86400 + h*3600 + m*60) );
+      if (d > 86399) {
+        var interval = 3600000;
+        _el.empty().append(((j + " j ") + ((h < 10 ? "0" : "") + h + " h")));
+      } else if (d > 3599 && d < 86400) {
+        var interval = 60000;
+        _el.empty().append(((h + " h ") + ((m < 10 ? "0" : "") + m + " m")));
+      } else {
+        var interval = 10000;
+        _el.empty().append(((m > 0 ? m + " m " : "") + (s > 0 ? (m > 0 && s < 10 ? "0" : "") + s + " s " : "0 s")));
+      }
+    }, interval);
     _el.attr('data-interval',myinterval);
   }else{
-    _el.empty().append("0 min");
+    _el.empty().append("0 s");
+    var interval = 10000;
     var myinterval = setInterval(function(){
       if(_el.attr('data-time') < (Date.now()+ clientServerDiffDatetime)){
         var d = ((Date.now() + clientServerDiffDatetime) - _el.attr('data-time')) / 1000;
         var j = Math.floor(d / 86400);
         var h = Math.floor(d % 86400 / 3600);
         var m = Math.floor(d % 3600 / 60);
-        _el.empty().append(((j > 0 ? j + " j " : "") + (h > 0 ? h + " h " : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + " min" : "0 min")));
+        var s = Math.floor( d - (j*86400 + h*3600 + m*60) );
+        if (d > 86399) {
+          interval = 3600000;
+          _el.empty().append(((j + " j ") + ((h < 10 ? "0" : "") + h + " h")));
+        } else if (d > 3599 && d < 86400) {
+          interval = 60000;
+          _el.empty().append(((h + " h ") + ((m < 10 ? "0" : "") + m + " m")));
+        } else {
+          interval = 10000;
+          _el.empty().append(((m > 0 ? m + " m " : "") + (s > 0 ? (m > 0 && s < 10 ? "0" : "") + s + " s " : "0 s")));
+        }
       }else{
-        _el.empty().append("0 min");
+        _el.empty().append("0 s");
       }
-    }, 60000);
+    }, interval);
     _el.attr('data-interval',myinterval);
   }
 };

@@ -1,5 +1,5 @@
-The plugin management sub-menu allows you to manipulate plugins,
-know how to download, update and activate them, ...
+Le sous-menu Gestion des plugins permet de manipuler les plugins, à
+savoir : les télécharger, les mettre à jour et les activer,…​
 
 Plugins management
 ===================
@@ -46,14 +46,14 @@ En dessous à gauche, on retrouve une zone état avec :
 
 -   **Version**: the version of the installed plugin
 
--   **Author**: the author of the plugin
+-   **Auteur** : l’auteur du plugin
 
--   **Action**: Enable or disable the plugin
+-   **Action** : Permet d’activer ou désactiver le plugin
 
--   **Jeedom version**: Indicates the minimum Jeedom version required
-    for the plugin
+-   **Version jeedom** : Indique la version de Jeedom minimum requise
+    pour le plugin
 
--   **License**: Indicates the license of the plugin that will usually be
+-   **Licence** : Indique la licence du plugin qui sera généralement
     AGPL
 
 A droite, on retrouve la zone Log qui permet de définir 

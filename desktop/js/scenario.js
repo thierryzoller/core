@@ -14,19 +14,68 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
-$('.backgroundforJeedom').css('background-position','bottom right');
-$('.backgroundforJeedom').css('background-size','auto');
-$('.backgroundforJeedom').css('background-repeat','no-repeat');
+SC_CLIPBOARD = null
+PREV_FOCUS = null
+tab = null
+var $pageContainer = $('#div_pageContainer')
+jwerty.key('ctrl+s/⌘+s', function (e) {
+  e.preventDefault();
+  saveScenario();
+});
 
-tab = null;
-var url = document.location.toString();
-if (url.match('#')) {
-  $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
-}
-$('.nav-tabs a').on('shown.bs.tab', function (e) {
-  window.location.hash = e.target.hash;
+$('#div_scenarioElement').on('focus', ':input', function() {
+  PREV_FOCUS = $(this)
 })
 
+$('.backgroundforJeedom').css({
+  'background-position':'bottom right',
+  'background-repeat':'no-repeat',
+  'background-size':'auto'
+});
+
+
+//searching
+$('#in_searchScenario').keyup(function () {
+  var search = $(this).value()
+  if (search == '') {
+    $('.panel-collapse.in').closest('.panel').find('.accordion-toggle').click()
+    $('.scenarioDisplayCard').show()
+    $('.scenarioListContainer').packery()
+    return;
+  }
+  search = normTextLower(search)
+  $('.panel-collapse').attr('data-show',0)
+  $('.scenarioDisplayCard').hide()
+  $('.scenarioDisplayCard .name').each(function(){
+    var text = $(this).text()
+    text = normTextLower(text)
+    if (text.indexOf(search) >= 0) {
+      $(this).closest('.scenarioDisplayCard').show();
+      $(this).closest('.panel-collapse').attr('data-show',1)
+    }
+  });
+  $('.panel-collapse[data-show=1]').collapse('show')
+  $('.panel-collapse[data-show=0]').collapse('hide')
+  $('.scenarioListContainer').packery()
+});
+
+$('#bt_openAll').off('click').on('click', function () {
+  $(".accordion-toggle[aria-expanded='false']").each(function(){
+    $(this).click()
+  })
+})
+$('#bt_closeAll').off('click').on('click', function () {
+  $(".accordion-toggle[aria-expanded='true']").each(function(){
+    $(this).click()
+  })
+})
+
+$('#bt_resetScenarioSearch').on('click', function () {
+  $('#in_searchScenario').val('')
+  $('#in_searchScenario').keyup()
+})
+
+/* contextMenu */
 $(function(){
   try{
     $.contextMenu('destroy', $('.nav.nav-tabs'));
@@ -38,19 +87,16 @@ $(function(){
         if(scenarios.length == 0){
           return;
         }
-        //get groups:
         scenarioGroups = []
-        for(i=0; i<scenarios.length; i++)
-        {
+        for(i=0; i<scenarios.length; i++){
           group = scenarios[i].group
+          if (group == null) continue
           if (group == "") group = 'Aucun'
           group = group[0].toUpperCase() + group.slice(1)
           scenarioGroups.push(group)
         }
         scenarioGroups = Array.from(new Set(scenarioGroups))
         scenarioGroups.sort()
-        
-        //set list of scenarios per groups:
         scenarioList = []
         for(i=0; i<scenarioGroups.length; i++)
         {
@@ -60,12 +106,12 @@ $(function(){
           {
             sc = scenarios[j]
             scGroup = sc.group
+            if (scGroup == null) continue
             if (scGroup == "") scGroup = 'Aucun'
             if (scGroup.toLowerCase() != group.toLowerCase()) continue
             scenarioList[group].push([sc.name, sc.id])
           }
         }
-        
         //set context menu!
         var contextmenuitems = {}
         for (var group in scenarioList) {
@@ -80,31 +126,30 @@ $(function(){
           contextmenuitems[group] = {'name':group, 'items':items}
         }
         
-        $('.nav.nav-tabs').contextMenu({
-          selector: 'li',
-          autoHide: true,
-          zIndex: 9999,
-          className: 'scenario-context-menu',
-          callback: function(key, options) {
-            url = 'index.php?v=d&p=scenario&id=' + key;
-            if (document.location.toString().match('#')) {
-              url += '#' + document.location.toString().split('#')[1];
-            }
-            loadPage(url);
-          },
-          items: contextmenuitems
-        })
+        if (Object.entries(contextmenuitems).length > 0 && contextmenuitems.constructor === Object)
+        {
+          $('.nav.nav-tabs').contextMenu({
+            selector: 'li',
+            autoHide: true,
+            zIndex: 9999,
+            className: 'scenario-context-menu',
+            callback: function(key, options) {
+              url = 'index.php?v=d&p=scenario&id=' + key;
+              if (document.location.toString().match('#')) {
+                url += '#' + document.location.toString().split('#')[1];
+              }
+              loadPage(url);
+            },
+            items: contextmenuitems
+          })
+        }
       }
     })
   }
   catch(err) {}
 })
 
-editor = [];
-
-listColor = ['#16a085', '#27ae60', '#2980b9', '#745cb0', '#f39c12', '#d35400', '#c0392b', '#2c3e50', '#7f8c8d'];
-listColorStrong = ['#12846D', '#229351', '#246F9E', '#634F96', '#D88811', '#B74600', '#A53026', '#1D2935', '#687272'];
-pColor = 0;
+var editor = [];
 
 autoCompleteCondition = [
   {val: 'rand(MIN,MAX)'},
@@ -140,13 +185,9 @@ autoCompleteCondition = [
   {val: 'name(type,commande)'},
   {val: 'value(commande)'},
   {val: 'lastCommunication(equipement)'},
-  {val:'color_gradient(couleur_debut,couleur_fin,valuer_min,valeur_max,valeur)'}
+  {val: 'color_gradient(couleur_debut,couleur_fin,valuer_min,valeur_max,valeur)'}
 ];
-autoCompleteAction = ['tag','report','sleep', 'variable', 'delete_variable', 'scenario', 'stop', 'wait','gotodesign','log','message','equipement','ask','jeedom_poweroff','scenario_return','alert','popup','icon','event','remove_inat'];
-
-if (getUrlVars('saveSuccessFull') == 1) {
-  $('#div_alert').showAlert({message: '{{Sauvegarde effectuée avec succès}}', level: 'success'});
-}
+autoCompleteAction = ['setColoredIcon','tag','report','sleep', 'variable', 'delete_variable', 'scenario', 'stop', 'wait','gotodesign','log','message','equipement','ask','jeedom_poweroff','scenario_return','alert','popup','icon','event','remove_inat'];
 
 setTimeout(function(){
   $('.scenarioListContainer').packery();
@@ -157,17 +198,22 @@ $("#div_listScenario").trigger('resize');
 $('.scenarioListContainer').packery();
 
 $('#bt_scenarioThumbnailDisplay').off('click').on('click', function () {
+  if (modifyWithoutSave) {
+    if (!confirm('{{Attention vous quittez une page ayant des données modifiées non sauvegardées. Voulez-vous continuer ?}}')) {
+      return
+    }
+    modifyWithoutSave = false
+  }
+  
   $('#div_editScenario').hide();
   $('#scenarioThumbnailDisplay').show();
   $('.scenarioListContainer').packery();
+  addOrUpdateUrl('id',null,'{{Scénario}} - '+JEEDOM_PRODUCT_NAME);
 });
 
 $('.scenarioDisplayCard').off('click').on('click', function () {
   $('#scenarioThumbnailDisplay').hide();
   printScenario($(this).attr('data-scenario_id'));
-  if(document.location.toString().split('#')[1] == '' || document.location.toString().split('#')[1] == undefined){
-    $('.nav-tabs a[href="#generaltab"]').click();
-  }
 });
 
 $('.accordion-toggle').off('click').on('click', function () {
@@ -176,36 +222,19 @@ $('.accordion-toggle').off('click').on('click', function () {
   },100);
 });
 
-$("#div_tree").jstree({
-  "plugins": ["search"]
-});
-$('#in_treeSearch').keyup(function () {
-  $('#div_tree').jstree(true).search($('#in_treeSearch').val());
-});
-
-$('#in_searchScenario').keyup(function () {
-  var search = $(this).value();
-  if(search == ''){
-    $('.panel-collapse.in').closest('.panel').find('.accordion-toggle').click()
-    $('.scenarioDisplayCard').show();
-    $('.scenarioListContainer').packery();
-    return;
-  }
-  $('.panel-collapse:not(.in)').closest('.panel').find('.accordion-toggle').click()
-  $('.scenarioDisplayCard').hide();
-  $('.scenarioDisplayCard .name').each(function(){
-    var text = $(this).text().toLowerCase();
-    if(text.indexOf(search.toLowerCase()) >= 0){
-      $(this)
-      $(this).closest('.scenarioDisplayCard').show();
-    }
-  });
-  $('.scenarioListContainer').packery();
-});
 $('#bt_chooseIcon').on('click', function () {
+  var _icon = false
+  if ( $('div[data-l2key="icon"] > i').length ) {
+    _icon = $('div[data-l2key="icon"] > i').attr('class')
+    _icon = '.' + _icon.replace(' ', '.')
+  }
   chooseIcon(function (_icon) {
     $('.scenarioAttr[data-l1key=display][data-l2key=icon]').empty().append(_icon);
-  });
+  },{icon:_icon});
+});
+
+$('.scenarioAttr[data-l1key=display][data-l2key=icon]').on('dblclick',function(){
+  $('.scenarioAttr[data-l1key=display][data-l2key=icon]').value('');
 });
 
 $('.scenarioAttr[data-l1key=group]').autocomplete({
@@ -268,6 +297,7 @@ $("#bt_addScenario,#bt_addScenario2").off('click').on('click', function (event) 
             url += tab;
           }
           modifyWithoutSave = false;
+          resetUndo()
           loadPage(url);
         }
       });
@@ -275,18 +305,14 @@ $("#bt_addScenario,#bt_addScenario2").off('click').on('click', function (event) 
   });
 });
 
-jwerty.key('ctrl+s/⌘+s', function (e) {
-  e.preventDefault();
-  saveScenario();
-});
-
 $("#bt_saveScenario,#bt_saveScenario2").off('click').on('click', function (event) {
-  saveScenario();
+  saveScenario()
+  SC_CLIPBOARD = null
 });
 
 $("#bt_delScenario,#bt_delScenario2").off('click').on('click', function (event) {
   $.hideAlert();
-  bootbox.confirm('{{Etes-vous sûr de vouloir supprimer le scénario}} <span style="font-weight: bold ;">' + $('.scenarioAttr[data-l1key=name]').value() + '</span> ?', function (result) {
+  bootbox.confirm('{{Êtes-vous sûr de vouloir supprimer le scénario}} <span style="font-weight: bold ;">' + $('.scenarioAttr[data-l1key=name]').value() + '</span> ?', function (result) {
     if (result) {
       jeedom.scenario.remove({
         id: $('.scenarioAttr[data-l1key=id]').value(),
@@ -295,6 +321,7 @@ $("#bt_delScenario,#bt_delScenario2").off('click').on('click', function (event) 
         },
         success: function () {
           modifyWithoutSave = false;
+          resetUndo()
           loadPage('index.php?v=d&p=scenario');
         }
       });
@@ -302,18 +329,40 @@ $("#bt_delScenario,#bt_delScenario2").off('click').on('click', function (event) 
   });
 });
 
-$("#bt_testScenario,#bt_testScenario2").off('click').on('click', function () {
+$("#bt_testScenario,#bt_testScenario2").off('click').on('click', function (event) {
   $.hideAlert();
-  jeedom.scenario.changeState({
-    id: $('.scenarioAttr[data-l1key=id]').value(),
-    state: 'start',
-    error: function (error) {
-      $('#div_alert').showAlert({message: error.message, level: 'danger'});
-    },
-    success: function () {
-      $('#div_alert').showAlert({message: '{{Lancement du scénario réussi}}', level: 'success'});
-    }
-  });
+  var scenario_id = $('.scenarioAttr[data-l1key=id]').value();
+  var logmode = $('button[data-l2key="logmode"]').attr('value')
+  if(event.ctrlKey) {
+    saveScenario(function(){
+      jeedom.scenario.changeState({
+        id: scenario_id,
+        state: 'start',
+        error: function (error) {
+          $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        },
+        success: function () {
+          $('#div_alert').showAlert({message: '{{Lancement du scénario réussi}}', level: 'success'});
+          if (logmode != 'none') {
+            $('#md_modal').dialog({title: "{{Log d'exécution du scénario}}"})
+            .load('index.php?v=d&modal=scenario.log.execution&scenario_id=' + scenario_id)
+            .dialog('open')
+          }
+        }
+      });
+    });
+  } else {
+    jeedom.scenario.changeState({
+      id: $('.scenarioAttr[data-l1key=id]').value(),
+      state: 'start',
+      error: function (error) {
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+      },
+      success: function () {
+        $('#div_alert').showAlert({message: '{{Lancement du scénario réussi}}', level: 'success'});
+      }
+    });
+  }
 });
 
 $("#bt_copyScenario").off('click').on('click', function () {
@@ -347,23 +396,23 @@ $("#bt_stopScenario").off('click').on('click', function () {
 });
 
 $('#bt_editJsonScenario').on('click',function(){
-  $('#md_modal').dialog({title: "{{Edition texte scénarios}}"});
-  $("#md_modal").load('index.php?v=d&modal=scenario.jsonEdit&id='+$('.scenarioAttr[data-l1key=id]').value()).dialog('open');
+  $('#md_modal').dialog({title: "{{Edition texte scénarios}}"})
+  .load('index.php?v=d&modal=scenario.jsonEdit&id='+$('.scenarioAttr[data-l1key=id]').value()).dialog('open');
 });
 
 $('#bt_displayScenarioVariable,#bt_displayScenarioVariable2').off('click').on('click', function () {
-  $('#md_modal').dialog({title: "{{Variables des scénarios}}"});
-  $("#md_modal").load('index.php?v=d&modal=dataStore.management&type=scenario').dialog('open');
+  $('#md_modal').dialog({title: "{{Variables des scénarios}}"})
+  .load('index.php?v=d&modal=dataStore.management&type=scenario').dialog('open');
 });
 
 $('.bt_showExpressionTest').off('click').on('click', function () {
-  $('#md_modal').dialog({title: "{{Testeur d'expression}}"});
-  $("#md_modal").load('index.php?v=d&modal=expression.test').dialog('open');
+  $('#md_modal').dialog({title: "{{Testeur d'expression}}"})
+  .load('index.php?v=d&modal=expression.test').dialog('open');
 });
 
 $('.bt_showScenarioSummary').off('click').on('click', function () {
-  $('#md_modal').dialog({title: "{{Résumé scénario}}"});
-  $("#md_modal").load('index.php?v=d&modal=scenario.summary').dialog('open');
+  $('#md_modal').dialog({title: "{{Résumé scénario}}"})
+  .load('index.php?v=d&modal=scenario.summary').dialog('open');
 });
 
 $('#in_addElementType').off('change').on('change',function(){
@@ -375,102 +424,224 @@ $('#bt_scenarioTab').on('click',function(){
   setTimeout(function(){
     setEditor();
     taAutosize();
+    updateElseToggle();
   }, 50);
 });
 
 /*******************Element***********************/
+$pageContainer.off('change','.subElementAttr[data-l1key=options][data-l2key=enable]').on('change','.subElementAttr[data-l1key=options][data-l2key=enable]',function(){
+  var checkbox = $(this);
+  var element = checkbox.closest('.element');
+  if(checkbox.value() == 1){
+    element.removeClass('disableElement');
+  }else{
+    element.addClass('disableElement');
+  }
+  var subElement =checkbox.closest('.element').find('.subElement:not(.noSortable)');
+  if(checkbox.value() == 1){
+    subElement.find('.expressions').removeClass('disableSubElement');
+  }else{
+    subElement.find('.expressions').addClass('disableSubElement');
+  }
+});
 
-$('#div_pageContainer').off('click','.helpSelectCron').on('click','.helpSelectCron',function(){
+$pageContainer.off('change','.expressionAttr[data-l1key=options][data-l2key=enable]').on('change','.expressionAttr[data-l1key=options][data-l2key=enable]',function(){
+  var checkbox = $(this);
+  var element = checkbox.closest('.expression');
+  if(checkbox.value() == 1){
+    element.removeClass('disableSubElement');
+  }else{
+    element.addClass('disableSubElement');
+  }
+});
+
+$pageContainer.off('click','.helpSelectCron').on('click','.helpSelectCron',function(){
   var el = $(this).closest('.schedule').find('.scenarioAttr[data-l1key=schedule]');
   jeedom.getCronSelectModal({},function (result) {
     el.value(result.value);
   });
 });
 
-$('#div_pageContainer').off('click','.bt_addScenarioElement').on( 'click','.bt_addScenarioElement', function (event) {
-  var elementDiv = $(this).closest('.element');
-  if(elementDiv.html() == undefined){
-    elementDiv = $('#div_scenarioElement');
-  }
-  var expression = false;
-  if ($(this).hasClass('fromSubElement')) {
-    elementDiv = $(this).closest('.subElement').find('.expressions').eq(0);
-    expression = true;
-  }
-  $('#md_addElement').modal('show');
-  $("#bt_addElementSave").off('click').on('click', function (event) {
-    if (expression) {
-      elementDiv.append(addExpression({type: 'element', element: {type: $("#in_addElementType").value()}}));
-    } else {
-      $('#div_scenarioElement .span_noScenarioElement').remove();
-      elementDiv.append(addElement({type: $("#in_addElementType").value()}));
-    }
-    setEditor();
-    updateSortable();
-    $('#md_addElement').modal('hide');
-  });
-});
-
-$('#div_pageContainer').off('click','.bt_removeElement').on('click','.bt_removeElement',  function (event) {
-  if ($(this).closest('.expression').length != 0) {
-    $(this).closest('.expression').remove();
+$pageContainer.off('click','.bt_addScenarioElement').on( 'click','.bt_addScenarioElement', function (event) {
+  if (!window.location.href.includes('#scenariotab')) $('#bt_scenarioTab').trigger('click')
+  
+  //is scenario empty:
+  var elementDiv = $(this).closest('.element')
+  if ($('#div_scenarioElement').children('.element').length == 0) {
+    elementDiv = $('#div_scenarioElement')
+    $('#div_scenarioElement .span_noScenarioElement').remove()
   } else {
-    $(this).closest('.element').remove();
+    var expression = false
+    var insertAfter = false
+    
+    //Is triggerred from element button:
+    if ($(this).hasClass('fromSubElement')) {
+      elementDiv = $(this).closest('.subElement').find('.expressions').eq(0)
+      expression = true
+    } else {
+      //had focus ?
+      if (PREV_FOCUS != null && $(PREV_FOCUS).closest('div.element').html() != undefined) {
+        insertAfter = true
+        elementDiv = $(PREV_FOCUS).closest('div.element')
+        if (elementDiv.parent().attr('id') != 'div_scenarioElement') {
+          elementDiv = elementDiv.parents('.expression').eq(0)
+          expression = true
+        }
+      } else {
+        elementDiv = $('#div_scenarioElement')
+      }
+    }
   }
+  
+  $('#md_addElement').modal('show')
+  $("#bt_addElementSave").off('click').on('click', function (event) {
+    setUndoStack()
+    if (expression) {
+      newEL = $(addExpression({type: 'element', element: {type: $("#in_addElementType").value()}}))
+    } else {
+      newEL = $(addElement({type: $("#in_addElementType").value()}))
+    }
+    if (insertAfter) {
+      elementDiv.after(newEL.addClass('disableElement'))
+    } else {
+      elementDiv.append(newEL.addClass('disableElement'))
+    }
+    
+    setEditor()
+    updateSortable()
+    updateElseToggle()
+    $('#md_addElement').modal('hide')
+    modifyWithoutSave = true
+    updateTooltips()
+    setTimeout(function(){ newEL.removeClass('disableElement') }, 600)
+  })
+})
+
+$pageContainer.off('click','.bt_removeElement').on('click','.bt_removeElement',  function (event) {
+  setUndoStack()
+  var button = $(this);
+  if(event.ctrlKey) {
+    if (button.closest('.expression').length != 0) {
+      button.closest('.expression').remove();
+    } else {
+      button.closest('.element').remove();
+    }
+  }else{
+    bootbox.confirm("{{Êtes-vous sûr de vouloir supprimer ce bloc ?}}", function (result) {
+      if (result) {
+        if (button.closest('.expression').length != 0) {
+          button.closest('.expression').remove();
+        } else {
+          button.closest('.element').remove();
+        }
+      }
+    });
+  }
+  modifyWithoutSave = true;
 });
 
-$('#div_pageContainer').off('click','.bt_addAction').on( 'click','.bt_addAction', function (event) {
+$pageContainer.off('click','.bt_copyElement').on('click','.bt_copyElement',  function (event) {
+  clickedBloc = $(this).closest('.element')
+  //if element in an expression, copy the entire expression:
+  if (!clickedBloc.parent('#div_scenarioElement').length) {
+    SC_CLIPBOARD = clickedBloc.parent().parent().clone()
+  } else {
+    SC_CLIPBOARD = clickedBloc.clone()
+  }
+  SC_CLIPBOARD.find('.tooltipstered').removeClass('tooltipstered')
+  if(event.ctrlKey) {
+    setUndoStack()
+    clickedBloc.remove()
+  }
+  modifyWithoutSave = true;
+});
+
+$pageContainer.off('click','.bt_pasteElement').on('click','.bt_pasteElement',  function (event) {
+  if (!SC_CLIPBOARD) return
+  setUndoStack()
+  //clone clipboard and removes its id for later save:
+  newBloc = $(SC_CLIPBOARD).clone()
+  newBloc.find('input[data-l1key="id"]').attr("value", "")
+  newBloc.find('input[data-l1key="scenarioElement_id"]').attr("value", "")
+  newBloc.find('input[data-l1key="scenarioSubElement_id"]').attr("value", "")
+  
+  clickedBloc = $(this).closest('.element')
+  //Are we pasting inside an expresion:
+  if (clickedBloc.parent('#div_scenarioElement').length) {
+    //get the element if copied from an expression:
+    if (newBloc.hasClass('expression')) newBloc = newBloc.find('.element')
+    newBloc.insertAfter(clickedBloc)
+  } else {
+    //make it an expression if not yet:
+    if (newBloc.hasClass('expression')) {
+      newBloc.insertAfter(clickedBloc.parent().parent())
+    } else {
+      newDiv = '<div class="expression sortable col-xs-12">'
+      newDiv += '<input class="expressionAttr" data-l1key="type" style="display : none;" value="element">'
+      newDiv += '<div class="col-xs-12" id="insertHere">'
+      newDiv += '</div>'
+      newDiv += '</div>'
+      $(newDiv).insertAfter(clickedBloc.parent().parent())
+      newBloc.appendTo('#insertHere')
+      $('#insertHere').removeAttr('id')
+    }
+  }
+  
+  if(event.ctrlKey) {
+    clickedBloc.remove()
+  }
+  updateSortable()
+  updateTooltips()
+  modifyWithoutSave = true
+});
+
+$pageContainer.off('click','.bt_addAction').on( 'click','.bt_addAction', function (event) {
+  setUndoStack()
   $(this).closest('.subElement').children('.expressions').append(addExpression({type: 'action'}));
   setAutocomplete();
   updateSortable();
+  updateTooltips()
 });
 
-$('#div_pageContainer').off('click','.bt_addSinon').on( 'click','.bt_addSinon', function (event) {
+$pageContainer.off('click','.bt_showElse').on( 'click','.bt_showElse', function (event) {
+  if($(this).children('i').hasClass('fa-chevron-right')){
+    $(this).children('i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+    $(this).closest('.element').children('.subElementELSE').show();
+  }else{
+    if($(this).closest('.element').children('.subElementELSE').children('.expressions').children('.expression').length>0){
+      $('#div_alert').showAlert({message:"{{Le bloc Sinon ne peut être supprimé s'il contient des éléments.}}", level: 'danger'})
+      return;
+    }
+    $(this).children('i').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+    $(this).closest('.element').children('.subElementELSE').hide();
+  }
+});
+
+$pageContainer.off('click','.bt_collapse').on( 'click','.bt_collapse', function (event) {
+  changeThis = $(this)
+  if (event.ctrlKey) changeThis = $('.element').find('.bt_collapse');
   
-  if($(this).children("i").hasClass('fa-chevron-right')){
-    $(this).children("i").removeClass('fa-chevron-right').addClass('fa-chevron-down');
-    $(this).closest('.subElement').next().css('display','table');
-  }
-  else
-  {
-    if($(this).closest('.subElement').next().children('.expressions').children('.expression').length>0)
-    {
-      alert("{{Le bloc Sinon ne peut être supprimé s'il contient des éléments}}");
-    }
-    else
-    {
-      $(this).children("i").removeClass('fa-chevron-down').addClass('fa-chevron-right');
-      $(this).closest('.subElement').next().css('display','none');
-    }
+  if($(this).children('i').hasClass('fa-eye')){
+    changeThis.children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+    changeThis.closest('.element').addClass('elementCollapse');
+    changeThis.attr('value',1);
+    changeThis.attr('title',"{{Afficher ce bloc.<br>Ctrl+click: tous.}}");
+  }else{
+    changeThis.children('i').addClass('fa-eye').removeClass('fa-eye-slash');
+    changeThis.closest('.element').removeClass('elementCollapse');
+    changeThis.attr('value',0);
+    changeThis.attr('title',"{{Masquer ce bloc.<br>Ctrl+click: tous.}}");
+    setEditor();
   }
 });
 
-$('#div_pageContainer').off('click','.bt_addSinon').on( 'click','.bt_addSinon', function (event) {
-  
-  if($(this).children("i").hasClass('fa-chevron-right')){
-    $(this).children("i").removeClass('fa-chevron-right').addClass('fa-chevron-down');
-    $(this).closest('.subElement').next().css('display','table');
-  }
-  else
-  {
-    if($(this).closest('.subElement').next().children('.expressions').children('.expression').length>0)
-    {
-      alert("{{Le bloc Sinon ne peut être supprimé s'il contient des éléments}}");
-    }
-    else
-    {
-      $(this).children("i").removeClass('fa-chevron-down').addClass('fa-chevron-right');
-      $(this).closest('.subElement').next().css('display','none');
-    }
-  }
-});
-
-$('#div_pageContainer').off('click','.bt_removeExpression').on('click','.bt_removeExpression',  function (event) {
+$pageContainer.off('click','.bt_removeExpression').on('click','.bt_removeExpression',  function (event) {
+  setUndoStack()
   $(this).closest('.expression').remove();
   updateSortable();
 });
 
-$('#div_pageContainer').off('click','.bt_selectCmdExpression').on('click','.bt_selectCmdExpression',  function (event) {
+$pageContainer.off('click','.bt_selectCmdExpression').on('click','.bt_selectCmdExpression',  function (event) {
   var el = $(this);
   var expression = $(this).closest('.expression');
   var type = 'info';
@@ -479,10 +650,12 @@ $('#div_pageContainer').off('click','.bt_selectCmdExpression').on('click','.bt_s
   }
   jeedom.cmd.getSelectModal({cmd: {type: type}}, function (result) {
     if (expression.find('.expressionAttr[data-l1key=type]').value() == 'action') {
+      setUndoStack()
       expression.find('.expressionAttr[data-l1key=expression]').value(result.human);
       jeedom.cmd.displayActionOption(expression.find('.expressionAttr[data-l1key=expression]').value(), '', function (html) {
         expression.find('.expressionOptions').html(html);
         taAutosize();
+        updateTooltips()
       });
     }
     if (expression.find('.expressionAttr[data-l1key=type]').value() == 'condition') {
@@ -581,7 +754,7 @@ $('#div_pageContainer').off('click','.bt_selectCmdExpression').on('click','.bt_s
       }
       
       bootbox.dialog({
-        title: "{{Ajout d'un nouveau scénario}}",
+        title: "{{Ajout d'une nouvelle condition}}",
         message: message,
         buttons: {
           "Ne rien mettre": {
@@ -594,20 +767,22 @@ $('#div_pageContainer').off('click','.bt_selectCmdExpression').on('click','.bt_s
             label: "Valider",
             className: "btn-primary",
             callback: function () {
+              setUndoStack()
+              modifyWithoutSave = true;
               var condition = result.human;
               condition += ' ' + $('.conditionAttr[data-l1key=operator]').value();
-              if(result.cmd.subType == 'string'){
-                if($('.conditionAttr[data-l1key=operator]').value() == 'matches'){
+              if (result.cmd.subType == 'string') {
+                if ($('.conditionAttr[data-l1key=operator]').value() == 'matches') {
                   condition += ' "/' + $('.conditionAttr[data-l1key=operande]').value()+'/"';
-                }else{
-                  condition += ' "' + $('.conditionAttr[data-l1key=operande]').value()+'"';
+                } else {
+                  condition += " '" + $('.conditionAttr[data-l1key=operande]').value() + "'";
                 }
-              }else{
+              } else {
                 condition += ' ' + $('.conditionAttr[data-l1key=operande]').value();
               }
-              condition += ' ' + $('.conditionAttr[data-l1key=next]').value()+' ';
+              condition += ' ' + $('.conditionAttr[data-l1key=next]').value() + ' ';
               expression.find('.expressionAttr[data-l1key=expression]').atCaret('insert', condition);
-              if($('.conditionAttr[data-l1key=next]').value() != ''){
+              if ($('.conditionAttr[data-l1key=next]').value() != '') {
                 el.click();
               }
             }
@@ -618,10 +793,10 @@ $('#div_pageContainer').off('click','.bt_selectCmdExpression').on('click','.bt_s
   });
 });
 
-
-$('#div_pageContainer').off('click','.bt_selectOtherActionExpression').on('click','.bt_selectOtherActionExpression',  function (event) {
+$pageContainer.off('click','.bt_selectOtherActionExpression').on('click','.bt_selectOtherActionExpression',  function (event) {
   var expression = $(this).closest('.expression');
   jeedom.getSelectActionModal({scenario : true}, function (result) {
+    setUndoStack()
     expression.find('.expressionAttr[data-l1key=expression]').value(result.human);
     jeedom.cmd.displayActionOption(expression.find('.expressionAttr[data-l1key=expression]').value(), '', function (html) {
       expression.find('.expressionOptions').html(html);
@@ -630,8 +805,7 @@ $('#div_pageContainer').off('click','.bt_selectOtherActionExpression').on('click
   });
 });
 
-
-$('#div_pageContainer').off('click','.bt_selectScenarioExpression').on('click','.bt_selectScenarioExpression',  function (event) {
+$pageContainer.off('click','.bt_selectScenarioExpression').on('click','.bt_selectScenarioExpression',  function (event) {
   var expression = $(this).closest('.expression');
   jeedom.scenario.getSelectModal({}, function (result) {
     if (expression.find('.expressionAttr[data-l1key=type]').value() == 'action') {
@@ -643,7 +817,7 @@ $('#div_pageContainer').off('click','.bt_selectScenarioExpression').on('click','
   });
 });
 
-$('#div_pageContainer').off('click','.bt_selectEqLogicExpression').on('click','.bt_selectEqLogicExpression',  function (event) {
+$pageContainer.off('click','.bt_selectEqLogicExpression').on('click','.bt_selectEqLogicExpression',  function (event) {
   var expression = $(this).closest('.expression');
   jeedom.eqLogic.getSelectModal({}, function (result) {
     if (expression.find('.expressionAttr[data-l1key=type]').value() == 'action') {
@@ -655,27 +829,30 @@ $('#div_pageContainer').off('click','.bt_selectEqLogicExpression').on('click','.
   });
 });
 
-$('#div_pageContainer').off('focusout','.expression .expressionAttr[data-l1key=expression]').on('focusout','.expression .expressionAttr[data-l1key=expression]',  function (event) {
+$pageContainer.off('focusout','.expression .expressionAttr[data-l1key=expression]').on('focusout','.expression .expressionAttr[data-l1key=expression]',  function (event) {
   var el = $(this);
   if (el.closest('.expression').find('.expressionAttr[data-l1key=type]').value() == 'action') {
     var expression = el.closest('.expression').getValues('.expressionAttr');
     jeedom.cmd.displayActionOption(el.value(), init(expression[0].options), function (html) {
       el.closest('.expression').find('.expressionOptions').html(html);
       taAutosize();
+      updateTooltips()
     });
   }
 });
 
 
 /**************** Scheduler **********************/
-
 $('.scenarioAttr[data-l1key=mode]').off('change').on('change', function () {
+  $('#bt_addSchedule').removeClass('roundedRight');
+  $('#bt_addTrigger').removeClass('roundedRight');
   if ($(this).value() == 'schedule' || $(this).value() == 'all') {
     $('.scheduleDisplay').show();
     $('#bt_addSchedule').show();
   } else {
     $('.scheduleDisplay').hide();
     $('#bt_addSchedule').hide();
+    $('#bt_addTrigger').addClass('roundedRight');
   }
   if ($(this).value() == 'provoke' || $(this).value() == 'all') {
     $('.provokeDisplay').show();
@@ -683,6 +860,10 @@ $('.scenarioAttr[data-l1key=mode]').off('change').on('change', function () {
   } else {
     $('.provokeDisplay').hide();
     $('#bt_addTrigger').hide();
+    $('#bt_addSchedule').addClass('roundedRight');
+  }
+  if($(this).value() == 'all'){
+    $('#bt_addSchedule').addClass('roundedRight');
   }
 });
 
@@ -694,29 +875,29 @@ $('#bt_addSchedule').off('click').on('click', function () {
   addSchedule('');
 });
 
-$('#div_pageContainer').off('click','.bt_removeTrigger').on('click','.bt_removeTrigger',  function (event) {
+$pageContainer.off('click','.bt_removeTrigger').on('click','.bt_removeTrigger',  function (event) {
   $(this).closest('.trigger').remove();
 });
 
-$('#div_pageContainer').off('click','.bt_removeSchedule').on('click','.bt_removeSchedule',  function (event) {
+$pageContainer.off('click','.bt_removeSchedule').on('click','.bt_removeSchedule',  function (event) {
   $(this).closest('.schedule').remove();
 });
 
-$('#div_pageContainer').off('click','.bt_selectTrigger').on('click','.bt_selectTrigger',  function (event) {
+$pageContainer.off('click','.bt_selectTrigger').on('click','.bt_selectTrigger',  function (event) {
   var el = $(this);
   jeedom.cmd.getSelectModal({cmd: {type: 'info'}}, function (result) {
     el.closest('.trigger').find('.scenarioAttr[data-l1key=trigger]').value(result.human);
   });
 });
 
-$('#div_pageContainer').off('click','.bt_selectDataStoreTrigger').on( 'click','.bt_selectDataStoreTrigger', function (event) {
+$pageContainer.off('click','.bt_selectDataStoreTrigger').on( 'click','.bt_selectDataStoreTrigger', function (event) {
   var el = $(this);
   jeedom.dataStore.getSelectModal({cmd: {type: 'info'}}, function (result) {
     el.closest('.trigger').find('.scenarioAttr[data-l1key=trigger]').value(result.human);
   });
 });
 
-$('#div_pageContainer').off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable',  function () {
+$pageContainer.off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable',  function () {
   var expressions = $(this).closest('.expressions');
   $("#div_scenarioElement").sortable({
     cursor: "move",
@@ -725,33 +906,83 @@ $('#div_pageContainer').off('mouseenter','.bt_sortable').on('mouseenter','.bt_so
     forcePlaceholderSize: true,
     forceHelperSize: true,
     placeholder: "sortable-placeholder",
+    start: function (event, ui) {
+      if (expressions.find('.sortable').length < 3) {
+        expressions.find('.sortable.empty').show();
+      }
+    },
+    change: function (event, ui) {
+      if (ui.placeholder.next().length == 0) {
+        ui.placeholder.addClass('sortable-placeholderLast')
+      } else {
+        ui.placeholder.removeClass('sortable-placeholderLast')
+      }
+      
+      getClass = true
+      if (ui.placeholder.parent().hasClass('subElement')) {
+        getClass = false
+      }
+      if (ui.helper.hasClass('expressionACTION') && ui.placeholder.parent().attr('id') == 'div_scenarioElement') {
+        getClass = false
+      }
+      
+      thisSub = ui.placeholder.parents('.expressions').parents('.subElement')
+      if(thisSub.hasClass('subElementCOMMENT') || thisSub.hasClass('subElementCODE')) {
+        getClass = false
+      }
+      
+      if (getClass) {
+        ui.placeholder.addClass('sortable-placeholder')
+      } else {
+        ui.placeholder.removeClass('sortable-placeholder')
+      }
+    },
     update: function (event, ui) {
+      if (ui.item.closest('.subElement').hasClass('subElementCOMMENT')) {
+        $("#div_scenarioElement").sortable('cancel');
+      }
       if (ui.item.findAtDepth('.element', 2).length == 1 && ui.item.parent().attr('id') == 'div_scenarioElement') {
         ui.item.replaceWith(ui.item.findAtDepth('.element', 2));
       }
+      
       if (ui.item.hasClass('element') && ui.item.parent().attr('id') != 'div_scenarioElement') {
-        ui.item.replaceWith(addExpression({type: 'element', element: {html: ui.item.clone().wrapAll("<div/>").parent().html()}}));
+        ui.item.find('.expressionAttr,.subElementAttr,.elementAttr').each(function(){
+          var value = $(this).value();
+          if(value != undefined && value != ''){
+            $(this).attr('data-tmp-value',value);
+          }
+        })
+        el = $(addExpression({type: 'element', element: {html: ui.item.wrapAll("<div/>").parent().html()}}));
+        el.find('.expressionAttr,.subElementAttr,.elementAttr').each(function(){
+          var value = $(this).attr('data-tmp-value');
+          if(value != undefined && value != ''){
+            $(this).value(value);
+          }
+          $(this).removeAttr('data-tmp-value');
+        })
+        ui.item.parent().replaceWith(el);
       }
+      
       if (ui.item.hasClass('expression') && ui.item.parent().attr('id') == 'div_scenarioElement') {
         $("#div_scenarioElement").sortable("cancel");
       }
       if (ui.item.closest('.subElement').hasClass('noSortable')) {
         $("#div_scenarioElement").sortable("cancel");
       }
-      updateSortable();
-    },
-    start: function (event, ui) {
-      if (expressions.find('.sortable').length < 3) {
-        expressions.find('.sortable.empty').show();
-      }
-    },
+      
+      updateTooltips()
+      updateSortable()
+    }
   });
   $("#div_scenarioElement").sortable("enable");
 });
 
-$('#div_pageContainer').off('mouseout','.bt_sortable').on('mouseout','.bt_sortable',  function () {
+$pageContainer.on('mousedown','.bt_sortable',  function () {
+  setUndoStack()
+});
+
+$pageContainer.off('mouseout','.bt_sortable').on('mouseout','.bt_sortable',  function () {
   $("#div_scenarioElement").sortable("disable");
-  
 });
 
 $('#bt_graphScenario').off('click').on('click', function () {
@@ -774,21 +1005,21 @@ $('#bt_templateScenario').off('click').on('click', function () {
   $("#md_modal").load('index.php?v=d&modal=scenario.template&scenario_id=' + $('.scenarioAttr[data-l1key=id]').value()).dialog('open');
 });
 
+
 /**************** Initialisation **********************/
-
-$('#div_pageContainer').on('change','.scenarioAttr',  function () {
+$pageContainer.off('change','.scenarioAttr').on('change','.scenarioAttr:visible',  function () {
   modifyWithoutSave = true;
 });
 
-$('#div_pageContainer').on('change','.expressionAttr',  function () {
+$pageContainer.off('change','.expressionAttr').on('change','.expressionAttr:visible',  function () {
   modifyWithoutSave = true;
 });
 
-$('#div_pageContainer').on('change','.elementAttr',  function () {
+$pageContainer.off('change','.elementAttr').on('change','.elementAttr:visible',  function () {
   modifyWithoutSave = true;
 });
 
-$('#div_pageContainer').on('change', '.subElementAttr', function () {
+$pageContainer.off('change','.subElementAttr').on('change', '.subElementAttr:visible', function () {
   modifyWithoutSave = true;
 });
 
@@ -811,8 +1042,22 @@ function updateSortable() {
 }
 
 function updateElseToggle() {
-  $('.subElementElse').each(function () {
-    if ($(this).parent().css('display')=='table') $(this).parent().prev().find('.bt_addSinon:first').children('i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+  $('.subElementELSE').each(function () {
+    if(!$(this).closest('.element').children('.subElementTHEN').find('.bt_showElse:first i').hasClass('fa-chevron-right')){
+      if($(this).children('.expressions').children('.expression').length == 0){
+        $(this).closest('.element').children('.subElementTHEN').find('.bt_showElse').first().trigger('click');
+      }
+    }
+  });
+}
+
+function updateElementCollpase() {
+  $('.bt_collapse').each(function () {
+    if($(this).value() == 0){
+      $(this).closest('.element').removeClass('elementCollapse');
+    }else{
+      $(this).closest('.element').addClass('elementCollapse');
+    }
   });
 }
 
@@ -833,7 +1078,6 @@ function setEditor() {
         });
       }, 1);
     }
-    
   });
 }
 
@@ -856,7 +1100,7 @@ function setAutocomplete() {
 function printScenario(_id) {
   $.showLoading();
   jeedom.scenario.update[_id] =function(_options){
-    if(_options.scenario_id =! $('#div_pageContainer').getValues('.scenarioAttr')[0]['id']){
+    if(_options.scenario_id =! $pageContainer.getValues('.scenarioAttr')[0]['id']){
       return;
     }
     switch(_options.state){
@@ -892,14 +1136,11 @@ function printScenario(_id) {
       $('#div_alert').showAlert({message: error.message, level: 'danger'});
     },
     success: function (data) {
-      pColor = 0;
       $('.scenarioAttr').value('');
-      if(data.name){
-        document.title = data.name +' - Jeedom';
-      }
-      $('.scenarioAttr[data-l1key=object_id] option:first').attr('selected',true);
+      
+      $('.scenarioAttr[data-l1key=object_id] option').first().attr('selected',true);
       $('.scenarioAttr[data-l1key=object_id]').val('');
-      $('#div_pageContainer').setValues(data, '.scenarioAttr');
+      $pageContainer.setValues(data, '.scenarioAttr');
       data.lastLaunch = (data.lastLaunch == null) ? '{{Jamais}}' : data.lastLaunch;
       $('#span_lastLaunch').text(data.lastLaunch);
       
@@ -938,14 +1179,17 @@ function printScenario(_id) {
           addSchedule(data.schedule);
         }
       }
-      
       if(data.elements.length == 0){
-        $('#div_scenarioElement').append('<center class="span_noScenarioElement"><span style=\'color:#767676;font-size:1.2em;font-weight: bold;\'>Pour constituer votre scénario veuillez ajouter des blocs</span></center>')
+        $('#div_scenarioElement').append('<center class="span_noScenarioElement"><span>Pour constituer votre scénario veuillez ajouter des blocs</span></center>')
       }
       actionOptions = []
+      var elements = '';
       for (var i in data.elements) {
-        $('#div_scenarioElement').append(addElement(data.elements[i]));
+        elements += addElement(data.elements[i]);
       }
+      $('#div_scenarioElement').append(elements);
+      $('.subElementAttr[data-l1key=options][data-l2key=enable]').trigger('change');
+      $('.expressionAttr[data-l1key=options][data-l2key=enable]').trigger('change');
       jeedom.cmd.displayActionsOption({
         params : actionOptions,
         async : false,
@@ -961,32 +1205,44 @@ function printScenario(_id) {
           taAutosize();
         }
       });
+      $('#div_editScenario').show();
       updateSortable();
       setAutocomplete();
+      updateElementCollpase();
       updateElseToggle();
-      $('#div_editScenario').show();
       taAutosize();
+      var title = '';
+      if(data.name){
+        title = data.name +' - Jeedom';
+      }
+      addOrUpdateUrl('id',data.id,title);
+      if(window.location.hash == ''){
+        $('.nav-tabs a[href="#generaltab"]').click();
+      }
       setTimeout(function () {
         setEditor();
       }, 100);
       modifyWithoutSave = false;
+      resetUndo()
       setTimeout(function () {
         modifyWithoutSave = false;
       }, 1000);
+      setTimeout(function () {
+        updateTooltips();
+      }, 500);
     }
   });
 }
 
-function saveScenario() {
+function saveScenario(_callback) {
   $.hideAlert();
-  var scenario = $('#div_pageContainer').getValues('.scenarioAttr')[0];
+  var scenario = $pageContainer.getValues('.scenarioAttr')[0];
   if(typeof scenario.trigger == 'undefined'){
     scenario.trigger = '';
   }
   if(typeof scenario.schedule == 'undefined'){
     scenario.schedule = '';
   }
-  scenario.type = "expert";
   var elements = [];
   $('#div_scenarioElement').children('.element').each(function () {
     elements.push(getElement($(this)));
@@ -999,11 +1255,15 @@ function saveScenario() {
     },
     success: function (data) {
       modifyWithoutSave = false;
+      resetUndo()
       url = 'index.php?v=d&p=scenario&id=' + data.id + '&saveSuccessFull=1';
-      if (document.location.toString().match('#')) {
-        url += '#' + document.location.toString().split('#')[1];
+      if (window.location.hash != '') {
+        url += window.location.hash;
       }
       loadPage(url);
+      if(typeof _callback == 'function'){
+        _callback();
+      }
     }
   });
 }
@@ -1013,11 +1273,11 @@ function addTrigger(_trigger) {
   div += '<label class="col-xs-3 control-label">{{Evénement}}</label>';
   div += '<div class="col-xs-9">';
   div += '<div class="input-group">';
-  div += '<input class="scenarioAttr input-sm form-control" data-l1key="trigger" value="' + _trigger.replace(/"/g,'&quot;') + '" >';
+  div += '<input class="scenarioAttr input-sm form-control roundedLeft" data-l1key="trigger" value="' + _trigger.replace(/"/g,'&quot;') + '" >';
   div += '<span class="input-group-btn">';
-  div += '<a class="btn btn-default btn-sm cursor bt_selectTrigger" title="{{Choisir une commande}}"><i class="fas fa-list-alt"></i></a>';
-  div += '<a class="btn btn-default btn-sm cursor bt_selectDataStoreTrigger" title="{{Choisir une variable}}"><i class="fas fa-calculator"></i></a>';
-  div += '<a class="btn btn-default btn-sm cursor bt_removeTrigger"><i class="fas fa-minus-circle"></i></a>';
+  div += '<a class="btn btn-default btn-sm cursor bt_selectTrigger" tooltip="{{Choisir une commande}}"><i class="fas fa-list-alt"></i></a>';
+  div += '<a class="btn btn-default btn-sm cursor bt_selectDataStoreTrigger" tooltip="{{Choisir une variable}}"><i class="fas fa-calculator"></i></a>';
+  div += '<a class="btn btn-default btn-sm cursor bt_removeTrigger roundedRight"><i class="fas fa-minus-circle"></i></a>';
   div += '</span>';
   div += '</div>';
   div += '</div>';
@@ -1030,10 +1290,10 @@ function addSchedule(_schedule) {
   div += '<label class="col-xs-3 control-label">{{Programmation}}</label>';
   div += '<div class="col-xs-9">';
   div += '<div class="input-group">';
-  div += '<input class="scenarioAttr input-sm form-control" data-l1key="schedule" value="' + _schedule.replace(/"/g,'&quot;') + '">';
+  div += '<input class="scenarioAttr input-sm form-control roundedLeft" data-l1key="schedule" value="' + _schedule.replace(/"/g,'&quot;') + '">';
   div += '<span class="input-group-btn">';
   div += '<a class="btn btn-default btn-sm cursor helpSelectCron"><i class="fas fa-question-circle"></i></a>';
-  div += '<a class="btn btn-default btn-sm cursor bt_removeSchedule"><i class="fas fa-minus-circle"></i></a>';
+  div += '<a class="btn btn-default btn-sm cursor bt_removeSchedule roundedRight"><i class="fas fa-minus-circle"></i></a>';
   div += '</span>';
   div += '</div>';
   div += '</div>';
@@ -1049,7 +1309,12 @@ function addExpression(_expression) {
   if (_expression.type == 'condition') {
     sortable = 'noSortable';
   }
-  var retour = '<div class="expression ' + sortable + ' col-xs-12" style="margin-bottom: 0px; margin-right: 0px;margin-left: 0px;padding-right: 0px; padding-left: 0px">';
+  
+  if (_expression.type == 'action') {
+    var retour = '<div class="expression expressionACTION ' + sortable + ' col-xs-12" >';
+  } else {
+    var retour = '<div class="expression ' + sortable + ' col-xs-12" >';
+  }
   retour += '<input class="expressionAttr" data-l1key="id" style="display : none;" value="' + init(_expression.id) + '"/>';
   retour += '<input class="expressionAttr" data-l1key="scenarioSubElement_id" style="display : none;" value="' + init(_expression.scenarioSubElement_id) + '"/>';
   retour += '<input class="expressionAttr" data-l1key="type" style="display : none;" value="' + init(_expression.type) + '"/>';
@@ -1058,18 +1323,18 @@ function addExpression(_expression) {
     if (isset(_expression.expression)) {
       _expression.expression = _expression.expression.replace(/"/g, '&quot;');
     }
-    retour += '<div class="input-group input-group-sm" style="width: 100%; padding-top: 5px;">';
-    retour += '<textarea class="expressionAttr form-control" data-l1key="expression" rows="1" style="resize:vertical;">' + init(_expression.expression) + '</textarea>';
+    retour += '<div class="input-group input-group-sm" >';
+    retour += '<input class="expressionAttr form-control roundedLeft" data-l1key="expression" value="' + init(_expression.expression) + '" />';
     retour += '<span class="input-group-btn">';
-    retour += '<button type="button" class="btn btn-default cursor bt_selectCmdExpression tooltips"  title="{{Rechercher une commande}}"><i class="fas fa-list-alt"></i></button>';
-    retour += '<button type="button" class="btn btn-default cursor bt_selectScenarioExpression tooltips"  title="{{Rechercher un scenario}}"><i class="fas fa-history"></i></button>';
-    retour += '<button type="button" class="btn btn-default cursor bt_selectEqLogicExpression tooltips"  title="{{Rechercher d\'un équipement}}"><i class="fas fa-cube"></i></button>';
+    retour += '<button type="button" class="btn btn-default cursor bt_selectCmdExpression"  tooltip="{{Rechercher une commande}}"><i class="fas fa-list-alt"></i></button>';
+    retour += '<button type="button" class="btn btn-default cursor bt_selectScenarioExpression"  tooltip="{{Rechercher un scenario}}"><i class="fas fa-history"></i></button>';
+    retour += '<button type="button" class="btn btn-default cursor bt_selectEqLogicExpression roundedRight"  tooltip="{{Rechercher un équipement}}"><i class="fas fa-cube"></i></button>';
     retour += '</span>';
     retour += '</div>';
     
     break;
     case 'element' :
-    retour += '<div class="col-xs-12" style="padding-right: 0px; padding-left: 0px;">';
+    retour += '<div class="col-xs-12" >';
     if (isset(_expression.element) && isset(_expression.element.html)) {
       retour += _expression.element.html;
     } else {
@@ -1082,35 +1347,35 @@ function addExpression(_expression) {
     retour += '</div>';
     break;
     case 'action' :
-    retour += '<div class="col-xs-1" style="margin-top: 4px">';
-    retour += '<i class="fas fa-arrows-alt-v cursor bt_sortable" style="margin-right: 5px; "></i>';
+    retour += '<div class="col-xs-1" >';
+    retour += '<i class="fas fa-arrows-alt-v cursor bt_sortable" ></i>';
     if (!isset(_expression.options) || !isset(_expression.options.enable) || _expression.options.enable == 1) {
-      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="enable" checked style="margin-top : 9px;margin-right : 0px;" title="{{Décocher pour désactiver l\'action}}"/>';
+      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="enable" checked  tooltip="{{Décocher pour désactiver l\'action}}"/>';
     } else {
-      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="enable" style="margin-top : 9px;margin-right : 0px;" title="{{Décocher pour désactiver l\'action}}"/>';
+      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="enable"  tooltip="{{Décocher pour désactiver l\'action}}"/>';
     }
     if (!isset(_expression.options) || !isset(_expression.options.background) || _expression.options.background == 0) {
-      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="background" style="margin-top : 9px;margin-right : 0px;" title="{{Cocher pour que la commande s\'exécute en parallèle des autres actions}}"/>';
+      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="background"  tooltip="{{Cocher pour que la commande s\'exécute en parallèle des autres actions}}"/>';
     } else {
-      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="background" checked style="margin-top : 9px;margin-right : 0px;" title="{{Cocher pour que la commande s\'exécute en parallèle des autres actions}}"/>';
+      retour += '<input type="checkbox" class="expressionAttr" data-l1key="options" data-l2key="background" checked  tooltip="{{Cocher pour que la commande s\'exécute en parallèle des autres actions}}"/>';
     }
     var expression_txt = init(_expression.expression);
     if(typeof expression_txt != 'string'){
       expression_txt = json_encode(expression_txt);
     }
     retour += '</div>';
-    retour += '<div class="col-xs-4" style="margin-top: 4px"><div class="input-group input-group-sm">';
+    retour += '<div class="col-xs-4" ><div class="input-group input-group-sm">';
     retour += '<span class="input-group-btn">';
-    retour += '<button class="btn btn-default bt_removeExpression" type="button" title="{{Supprimer l\'action}}"><i class="fas fa-minus-circle"></i></button>';
+    retour += '<button class="btn btn-default bt_removeExpression roundedLeft" type="button" tooltip="{{Supprimer l\'action}}"><i class="fas fa-minus-circle"></i></button>';
     retour += '</span>';
-    retour += '<input class="expressionAttr form-control" data-l1key="expression" value="' + expression_txt.replace(/"/g,'&quot;') + '" style="font-weight:bold;"/>';
+    retour += '<input class="expressionAttr form-control" data-l1key="expression" value="' + expression_txt.replace(/"/g,'&quot;') + '"/>';
     retour += '<span class="input-group-btn">';
-    retour += '<button class="btn btn-default bt_selectOtherActionExpression" type="button" title="{{Sélectionner un mot-clé}}"><i class="fas fa-tasks"></i></button>';
-    retour += '<button class="btn btn-default bt_selectCmdExpression" type="button" title="{{Sélectionner la commande}}"><i class="fas fa-list-alt"></i></button>';
+    retour += '<button class="btn btn-default bt_selectOtherActionExpression" type="button" tooltip="{{Sélectionner un mot-clé}}"><i class="fas fa-tasks"></i></button>';
+    retour += '<button class="btn btn-default bt_selectCmdExpression roundedRight" type="button" tooltip="{{Sélectionner la commande}}"><i class="fas fa-list-alt"></i></button>';
     retour += '</span>';
     retour += '</div></div>';
     var actionOption_id = uniqId();
-    retour += '<div class="col-xs-7 expressionOptions" style="margin-top: 4px" id="'+actionOption_id+'">';
+    retour += '<div class="col-xs-7 expressionOptions"  id="'+actionOption_id+'">';
     retour += '</div>';
     actionOptions.push({
       expression : init(_expression.expression, ''),
@@ -1131,17 +1396,17 @@ function addExpression(_expression) {
   return retour;
 }
 
-$('#div_pageContainer').on('click','.subElementAttr[data-l1key=options][data-l2key=allowRepeatCondition]',function(){
+$pageContainer.on('click','.subElementAttr[data-l1key=options][data-l2key=allowRepeatCondition]',function(){
   if($(this).attr('value') == 0){
     $(this).attr('value',1);
-    $(this).html('<span class="fa-stack"><i class="fas fa-refresh fa-stack-1x"></i><i class="fas fa-ban fa-stack-2x text-danger"></i></span>');
+    $(this).html('<span><i class="fas fa-ban text-danger"></i></span>');
   }else{
     $(this).attr('value',0);
-    $(this).html('<span class="fa-stack"><i class="fas fa-refresh fa-stack-1x"></span>');
+    $(this).html('<span><i class="fas fa-sync"></span>');
   }
 });
 
-function addSubElement(_subElement, _pColor) {
+function addSubElement(_subElement) {
   if (!isset(_subElement.type) || _subElement.type == '') {
     return '';
   }
@@ -1152,272 +1417,353 @@ function addSubElement(_subElement, _pColor) {
   if (_subElement.type == 'if' || _subElement.type == 'for' || _subElement.type == 'code') {
     noSortable = 'noSortable';
   }
-  var displayElse = 'table';
-  if (_subElement.type == 'else') {
-    if (!isset(_subElement.expressions) || _subElement.expressions.length==0) displayElse = 'none';
+  
+  blocClass = '';
+  switch (_subElement.type) {
+    case 'if':
+    blocClass = 'subElementIF';
+    break;
+    case 'then':
+    blocClass = 'subElementTHEN';
+    break;
+    case 'else':
+    blocClass = 'subElementELSE';
+    break;
+    case 'for':
+    blocClass = 'subElementFOR';
+    break;
+    case 'in':
+    blocClass = 'subElementIN';
+    break;
+    case 'at':
+    blocClass = 'subElementAT';
+    break;
+    case 'do':
+    blocClass = 'subElementDO';
+    break;
+    case 'code':
+    blocClass = 'subElementCODE';
+    break;
+    case 'comment':
+    blocClass = 'subElementCOMMENT';
+    break;
+    case 'action':
+    blocClass = 'subElementACTION';
+    break;
   }
-  var retour = '<div class="subElement ' + noSortable + '" style="display:' + displayElse + '; width:100%;">';
+  var retour = '<div class="subElement ' + blocClass + ' ' + noSortable + '">';
   retour += '<input class="subElementAttr" data-l1key="id" style="display : none;" value="' + init(_subElement.id) + '"/>';
   retour += '<input class="subElementAttr" data-l1key="scenarioElement_id" style="display : none;" value="' + init(_subElement.scenarioElement_id) + '"/>';
   retour += '<input class="subElementAttr" data-l1key="type" style="display : none;" value="' + init(_subElement.type) + '"/>';
+  
   switch (_subElement.type) {
     case 'if' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable" style="position:relative;top:5px;"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="Décocher pour désactiver l\'élément" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor" ></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="Décocher pour désactiver l\'élément" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="Décocher pour désactiver l\'élément" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="Décocher pour désactiver l\'élément" />';
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 50px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{SI}}';
+    retour += '<div >';
+    retour += '<legend >{{SI}}';
     retour += '</legend>';
     retour += '</div>';
     
-    retour += '<div style="display:table-cell; width: 35px;vertical-align: top; padding-top: 5px;">';
-    if(!isset(_subElement.options) || !isset(_subElement.options.allowRepeatCondition) || _subElement.options.allowRepeatCondition == 0){
-      retour += '<a style="height : 30px;" class="btn btn-default btn-xs cursor subElementAttr tooltips pull-right" title="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="0"><span class="fa-stack"><i class="fas fa-refresh fa-stack-1x"></i></span></a>';
-    }else{
-      retour += '<a style="height : 30px;" class="btn btn-default btn-xs cursor subElementAttr tooltips pull-right" title="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="1"><span class="fa-stack"><i class="fas fa-refresh fa-stack-1x"></i><i class="fas fa-ban fa-stack-2x text-danger"></i></span></a>';
+    retour += '<div >';
+    if(!isset(_subElement.options) || !isset(_subElement.options.allowRepeatCondition) || _subElement.options.allowRepeatCondition == 0) {
+      retour += '<a class="bt_repeat cursor subElementAttr" tooltip="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="0"><span><i class="fas fa-sync"></i></span></a>';
+    } else {
+      retour += '<a class="bt_repeat cursor subElementAttr" tooltip="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="1"><span><i class="fas fa-ban text-danger"></i></span></a>';
     }
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell;">';
+    
+    retour += '<div class="expressions" >';
     var expression = {type: 'condition'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '  </div>';
-    retour += '  <div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
-    
+    retour = addElButtons(retour)
     break;
+    
     case 'then' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
-    retour += '<div style="display:table-cell; width: 125px;vertical-align: top; padding-left: 15px;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{ALORS}}</legend>';
-    retour += '<button class="btn btn-xs btn-default bt_addSinon" type="button" id="addSinon" data-toggle="dropdown" title="{{Afficher/masquer le bloc Sinon}}" aria-haspopup="true" aria-expanded="true">';
-    retour += '<i class="fas fa-chevron-right"></i>';
+    retour += '<div class="subElementFields">';
+    retour += '<legend >{{ALORS}}</legend>';
+    retour += '<div class="input-group">';
+    retour += '<button class="bt_showElse btn btn-xs btn-default roundedLeft" type="button" data-toggle="dropdown" tooltip="{{Afficher/masquer le bloc Sinon}}" aria-haspopup="true" aria-expanded="true">';
+    retour += '<i class="fas fa-chevron-down"></i>';
     retour += '</button>';
-    retour += '<div class="dropdown" style="display : inline-block;">';
-    retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
+    retour += '<span class="input-group-btn">';
+    retour += '<div class="dropdown" >';
+    retour += '<button class="btn btn-default dropdown-toggle roundedRight" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
     retour += '<i class="fas fa-plus-circle"></i> {{Ajouter}}';
     retour += '<span class="caret"></span>';
     retour += '</button>';
     retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" title="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
+    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
     retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
     retour += '</ul>';
-    retour += '</div><p> </p>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + ';">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '</span>';
+    retour += '</div>';
+    retour += '</div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     if (isset(_subElement.expressions)) {
       for (var k in _subElement.expressions) {
         retour += addExpression(_subElement.expressions[k]);
       }
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"> </div>';
-    
     break;
+    
     case 'else' :
     retour += '<input class="subElementAttr subElementElse" data-l1key="subtype" style="display : none;" value="action"/>';
-    retour += '<div style="display:table-cell; width: 125px; vertical-align: top; padding-left: 15px;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{SINON}}</legend>';
+    retour += '<div class="subElementFields">';
+    retour += '<legend >{{SINON}}</legend>';
     retour += '<div class="dropdown">';
     retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
     retour += '<i class="fas fa-plus-circle"></i> Ajouter';
     retour += '<span class="caret"></span>';
     retour += '</button>';
     retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" title="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
+    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
     retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
     retour += '</ul>';
-    retour += '</div><p> </p>';
     retour += '</div>';
-    retour += ' <div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + '; border-top :1px solid ' + listColorStrong[_pColor] + '">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '</div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     if (isset(_subElement.expressions)) {
       for (var k in _subElement.expressions) {
         retour += addExpression(_subElement.expressions[k]);
       }
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"> </div>';
-    
     break;
+    
     case 'for' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 85px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{DE 1 A}}</legend>';
+    retour += '<div>';
+    retour += '<legend >{{DE 1 A}}</legend>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px;">';
+    retour += '<div class="expressions" >';
     var expression = {type: 'condition'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
+    retour = addElButtons(retour)
     break;
+    
     case 'in' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 120px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{DANS (min)}}</legend>';
+    retour += '<div>';
+    retour += '<legend tooltip="Action DANS x minutes">{{DANS}}</legend>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px;">';
+    retour += '<div class="expressions" >';
     var expression = {type: 'condition'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
-    
+    retour = addElButtons(retour)
     break;
+    
     case 'at' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 85px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{A (Hmm)}}</legend>';
+    retour += '<div>';
+    retour += '<legend >{{A (Hmm)}}</legend>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px;">';
+    retour += '<div class="expressions" >';
     var expression = {type: 'condition'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
+    retour = addElButtons(retour)
     break;
+    
     case 'do' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
-    retour += '<div style="display:table-cell; width: 100px; vertical-align: top; padding-left: 15px;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{FAIRE}}</legend>';
+    retour += '<div class="subElementFields">';
+    retour += '<legend >{{FAIRE}}</legend>';
     retour += '<div class="dropdown">';
     retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
     retour += '<i class="fas fa-plus-circle"></i> Ajouter';
     retour += '<span class="caret"></span>';
     retour += '</button>';
     retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" title="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
+    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
     retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
     retour += '</ul>';
-    retour += '</div><p> </p>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + ';">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '</div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     if (isset(_subElement.expressions)) {
       for (var k in _subElement.expressions) {
         retour += addExpression(_subElement.expressions[k]);
       }
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"> </div>';
-    
     break;
+    
     case 'code' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 85px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{CODE}}</legend>';
+    retour += '<div>';
+    retour += '<legend >{{CODE}}</legend>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + ';">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     var expression = {type: 'code'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; "><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
+    retour = addElButtons(retour)
     break;
+    
     case 'comment' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="comment"/>';
-    retour += '<div style="display:table-cell; width: 15px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tou).}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
+    }else{
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tou).}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
+    }
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + ';">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '<div>';
+    retour += '<legend >{{COMMENTAIRE}}</legend>';
+    retour += '</div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     var expression = {type: 'comment'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
     }
     retour += addExpression(expression);
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
-    
+    retour = addElButtons(retour)
     break;
+    
     case 'action' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
-    retour += '<div style="display:table-cell; width: 30px;vertical-align: top; padding-top: 5px;">';
-    retour += '<i class="fas fa-arrows-alt-v pull-left cursor bt_sortable"></i>';
-    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+    retour += '<div>';
+    retour += '<i class="bt_sortable fas fa-arrows-alt-v pull-left cursor"></i>';
+    if(!isset(_subElement.options) || !isset(_subElement.options.collapse) || _subElement.options.collapse == 0){
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Masquer ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="0"><i class="far fa-eye"></i></a>';
     }else{
-      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" title="{{Décocher pour désactiver l\'élément}}" style="margin-right : 0px;"/>';
+      retour += '<a class="bt_collapse cursor subElementAttr" tooltip="{{Afficher ce bloc.<br>Ctrl+click: tous.}}" data-l1key="options" data-l2key="collapse" value="1"><i class="far fa-eye-slash"></i></a>';
     }
+    if(!isset(_subElement.options) || !isset(_subElement.options.enable) || _subElement.options.enable == 1){
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" checked tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }else{
+      retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
+    }
+    retour += '<legend class="legendHidden">ACTION</legend>';
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 85px;vertical-align: top;">';
-    retour += '<legend style="margin-bottom: 0px; color : white;border : none;">{{ACTION}}</legend><br/>';
+    retour += '<div class="subElementFields">';
+    retour += '<legend >{{ACTION}}</legend><br/>';
     retour += '<div class="dropdown">';
     retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
     retour += ' <i class="fas fa-plus-circle"></i> Ajouter';
     retour += '<span class="caret"></span>';
     retour += '</button>';
     retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" title="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
+    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
     retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
     retour += '</ul>';
-    retour += '</div><p> </p>';
     retour += '</div>';
-    retour += '<div class="expressions" style="display:table-cell; padding-bottom: 10px; background-color: ' + listColor[_pColor] + ';">';
-    retour += '<div class="sortable empty" style="height : 30px;"></div>';
+    retour += '</div>';
+    retour += '<div class="expressions">';
+    retour += '<div class="sortable empty" ></div>';
     if (isset(_subElement.expressions)) {
       for (var k in _subElement.expressions) {
         retour += addExpression(_subElement.expressions[k]);
       }
     }
     retour += '</div>';
-    retour += '<div style="display:table-cell; width: 15px; vertical-align: top;"><i class="fas fa-minus-circle pull-right cursor bt_removeElement" style="position : relative;z-index : 2;"></i></div>';
+    retour = addElButtons(retour)
     break;
   }
   retour += '</div>';
   return retour;
 }
 
+function addElButtons(_retour) {
+  _retour += '  <div><i class="fas fa-minus-circle pull-right cursor bt_removeElement" tooltip="{{Supprimer ce bloc.<br>Ctrl+Click: Supprimer sans confirmation.}}"></i></div>'
+  _retour += '  <div><i class="fas fa-copy pull-right cursor bt_copyElement" tooltip="{{Copier ce bloc.<br>Ctrl+Click: Couper ce bloc.}}"></i></div>'
+  _retour += '  <div><i class="fas fa-paste pull-right cursor bt_pasteElement" tooltip="{{Coller un bloc après celui-ci.<br>Ctrl+Click: remplacer ce bloc par le bloc copié.}}"></i></div>'
+  return _retour
+}
 
 function addElement(_element) {
   if (!isset(_element)) {
@@ -1427,82 +1773,101 @@ function addElement(_element) {
     return '';
   }
   
-  pColor++;
-  if (pColor > 4) {
-    pColor = 0;
+  elementClass = ''
+  switch (_element.type) {
+    case 'if' :
+    elementClass = 'elementIF'
+    break
+    case 'for' :
+    elementClass = 'elementFOR'
+    break
+    case 'in' :
+    elementClass = 'elementIN'
+    break
+    case 'at' :
+    elementClass = 'elementAT'
+    break
+    case 'code' :
+    elementClass = 'elementCODE'
+    break
+    case 'comment' :
+    elementClass = 'elementCOM'
+    break
+    case 'action' :
+    elementClass = 'elementACTION'
   }
-  var color = pColor;
   
-  var div = '<div class="element" style="color : white;padding-right : 7px;padding-left : 7px;padding-bottom : 0px;padding-top : 2px;margin-bottom : 0px;background-color : ' + listColorStrong[color] + '; border :1px solid ' + listColorStrong[color] + '">';
+  var div = '<div class="element ' + elementClass + '">';
+  
   div += '<input class="elementAttr" data-l1key="id" style="display : none;" value="' + init(_element.id) + '"/>';
   div += '<input class="elementAttr" data-l1key="type" style="display : none;" value="' + init(_element.type) + '"/>';
   switch (_element.type) {
     case 'if' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'if'}, color);
-      div += addSubElement({type: 'then'}, color);
-      div += addSubElement({type: 'else'}, color);
+      div += addSubElement({type: 'if'});
+      div += addSubElement({type: 'then'});
+      div += addSubElement({type: 'else'});
     }
     break;
     case 'for' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'for'}, color);
-      div += addSubElement({type: 'do'}, color);
+      div += addSubElement({type: 'for'});
+      div += addSubElement({type: 'do'});
     }
     break;
     case 'in' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'in'}, color);
-      div += addSubElement({type: 'do'}, color);
+      div += addSubElement({type: 'in'});
+      div += addSubElement({type: 'do'});
     }
     break;
     case 'at' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'at'}, color);
-      div += addSubElement({type: 'do'}, color);
+      div += addSubElement({type: 'at'});
+      div += addSubElement({type: 'do'});
     }
     break;
     case 'code' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'code'}, color);
+      div += addSubElement({type: 'code'});
     }
     break;
     case 'comment' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'comment'}, color);
+      div += addSubElement({type: 'comment'});
     }
     break;
     case 'action' :
     if (isset(_element.subElements) && isset(_element.subElements)) {
       for (var j in _element.subElements) {
-        div += addSubElement(_element.subElements[j], color);
+        div += addSubElement(_element.subElements[j]);
       }
     } else {
-      div += addSubElement({type: 'action'}, color);
+      div += addSubElement({type: 'action'});
     }
     break;
   }
@@ -1544,4 +1909,108 @@ function getElement(_element) {
     element.subElements.push(subElement);
   });
   return element;
+}
+
+function updateTooltips() {
+  //in scenarios, for faster undo/redo, tooltips are specially created with tooltip attribute and copied as title to keep track of it!
+  $('[tooltip]:not(.tooltipstered)').each(function() {
+    $(this).attr('title', $(this).attr('tooltip'))
+  })
+  $('[tooltip]:not(.tooltipstered)').tooltipster(TOOLTIPSOPTIONS)
+}
+
+//UNDO Management
+var _undoStack_ = new Array()
+var _undoState_ = -1
+var _firstState_ = 0
+var _undoLimit_ = 12
+var _redo_ = 0
+
+jwerty.key('shift+z', function (e) {
+  e.preventDefault()
+  undo()
+  PREV_FOCUS = null
+})
+jwerty.key('shift+y', function (e) {
+  e.preventDefault()
+  redo()
+  PREV_FOCUS = null
+})
+
+function setUndoStack(state=0) {
+  syncEditors()
+  newStack = $('#div_scenarioElement').clone()
+  newStack.find('.tooltipstered').removeClass('tooltipstered')
+  
+  if (newStack ==  $(_undoStack_[state-1])) return
+  if (state == 0) {
+    state = _undoState_ = _undoStack_.length
+    _redo_ = 0
+  }
+  _undoStack_[state] = newStack
+  //limit stack:
+  if (state >= _firstState_ + _undoLimit_) {
+    _firstState_ += 1
+    _undoStack_[_firstState_ -1] = 0
+  }
+}
+function undo() {
+  if (_undoState_ < _firstState_) return
+  try {
+    loadState = _undoState_
+    if (_redo_ == 0) setUndoStack(_undoState_ + 1)
+    loadStack = $(_undoStack_[loadState])
+    $('#div_scenarioElement').replaceWith(loadStack)
+    $('.dropdown.open').dropdown("toggle")
+    _undoState_ -= 1
+  } catch(error) {
+    console.log('undo ERROR:', error)
+  }
+  updateTooltips()
+  resetEditors()
+}
+function redo() {
+  _redo_ = 1
+  if (_undoState_ < _firstState_ -1 || _undoState_ +2 >= _undoStack_.length) return
+  try {
+    loadState = _undoState_ + 2
+    loadStack = $(_undoStack_[loadState])
+    $('#div_scenarioElement').replaceWith(loadStack)
+    $('.dropdown.open').dropdown("toggle")
+    _undoState_ += 1
+  } catch(error) {
+    console.log('redo ERROR:', error)
+  }
+  updateTooltips()
+  resetEditors()
+}
+function resetUndo() {
+  _undoStack_ = new Array()
+  _undoState_ = -1
+  _firstState_ = 0
+  _undoLimit_ = 10
+}
+
+function syncEditors() {
+  $('.expressionAttr[data-l1key=type][value=code]').each(function () {
+    var expression = $(this).closest('.expression')
+    var code = expression.find('.expressionAttr[data-l1key=expression]')
+    var id = code.attr('id')
+    if (isset(editor[id])) code.html(editor[id].getValue())
+  })
+}
+function resetEditors() {
+  editor = []
+  
+  $('.expressionAttr[data-l1key=type][value=code]').each(function () {
+    var expression = $(this).closest('.expression')
+    var code = expression.find('.expressionAttr[data-l1key=expression]')
+    var element = expression.parents('elementCODE').first()
+    
+    code.show()
+    code.removeAttr('id')
+    expression.find('.CodeMirror-wrap').remove()
+  })
+  
+  setEditor()
 }

@@ -1,10 +1,11 @@
-Jeedom kann von verschiedenen Standorten aus gesichert und
-wiederhergestellt werden.
+Jeedom offre la possibilité d’être sauvegardé et restauré depuis ou à partir
+de différents emplacements.
 
 Konfiguration
 =============
 
-Erreichbar unter **Verwaltung → Sicherungen**, diese Seite ermöglicht die Verwaltung von Sicherungen.
+Accessible depuis **Réglages → Système → Sauvegardes**, cette page permet la
+gestion des sauvegardes, restaurations.
 
 Auf der linken Seite befinden sich die Parameter und die Aktions Schaltflächen. Auf der rechten Seite ist der Echtzeitstatus der aktuellen Aktion (Sicherung oder Wiederherstellung), wenn Sie etwas gestartet haben.
 
@@ -92,10 +93,10 @@ Auf der linken Seite befinden sich die Parameter und die Aktions Schaltflächen.
 
 > **Tip**
 >
-> Bei der Neuinstallation von Jeedom und der Aufnahme des Backup
-> Abonnements in die Cloud des Marktes, müssen Sie Ihr Market-Konto auf 
-> Ihrem neuen Jeedom eingeben (Administration → Konfiguration →
-> Registerkarte Updates) und dann hierher kommen, um die Wiederherstellung zu starten.
+> Lors d’une réinstallation de Jeedom et en ayant pris l’abonnement de
+> sauvegarde vers le cloud du Market, vous devez renseigner votre compte
+> Market sur votre nouveau Jeedom (Administration→Configuration→Onglet
+> Mises à jour) puis venir ici pour lancer la restauration.
 
 > **Tip**
 >

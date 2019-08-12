@@ -28,7 +28,7 @@ Aquí está la URL =
 [Http: // \ # ip \ _JEEDOM \ # / core / api / jeeApi.php apikey = \ #APIKEY \ # & type = escenario & id = \ #ID \ # & action = \ #ACTION \ #?] (Http: // # # IP_JEEDOM / core / api / jeeApi.php? apikey apikey = # # & type = & id = escenario # ID # & action = aCCIÓN # #)
 
 -   ** ** Identificación: es el ID de su escenario. ID está en la
-    página escenario s en "Herramientas" → "escenarios", una vez que el
+    page du scénario concerné, dans "Outils" → "Scénarios", une fois le
     escenario seleccionado, junto al nombre de la pestaña "General". otro
     forma de recuperarla: "Herramientas" → "escenarios", haga clic
     "Información general".
@@ -38,9 +38,9 @@ Aquí está la URL =
     "Activar" para comenzar a detener, respectivamente, desactivar o
     activar el escenario.
 
--   ** ** etiquetas \ [opcional \]: si la acción es "start", puede cambiar
-    etiquetas escenario (véase la documentación sobre los escenarios) bajo
-    etiquetas de formulario = foo% 3D1%20tata 3D2% (tenga en cuenta que el 20% corresponde a una
+-   **etiquetas** \[opcional\] : si la acción es "start", puede pasar
+    des tags au scénario (voir la documentation sur les scénarios) sous
+    la forma etiquetas=toto% 3D1%20tata%3D2 (tenga en cuenta que el 20% corresponde a una
     El espacio y el% = 3D)
 
 Información / Control de Acción

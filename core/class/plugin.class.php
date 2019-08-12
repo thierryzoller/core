@@ -128,6 +128,17 @@ class plugin {
 		return $plugin;
 	}
 	
+	public static function forceDisablePlugin($_id){
+		config::save('active', 0, $_id);
+		$values = array(
+			'eqType_name' => $_id,
+		);
+		$sql = 'UPDATE eqLogic
+		SET isEnable=0
+		WHERE eqType_name=:eqType_name';
+		DB::Prepare($sql, $values);
+	}
+	
 	public static function getPathById($_id) {
 		return __DIR__ . '/../../plugins/' . $_id . '/plugin_info/info.json';
 	}
@@ -138,17 +149,6 @@ class plugin {
 		} else {
 			return '';
 		}
-	}
-	
-	public static function forceDisablePlugin($_id){
-		config::save('active', 0, $_id);
-		$values = array(
-			'eqType_name' => $_id,
-		);
-		$sql = 'UPDATE eqLogic
-		SET isEnable=0
-		WHERE eqType_name=:eqType_name';
-		DB::Prepare($sql, $values);
 	}
 	
 	public static function listPlugin($_activateOnly = false, $_orderByCaterogy = false, $_translate = true, $_nameOnly = false) {
@@ -344,7 +344,7 @@ class plugin {
 		cache::set('plugin::cron5::inprogress', 0);
 	}
 	
-		public static function cron10() {
+	public static function cron10() {
 		$cache = cache::byKey('plugin::cron10::inprogress');
 		if(is_array($cache->getValue(0))){
 			cache::set('plugin::cron10::inprogress', -1);
@@ -862,7 +862,7 @@ class plugin {
 				
 				$deamon_info = $this->deamon_info();
 				sleep(1);
-				log::add($this->getId(), 'info', 'Info sur le démon : ' . print_r($deamon_info, true));
+				log::add($this->getId(), 'info', 'Info sur le démon : ' . json_encode($deamon_info));
 				if ($deamon_info['state'] == 'ok') {
 					$this->deamon_stop();
 				}
