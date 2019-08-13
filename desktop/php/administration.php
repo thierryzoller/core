@@ -47,13 +47,11 @@ user::isBan();
 
 <div role="tabpanel" class="tab-pane" id="luxsmarthome">
 	<br/>
-
+	<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
 <form class="form-horizontal">
 	<fieldset>
 
 <div class="form-group">
-
-<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
 
 <legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
 
