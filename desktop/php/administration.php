@@ -48,13 +48,12 @@ user::isBan();
 <div role="tabpanel" class="tab-pane" id="luxsmarthome">
 	<br/>
 	<div class="alert alert-danger">{{ATTENTION : Ces commandes peuvent rendre votre Installation instable.}}</div>
-<form class="form-horizontal">
-	<fieldset>
 
-<div class="form-group">
+<form class="form-horizontal">
+<fieldset>
 
 <legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
-
+<div class="form-group">
 <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
 
 
@@ -84,9 +83,8 @@ if (!$status){
 </div>					
 
 
-
-<div class="form-group">
 <legend><i class="fas fa-first-aid"></i> {{Recovery}}</legend>
+<div class="form-group">
     <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Manually reset update repositry">{{Manualy Reset GIT}}</label>
 	<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">	
 		<a class="btn btn-danger form-control" id="bt_resetGit"><i class="fas fa-exclamation-triangle"></i> {{Reset Update Procedure}}</a>
