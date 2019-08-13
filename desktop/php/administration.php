@@ -58,7 +58,8 @@ user::isBan();
 
 
 <?php
-$status = shell_exec('sudo ifconfig | grep wlan0');
+$status = shell_exec('/var/www/lsh_tools./wifi-ctrl.sh status');
+
 if (!$status){
     echo '<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6"><span class="label label-info" style="font-size : 1em;">Wifi is currently <b>disabled</b></span></div>';
 	echo '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6"><a class="btn btn-primary form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a></div>';
