@@ -305,7 +305,6 @@ class update {
 					$tmp = $info['path'];
 					
 				
-				
 					log::add('update', 'alert', __("OK\n", __FILE__));
 					
 					if (!file_exists($tmp)) {
