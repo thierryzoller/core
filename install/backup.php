@@ -40,7 +40,7 @@ if (isset($argv)) {
 
 try {
 	require_once __DIR__ . '/../core/php/core.inc.php';
-	echo "***************Start of Jeedom backup at " . date('Y-m-d H:i:s') . "***************\n";
+	echo "***************Start of LUX Smart Home backup at " . date('Y-m-d H:i:s') . "***************\n";
 
 	try {
 		echo "Envoi l'évènement de début de sauvegarde...";
@@ -166,8 +166,8 @@ try {
 	/* Adding 7zip with Password and strong compression 08082019*/
 	
 	system('cd ' . $jeedom_dir . ';7z a \'-pRWEFSGDGEG\' "' . $backup_dir . '/' . $backup_name2 . '" ' . $exclude7z);
-	echo "7z OK" . "\n";
-
+	
+	echo 'Chiffrement fini...';
     /* =========================================================*/
 	
 	/* system('cd ' . $jeedom_dir . ';tar cfz "' . $backup_dir . '/' . $backup_name . '" ' . $exclude . ' . > /dev/null');
