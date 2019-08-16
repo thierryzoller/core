@@ -130,7 +130,7 @@ class jeedom {
         $cpu_temp = shell_exec('sudo vcgencmd measure_temp');
         $cpu_temp = str_replace("temp=","",$cpu_temp);
         $cpu_temp = str_replace("'C","",$cpu_temp);
-        if ($cputemp <70) {
+        if ($cpu_temp <70) {
         $state = true;
         } else
         {
@@ -1294,10 +1294,10 @@ class jeedom {
 		
 
 	public static function cleanFileSytemRight() {
-		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*;';
-		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*;';
-		$cmd .= system::getCmdSudo() . 'find ' . __DIR__ . '/../../log -type f -exec chmod 665 {} +;';
-			$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../.* ;';
+		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*; 2>/dev/null';
+		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*; 2>/dev/null' ;
+		$cmd .= system::getCmdSudo() . 'find ' . __DIR__ . '/../../log -type f -exec chmod 665 {} +; 2>/dev/null';
+			$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../.* ; 2>/dev/null';
 			exec($cmd);
 		}
 		

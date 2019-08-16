@@ -40,7 +40,7 @@ if (isset($argv)) {
 
 try {
 	require_once __DIR__ . '/../core/php/core.inc.php';
-	echo "***************Start of Jeedom backup at " . date('Y-m-d H:i:s') . "***************\n";
+	echo "***************Start of LUX Smart Home (LSH) backup at " . date('Y-m-d H:i:s') . "***************\n";
 
 	try {
 		echo "Envoi l'évènement de début de sauvegarde...";
