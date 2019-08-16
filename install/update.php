@@ -117,6 +117,7 @@ try {
 			try {
 				if (config::byKey('core::repo::provider') == 'default') {
 					$url = 'https://github.com/thierryzoller/core/archive/' . config::byKey('core::branch') . '.zip';
+					#https://github.com/thierryzoller/core/archive/release.zip
 					echo "Download url : " . $url . "\n";
 					echo "Download in progress...";
 					if (!is_writable($tmp_dir)) {

@@ -125,6 +125,47 @@ class jeedom {
 			'comment' => '',
 		);
 		
+
+        /*  CHANGES - LSH 2019 */
+        $cpu_temp = shell_exec('sudo vcgencmd measure_temp');
+        $cpu_temp = str_replace("temp=","",$cpu_temp);
+        $cpu_temp = str_replace("'C","",$cpu_temp);
+        if ($cputemp <70) {
+        $state = true;
+        } else
+        {
+        $state = false;
+        }
+        $return[] = array(
+        'name' => __('CPU Temp', __FILE__),
+        'state' => $state,
+        'result' => $cpu_temp . "C",
+        'comment' => ($cpu_temp < 70) ? '' : __('CPU is Hot', __FILE_$
+         );
+		 
+		 
+		 
+        /*  CHANGES - LSH 2019 */
+        $gpu_temp = shell_exec('cat /sys/class/thermal/thermal_zone0/temp');
+        $gpu_temp = $gpu_temp / 1000;
+        if ($gpu_temp <70) {
+        $state = true;
+        } else
+        {
+        $state = false;
+        }
+        $return[] = array(
+        'name' => __('GPU Temp', __FILE__),
+        'state' => $state,
+        'result' => $gpu_temp . "C",
+        'comment' => ($gpu_temp < 70) ? '' : __('GPU is hot', __FILE_$
+         );
+
+
+
+
+		/*  CHANGES - LSH 2019 */
+		
 		$state = (config::byKey('enableCron', 'core', 1, true) != 0) ? true : false;
 		$return[] = array(
 			'name' => __('Cron actif', __FILE__),
@@ -168,7 +209,7 @@ class jeedom {
 		);
 		
 		$return[] = array(
-			'name' => __('Version Jeedom', __FILE__),
+			'name' => __('Version LSH', __FILE__),
 			'state' => true,
 			'result' => self::version(),
 			'comment' => '',
@@ -1282,11 +1323,14 @@ class jeedom {
 			return $return;
 		}
 		
+
+		
+		
 		/*     * ******************hardware management*************************** */
 		
 		public static function getHardwareKey() {
 			$return = config::byKey('jeedom::installKey');
-			if ($return == '') {
+			if ($return == '') {ls
 				$return = substr(sha512(microtime() . config::genKey()), 0, 63);
 				config::save('jeedom::installKey', $return);
 			}
@@ -1302,7 +1346,7 @@ class jeedom {
 			if (file_exists('/.dockerinit')) {
 				$result = 'docker';
 			} else if (file_exists('/usr/bin/raspi-config')) {
-				$result = 'LUX SmartHome Platform';
+				$result = 'rpi';
 			} else if (strpos($uname, 'cubox') !== false || strpos($uname, 'imx6') !== false || file_exists('/media/boot/multiboot/meson64_odroidc2.dtb.linux')) {
 				$result = 'miniplus';
 			}
