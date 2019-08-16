@@ -1293,13 +1293,14 @@ class jeedom {
    /* ==================================== */
 		
 
-	public static function cleanFileSytemRight() {
-		$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../*; 2>/dev/null';
-		$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../*; 2>/dev/null' ;
-		$cmd .= system::getCmdSudo() . 'find ' . __DIR__ . '/../../log -type f -exec chmod 665 {} +; 2>/dev/null';
-			$cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../.* ; 2>/dev/null';
-			exec($cmd);
-		}
+        public static function cleanFileSytemRight() {
+                $cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . __DIR__ . '/../../* > /dev/null 2>&1 &';
+                $cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../* > /dev/null 2>&1 &;';
+                $cmd .= system::getCmdSudo() . 'find ' . __DIR__ . '/../../log -type f -exec chmod 665 {} + > /dev/null 2>&1 &;';
+                $cmd .= system::getCmdSudo() . 'chmod 775 -R ' . __DIR__ . '/../../.* > /dev/null 2>&1 &;';
+                exec($cmd);
+                }
+
 		
 		public static function checkSpaceLeft($_dir = null) {
 			if ($_dir == null) {
