@@ -40,7 +40,7 @@ if (isset($argv)) {
 
 try {
 	require_once __DIR__ . '/../core/php/core.inc.php';
-	echo "***************Start of LUX Smart Home backup at " . date('Y-m-d H:i:s') . "***************\n";
+	echo "***************Start of LUX Smart Home (LSH) backup at " . date('Y-m-d H:i:s') . "***************\n";
 
 	try {
 		echo "Envoi l'évènement de début de sauvegarde...";
@@ -77,7 +77,6 @@ try {
 		'-' => '',
 	);
 	$jeedom_name = str_replace(array_keys($replace_name), $replace_name, config::byKey('name', 'core', 'Jeedom'));
-	$backup_name = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.tar.gz');
 	$backup_name2 = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.7z');
 
 	global $NO_PLUGIN_BACKUP;
@@ -165,9 +164,9 @@ try {
 	
 	/* Adding 7zip with Password and strong compression 08082019*/
 	
-	system('cd ' . $jeedom_dir . ';7z a \'-pRWEFSGDGEG\' "' . $backup_dir . '/' . $backup_name2 . '" ' . $exclude7z);
-	
-	echo 'Chiffrement fini...';
+	system('cd ' . $jeedom_dir . ';7z a \'-pRWEFSGDGEG\' "' . $backup_dir . '/' . $backup_name2 . '" ' . $exclude7z . "/dev/null 2>&1 &");
+	echo "7z OK" . "\n";
+
     /* =========================================================*/
 	
 	/* system('cd ' . $jeedom_dir . ';tar cfz "' . $backup_dir . '/' . $backup_name . '" ' . $exclude . ' . > /dev/null');

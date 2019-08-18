@@ -289,6 +289,9 @@ class update {
 			if (class_exists($class) && method_exists($class, 'downloadObject') && config::byKey($this->getSource() . '::enable') == 1) {
 				$this->preInstallUpdate();
 				$cibDir = jeedom::getTmpFolder('market') . '/' . $this->getLogicalId();
+				
+				 log::add('update', 'alert', __('Path', $cibDir));
+
 				if (file_exists($cibDir)) {
 					rrmdir($cibDir);
 				}
@@ -300,6 +303,8 @@ class update {
 				$info = $class::downloadObject($this);
 				if ($info['path'] !== false) {
 					$tmp = $info['path'];
+					
+				
 					log::add('update', 'alert', __("OK\n", __FILE__));
 					
 					if (!file_exists($tmp)) {

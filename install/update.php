@@ -113,10 +113,11 @@ try {
 		jeedom::stop();
 		if (init('update::reapply') == '' && config::byKey('update::allowCore', 'core', 1) != 0) {
 			$tmp_dir = jeedom::getTmpFolder('install');
-			$tmp = $tmp_dir . '/jeedom_update.zip';
+			$tmp = $tmp_dir . '/lsh.zip';
 			try {
 				if (config::byKey('core::repo::provider') == 'default') {
 					$url = 'https://github.com/thierryzoller/core/archive/' . config::byKey('core::branch') . '.zip';
+					#https://github.com/thierryzoller/core/archive/release.zip
 					echo "Download url : " . $url . "\n";
 					echo "Download in progress...";
 					if (!is_writable($tmp_dir)) {
