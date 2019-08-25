@@ -126,28 +126,26 @@ class jeedom {
 		);
 		
 
-        /*  CHANGES - LSH 2019 */
-        $cpu_temp = shell_exec('sudo vcgencmd measure_temp');
-        $cpu_temp = str_replace("temp=","",$cpu_temp);
-        $cpu_temp = str_replace("'C","",$cpu_temp);
-        if ($cpu_temp <70) {
-        $state = true;
-        } else
-        {
-        $state = false;
-        }
-        $return[] = array(
-        'name' => __('CPU Temp', __FILE__),
-        'state' => $state,
-        'result' => $cpu_temp . "C",
-        'comment' => ($cpu_temp < 70) ? '' : __('CPU is Hot', __FILE_$
-         );
-		 
-		 
-		 
+		/*  CHANGES - LSH 2019 */
+		$cpu_temp = shell_exec('sudo vcgencmd measure_temp');
+		$cpu_temp = str_replace("temp=","",$cpu_temp);
+		$cpu_temp = str_replace("'C","",$cpu_temp);
+		if ($cpu_temp <70) {
+                $state = true;
+		} else 
+		{
+		$state = false;
+	        }
+		$return[] = array(
+			'name' => __('CPU Temp', __FILE__),
+			'state' => $state,
+			'result' => $cpu_temp . "C",
+			'comment' => ($cpu_temp < 70) ? '' : __('CPU is too hot', __FILE__),
+		);
+
         /*  CHANGES - LSH 2019 */
         $gpu_temp = shell_exec('cat /sys/class/thermal/thermal_zone0/temp');
-        $gpu_temp = $gpu_temp / 1000;
+              $gpu_temp = $gpu_temp / 1000;
         if ($gpu_temp <70) {
         $state = true;
         } else
@@ -157,9 +155,10 @@ class jeedom {
         $return[] = array(
         'name' => __('GPU Temp', __FILE__),
         'state' => $state,
-        'result' => $gpu_temp . "C",
-        'comment' => ($gpu_temp < 70) ? '' : __('GPU is hot', __FILE_$
+        'result' => $gpu_temp . " C",
+        'comment' => ($gpu_temp < 70) ? '' : __('GPU is hot', __FILE_),
          );
+
 
 
 
@@ -1343,7 +1342,7 @@ class jeedom {
 		
 		public static function getHardwareKey() {
 			$return = config::byKey('jeedom::installKey');
-			if ($return == '') {ls
+			if ($return == '') {
 				$return = substr(sha512(microtime() . config::genKey()), 0, 63);
 				config::save('jeedom::installKey', $return);
 			}
