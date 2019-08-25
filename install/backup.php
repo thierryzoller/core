@@ -81,20 +81,19 @@ try {
 // Changes Thierry - 25082019 - generate LSH UID
 
 $LSHUID = config::byKey('LSHUID', 'core');
-
-if (!$LSHUID || $LSHUID="0")
+echo "LSH Installation ID :" . $LSHUID . "/n";
+if (!$LSHUID)
         {
         echo "Generating new LSH UID\n";
         $random = rand();
-        $crc = crc32($random);
+        $crc = hash('crc32',$random);
         config::save('LSHUID', $crc, 'core');
-        echo $crc;
-        echo "Was empty, now set!";
         }
 
 ///////////////////////////////////////////////
-	
-	$backup_name2 = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . $LSHUID . '-' . date("Y-m-d-H\hi") . '.7z');
+$jeedom_name = str_replace(' ', '_', $jeedom_name);
+$backup_name2 = 'backup-' . $jeedom_name . '-' . $LSHUID . '-' . date("Y-m-d-H\hi") . '.7z';
+
 
 	global $NO_PLUGIN_BACKUP;
 	if (!isset($NO_PLUGIN_BACKUP) || $NO_PLUGIN_BACKUP === false) {
