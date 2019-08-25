@@ -288,7 +288,7 @@ $backup_name2 = 'backup-' . $jeedom_name . '-' . $LSHUID . '-' . date("Y-m-d-H\h
 		echo '***ERREUR*** ' . $e->getMessage();
 	}
 	echo "Durée de la sauvegarde : " . (strtotime('now') - $starttime) . "s\n";
-	echo "***************Fin de la sauvegarde de Jeedom***************\n";
+	echo "***************Fin de la sauvegarde de LUX Smart Home***************\n";
 	echo "[END BACKUP SUCCESS]\n";
 } catch (Exception $e) {
 	echo 'Erreur durant la sauvegarde : ' . br2nl($e->getMessage());
