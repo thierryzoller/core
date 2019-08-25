@@ -52,6 +52,17 @@ user::isBan();
 <form class="form-horizontal">
 <fieldset>
 
+
+<legend><i class="fas fa-wifi"></i> {{Lux Smart Home Information}}</legend>
+			<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="L'identifiant de LSH">{{LSH Identifier}}</label>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">
+							<span class="label label-info" style="font-size : 1em;"><?php $LSHUID = config::byKey('LSHUID', 'core');
+ ?><?php print LSHUID?></span>
+						</div>
+
+					</div>
+
 <legend><i class="fas fa-wifi"></i> {{Wireless Configuration}}</legend>
 <div class="form-group">
 <label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
@@ -282,26 +293,11 @@ if (!$status){
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="{{Indique à}} <?php echo config::byKey('product_name'); ?> {{de ne pas prendre en compte l'heure du système}}">{{Ignorer la vérification de l'heure}}</label>
 						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
 							<input type="checkbox" class="configKey" data-l1key="ignoreHourCheck" />
-						</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_resetGit"><i class="fas fa-refresh"></i> {{GitReset}}</a>
-						</div>
 
 						</div>
 						
 						
-					<div class="form-group">
-						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="Enable or Disable the Wireless Access Point">{{Wireless Access Point}}</label>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_enableWifi"><i class="fas fa-check"></i> {{Enable Wifi AP}}</a>
-						</div>
-						
-						<div class="col-lg-3 col-md-3 col-sm-3">
-							<a class="btn btn-default form-control" id="bt_disableWifi"><i class="fas fa-power-off"></i> {{Disable Wifi AP}}</a>
-						</div>
-
-					</div>
+				
 
 				</fieldset>
 			</form>
