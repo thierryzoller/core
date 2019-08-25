@@ -9,6 +9,9 @@ Changelog
 - Mise à jour de la doc
 - Suppression de la mise à jour des graphiques suite au nombreux bugs remontés
 - Correction d'un bug pouvant empecher l'affichage de certain log
+- Correction d'un bug sur le service de monitoring
+- Correction d'un bug sur la date de mise à jour de la batterie sur la page "Analyse équipement"
+- Amélioration de l'action remove_inat dans les scénario
 
 3.3.29
 =====

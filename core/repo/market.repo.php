@@ -234,7 +234,7 @@ class repo_market {
 			throw new Exception(__('Aucun serveur de backup defini. Avez vous bien un abonnement au backup cloud ?', __FILE__));
 		}
 		if (config::byKey('market::cloud::backup::password') == '') {
-			throw new Exception(__('Vous devez obligatoirement avoir un mot de passe pour le backup cloud', __FILE__));
+			throw new Exception(__('Vous devez obligatoirement avoir un mot de passe pour le backup cloud (allez dans Réglages -> Système -> Configuration puis onglet Mise à jour/Market)', __FILE__));
 		}
 		self::backup_createFolderIsNotExist();
 		self::backup_install();
@@ -506,6 +506,18 @@ public static function backup_restore($_backup) {
 				self::monitoring_stop();
 			}
 		} catch (Exception $e) {
+			
+		}
+	}
+	
+	public static function cronDaily(){
+		try {
+			$monitoring_state = self::monitoring_status();
+			if (self::monitoring_allow() && $monitoring_state){
+				self::monitoring_stop();
+				self::monitoring_start();
+			}
+		} catch (\Exception $e) {
 			
 		}
 	}
