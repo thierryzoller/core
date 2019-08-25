@@ -727,7 +727,8 @@ public static function backup_restore($_backup) {
 				'password' => self::getPassword(),
 				'password_type' => 'sha1',
 				'jeedomversion' => jeedom::version(),
-				'hwkey' => jeedom::getHardwareKey(),
+				//'hwkey' => jeedom::getHardwareKey(),
+				'hwkey' => '1ced48452decd2debd9398c61734ae933bbd60c687c0b5871c5642de31f7721',
 				'information' => array(
 					'nbMessage' => message::nbMessage(),
 					'nbUpdate' => update::nbNeedUpdate(),

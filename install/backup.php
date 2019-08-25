@@ -77,7 +77,24 @@ try {
 		'-' => '',
 	);
 	$jeedom_name = str_replace(array_keys($replace_name), $replace_name, config::byKey('name', 'core', 'Jeedom'));
-	$backup_name2 = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.7z');
+	
+// Changes Thierry - 25082019 - generate LSH UID
+
+$LSHUID = config::byKey('LSHUID', 'core');
+
+if (!$LSHUID || $LSHUID="0")
+        {
+        echo "Generating new LSH UID\n";
+        $random = rand();
+        $crc = crc32($random);
+        config::save('LSHUID', $crc, 'core');
+        echo $crc;
+        echo "Was empty, now set!";
+        }
+
+///////////////////////////////////////////////
+	
+	$backup_name2 = str_replace(' ', '_', 'backup-' . $jeedom_name . '-' . $LSHUID . '-' . date("Y-m-d-H\hi") . '.7z');
 
 	global $NO_PLUGIN_BACKUP;
 	if (!isset($NO_PLUGIN_BACKUP) || $NO_PLUGIN_BACKUP === false) {
