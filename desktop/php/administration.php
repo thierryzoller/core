@@ -58,7 +58,7 @@ user::isBan();
 						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label help" data-help="L'identifiant de LSH">{{LSH Identifier}}</label>
 						<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6">
 							<span class="label label-info" style="font-size : 1em;"><?php $LSHUID = config::byKey('LSHUID', 'core');
- ?><?php print LSHUID?></span>
+ ?><?php print $LSHUID?></span>
 						</div>
 
 					</div>
