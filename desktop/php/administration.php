@@ -1494,7 +1494,7 @@ if (!$status){
 									<select class="configKey form-control" data-l1key="core::branch">
 										<option value="release">{{Lux Smart Home v3 (Test)}}</option>
 										<option value="master">{{Lux Smart Home v3 (Stable)}}</option>
-										<option value="V4-stable">{{Lux Smart Home v4 (BETA)}}</option>
+										
 									</select>
 								</div>
 							</div>
