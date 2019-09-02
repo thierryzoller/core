@@ -1491,8 +1491,8 @@ if (!$status){
 							<div class="form-group">
 								<label class="col-lg-4 col-md-6 col-sm-6 col-xs-6 control-label">{{Version du core}}</label>
 								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-									<select class="configKey form-control" data-l1key="core::branch">
-										<option value="release">{{Lux Smart Home v3 (Test)}}</option>
+									<select class="configKey form-control" id="versionCore" data-l1key="core::branch">
+									    <option value="release">{{Lux Smart Home v3 (Test)}}</option>
 										<option value="master">{{Lux Smart Home v3 (Stable)}}</option>
 										<option value="V4-stable">{{Lux Smart Home v4 (BETA)}}</option>
 									</select>
