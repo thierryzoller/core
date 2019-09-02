@@ -457,7 +457,7 @@ jeedom.getCronSelectModal = function(_options,_callback) {
       closeText: '',
       autoOpen: false,
       modal: true,
-      height: 250,
+      height: 310,
       width: 800
     });
     jQuery.ajaxSetup({
@@ -495,7 +495,7 @@ jeedom.getSelectActionModal = function(_options, _callback){
       closeText: '',
       autoOpen: false,
       modal: true,
-      height: 250,
+      height: 310,
       width: 800
     });
     jQuery.ajaxSetup({
