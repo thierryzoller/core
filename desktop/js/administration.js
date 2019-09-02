@@ -838,11 +838,11 @@ function saveObjectSummary() {
     summary = {};
     temp = $('#table_objectSummary tbody tr').getValues('.objectSummaryAttr');
     for(var i in temp){
-        temp[i].key = temp[i].key.toLowerCase().stripAccents().replace(/\_/g, '').replace(/\-/g, '').replace(/\&/g, '').replace(/\s/g, '')
-        if(temp[i].key == ''){
-            temp[i].key = temp[i].name.toLowerCase().stripAccents().replace(/\_/g, '').replace(/\-/g, '').replace(/\&/g, '').replace(/\s/g, '')
-        }
-        summary[temp[i].key] = temp[i]
+     if(temp[i].key == ''){
+       temp[i].key = temp[i].name
+     }
+     temp[i].key = temp[i].key.toLowerCase().stripAccents().replace(/\_/g, '').replace(/\-/g, '').replace(/\&/g, '').replace(/\%/g, '').replace(/\s/g, '').replace(/\./g, '')
+     summary[temp[i].key] = temp[i]
     }
     value = {'object:summary' : summary};
     $.ajax({
@@ -887,4 +887,10 @@ $('#bt_consitency').off('click').on('click',function(){
       $('#div_alert').showAlert({message: '{{Lance de la vérification fait, voir le log consistency pour voir le résultat}}', level: 'success'});
     }
   });
+});
+
+$('#versionCore').on('change', function() {
+  if(this.value == 'V4-stable'){
+    alert('{{Attention cette version change la gestion des widgets ainsi que celle des designs. Il est fortement conseillé de ne pas passer sur cette version si vous en utilisez, veuillez-vous rendre sur le blog de Jeedom pour plus d\'informations Merci.}}');
+  }
 });
