@@ -400,11 +400,6 @@ $('#bt_editJsonScenario').on('click',function(){
   .load('index.php?v=d&modal=scenario.jsonEdit&id='+$('.scenarioAttr[data-l1key=id]').value()).dialog('open');
 });
 
-$('#bt_displayScenarioVariable,#bt_displayScenarioVariable2').off('click').on('click', function () {
-  $('#md_modal').dialog({title: "{{Variables des scénarios}}"})
-  .load('index.php?v=d&modal=dataStore.management&type=scenario').dialog('open');
-});
-
 $('.bt_showScenarioSummary').off('click').on('click', function () {
   $('#md_modal').dialog({title: "{{Résumé scénario}}"})
   .load('index.php?v=d&modal=scenario.summary').dialog('open');
@@ -1921,12 +1916,12 @@ var _firstState_ = 0
 var _undoLimit_ = 12
 var _redo_ = 0
 
-jwerty.key('shift+z', function (e) {
+jwerty.key('ctrl+shift+z', function (e) {
   e.preventDefault()
   undo()
   PREV_FOCUS = null
 })
-jwerty.key('shift+y', function (e) {
+jwerty.key('ctrl+shift+y', function (e) {
   e.preventDefault()
   redo()
   PREV_FOCUS = null

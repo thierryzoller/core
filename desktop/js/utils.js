@@ -102,7 +102,7 @@ function loadPage(_url,_noPushHistory){
   }
   jeedom.cmd.update = Array();
   jeedom.scenario.update = Array();
-  jeedom.eqLogic.bt_displayObjectName = false;
+  jeedom.eqLogic.changeDisplayObjectName(false);
   $('main').css('padding-right','').css('padding-left','').css('margin-right','').css('margin-left','');
   $('#div_pageContainer').add("#div_pageContainer *").off();
   $.hideAlert();
@@ -546,6 +546,10 @@ $(function () {
   
   $('#bt_showExpressionTesting').on('click',function(){
     $('#md_modal').dialog({title: "{{Testeur d'expression}}"}).load('index.php?v=d&modal=expression.test').dialog('open');
+  });
+  
+  $('#bt_showDatastoreVariable').off('click').on('click', function () {
+    $('#md_modal').dialog({title: "{{Variables des scénarios}}"}).load('index.php?v=d&modal=dataStore.management&type=scenario').dialog('open');
   });
   
   $('#bt_gotoDashboard').on('click',function(event){
@@ -1026,6 +1030,9 @@ function chooseIcon(_callback, _params) {
     icon = icon.trim().replace(new RegExp('  ', 'g'), ' ')
     icon = icon.trim().replace(new RegExp(' ', 'g'), '.')
     url += '&selectIcon=' + icon;
+  }
+  if(_params && _params.color) {
+    url += '&colorIcon=' + _params.color;
   }
   $('#mod_selectIcon').empty().load(url,function(){
     $("#mod_selectIcon").dialog('option', 'buttons', {

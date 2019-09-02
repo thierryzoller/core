@@ -520,7 +520,7 @@ class eqLogic {
 			$batterySince = round($batterySince, 1);
 		}
 		if (strpos($battery, ' ') !== false) {
-			$battery = substr(strrchr($battery, " "), 1);
+			$battery = mb_substr(strrchr($battery, " "), 1);
 		}
 		$plugins = $this->getEqType_name();
 		$object_name = 'Aucun';
@@ -541,7 +541,7 @@ class eqLogic {
 		$html .= '<div class="eqLogic eqLogic-widget ' . $classAttr . ' id="' . $idAttr . '">';
 		
 		$eqName = $this->getName();
-		if (strlen($eqName) > 23) $eqName = substr($eqName,0,23)."...";
+		if (strlen($eqName) > 23) $eqName = mb_substr($eqName,0,23)."...";
 		if ($_version == 'mobile') {
 			$html .= '<div class="widget-name">' . $eqName . '<br/><span>' . $object_name . '</span></div>';
 		} else {
@@ -551,16 +551,16 @@ class eqLogic {
 		$html .= '<i class="icon jeedom-batterie' . $niveau . '"></i>';
 		$html .= '<span>' . $this->getStatus('battery', -2) . '%</span>';
 		$html .= '</center>';
-		$html .= '<center>' . __('Le', __FILE__) . ' ' . date("d/m/y G:H:s", strtotime($this->getStatus('batteryDatetime', __('inconnue', __FILE__)))) . '</center>';
+		$html .= '<center>' . __('Le', __FILE__) . ' ' . date("Y-m-d H:i:s", strtotime($this->getStatus('batteryDatetime', __('inconnue', __FILE__)))) . '</center>';
 		$html .= '<span class="pull-left pluginName">' . ucfirst($this->getEqType_name()) . '</span>';
 		$html .= '<span class="pull-left batteryTime">';
 		if ($this->getConfiguration('battery_danger_threshold') != '' || $this->getConfiguration('battery_warning_threshold') != '') {
 			$html .= '<i class="icon techno-fingerprint41 pull-right" title="Seuil manuel défini"></i>';
 		}
 		if ($batteryTime != 'NA') {
-			$html .= '<i class="icon divers-calendar2" title="Pile(s) changée(s) il y a ' . $batterySince . ' jour(s) (' . $batteryTime . ')"></i><span> ('.$batterySince.'j)</span>';
+			$html .= '<i class="icon divers-calendar2" title="{{Pile(s) changée(s) il y a}} ' . $batterySince . ' {{jour(s)}} (' . $batteryTime . ')"></i><span> ('.$batterySince.'j)</span>';
 		} else {
-			$html .= '<i class="icon divers-calendar2" title="Pas de date de changement de pile(s) renseignée"></i>';
+			$html .= '<i class="icon divers-calendar2" title="{{Pas de date de changement de pile(s) renseignée}}"></i>';
 		}
 		$html .= '</span>';
 		if ($this->getConfiguration('battery_type', '') != '') {
@@ -659,7 +659,7 @@ class eqLogic {
 		$replace = array(
 			'#id#' => $this->getId(),
 			'#name#' => $this->getName(),
-			'#name_display#' => (strlen($this->getName()) <25) ? $this->getName() : substr($this->getName(),0,25)."...",
+			'#name_display#' => (strlen($this->getName()) <25) ? $this->getName() : mb_substr($this->getName(),0,25)."...",
 			'#eqLink#' => $this->getLinkToConfiguration(),
 			'#category#' => $this->getPrimaryCategory(),
 			'#translate_category#' => $translate_category,
@@ -1361,6 +1361,7 @@ class eqLogic {
 		addGraphLink($this, 'eqLogic', $usedBy['eqLogic'], 'eqLogic', $_data, $_level, $_drill);
 		addGraphLink($this, 'eqLogic', $usedBy['interactDef'], 'interactDef', $_data, $_level, $_drill, array('dashvalue' => '2,6', 'lengthfactor' => 0.6));
 		addGraphLink($this, 'eqLogic', $usedBy['plan'], 'plan', $_data, $_level, $_drill, array('dashvalue' => '2,6', 'lengthfactor' => 0.6));
+		addGraphLink($this, 'eqLogic', $usedBy['plan3d'], 'plan3d', $_data, $_level, $_drill, array('dashvalue' => '2,6', 'lengthfactor' => 0.6));
 		addGraphLink($this, 'eqLogic', $usedBy['view'], 'view', $_data, $_level, $_drill, array('dashvalue' => '2,6', 'lengthfactor' => 0.6));
 		if (!isset($_data['object' . $this->getObject_id()])) {
 			addGraphLink($this, 'eqLogic', $this->getObject(), 'object', $_data, $_level, $_drill, array('dashvalue' => '1,0', 'lengthfactor' => 0.6));
@@ -1384,6 +1385,7 @@ class eqLogic {
 		));
 		$return['view'] = view::searchByUse('eqLogic', $this->getId());
 		$return['plan'] = planHeader::searchByUse('eqLogic', $this->getId());
+		$return['plan3d'] = plan3dHeader::searchByUse('eqLogic', $this->getId());
 		if ($_array) {
 			foreach ($return as &$value) {
 				$value = utils::o2a($value);

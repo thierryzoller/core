@@ -62,6 +62,11 @@ Changelog
 - Changement de #message# à #subject# dans Configuration/Logs/Messages pour eviter la duplication du message
 - Possibilité dans les résumé d'ajouter une exclusion des commandes n'ayant pas étaient mise à jour depuis plus de XX minutes (exemple pour le calcul des moyennes de température si un capteur n'a rien remonté depuis plus de 30min il sera exclus du calcul)
 - Ajout dans le menu outils d'un bouton pour avoir accès au testeur d'expression
+- Le nom des équipements est tronqué sur le dashboard si il dépasse les 25 caracteres
+
+>**IMPORTANT**
+>
+>Si après la mise à jour vous avez une erreur sur le dashboard essayez de redemarrer votre box pour qu'elle prenne bien les nouveaux ajout de composants en compte
 
 3.3.29
 =====

@@ -6,7 +6,7 @@ aussi de changer votre mot de passe.
 Vous la retrouvez en haut à droite en cliquant sur le l’icône bonhomme
 puis Profil (suivi de votre identifiant).
 
-Thèmes 
+Thèmes
 ======
 
 Le panneau thèmes vous permet de régler des paramètres d’interface :
@@ -35,7 +35,7 @@ Le panneau thèmes vous permet de régler des paramètres d’interface :
 -   **Opacité par des widgets Mobile** : permet de donner l’opacité
     (entre 0 et 1) des widgets en mobile
 
-Interface 
+Interface
 ---------
 
 Vous permet de définir certains comportements de l’interface :
@@ -71,7 +71,7 @@ Vous permet de définir certains comportements de l’interface :
     -   **Déplier le panneau des vues** : permet de rendre visible par
         défaut le menu des vues (à gauche) sur les vues
 
-Sécurité 
+Sécurité
 --------
 
 -   **Authentification en 2 étapes** : permet de configurer
@@ -84,7 +84,7 @@ Sécurité
 
 -   **Hash de l’utilisateur** : votre clef API d’utilisateur
 
-### Sessions actives 
+### Sessions actives
 
 Vous avez ici la liste de vos sessions actuellement connectées, leur ID,
 leur IP ainsi que la date de dernière communication. En cliquant sur
@@ -99,10 +99,8 @@ dernière utilisation. Vous pouvez ici supprimer l’enregistrement d’un
 périphérique. Attention cela ne le déconnecte pas mais empêchera juste
 sa reconnection automatique.
 
-Notifications 
+Notifications
 -------------
 
 -   **Commande de notification utilisateur** : Commande par défaut pour
     vous joindre (commande de type message)
-
-
