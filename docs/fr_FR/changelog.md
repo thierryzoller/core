@@ -1,24 +1,35 @@
 
 Changelog
 =========
+3.3.32
+=====
+
+- Correction de bugs
+- Support en mobile des sliders sur les designs
+- SMART : optimisation de la gestion du swap
+
+3.3.31
+=====
+
+- Correction de bugs
 
 3.3.30
 =====
 
 - Correction d'un bug sur l'affichage des sessions utilisateur
-- Mise à jour de la doc
-- Suppression de la mise à jour des graphiques suite au nombreux bugs remontés
-- Correction d'un bug pouvant empecher l'affichage de certain log
+- Mise à jour de la documentation
+- Suppression de la mise à jour des graphiques en temps réel, suite aux nombreux bugs remontés
+- Correction d'un bug pouvant empêcher l'affichage de certains logs
 - Correction d'un bug sur le service de monitoring
-- Correction d'un bug sur la date de mise à jour de la batterie sur la page "Analyse équipement"
-- Amélioration de l'action remove_inat dans les scénario
+- Correction d'un bug sur la page "Analyse équipement", la date de mise à jour de la batterie est maintenant correcte 
+- Amélioration de l'action remove_inat dans les scénarios
 
 3.3.29
 =====
 
-- Correction de la disparition de la date de derniere verification des mises à jour
+- Correction de la disparition de la date de la dernière verification des mises à jour
 - Correction d'un bug pouvant bloquer les backups cloud
-- Correction d'un bugs sur le calcul d'utilisation des variable si c'est de la forme variable(toto,mavaleur)
+- Correction d'un bug sur le calcul d'utilisation des variables si elle sont sous la forme : variable(toto,mavaleur)
 
 
 3.3.28
