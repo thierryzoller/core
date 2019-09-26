@@ -102,7 +102,10 @@ try {
 			}else if (init('page') == 'plan3d') {
 				$page = 'design3d';
 			}
-			ajax::success('https://jeedom.github.io/core/' . config::byKey('language', 'core', 'fr_FR') . '/' . secureXSS($page));
+			if(config::byKey('core::branch') == 'master'){
+				ajax::success('https://jeedom.github.io/core/' . config::byKey('language', 'core', 'fr_FR') . '/' . secureXSS($page));
+			}
+			ajax::success('https://github.com/jeedom/core/blob/'.config::byKey('core::branch').'/docs/' . config::byKey('language', 'core', 'fr_FR'). '/' . secureXSS($page).'.md');
 		}
 		throw new Exception(__('Aucune documentation trouvée', __FILE__), -1234);
 	}
@@ -411,8 +414,8 @@ try {
 			throw new Exception(__('Aucun fichier trouvé. Vérifiez le paramètre PHP (post size limit)', __FILE__));
 		}
 		$extension = strtolower(strrchr($_FILES['file']['name'], '.'));
-		if (!in_array($extension, array('.jpg', '.png'))) {
-			throw new Exception('Extension du fichier non valide (autorisé .jpg .png) : ' . $extension);
+		if (!in_array($extension, array('.jpg', '.png','.gif'))) {
+			throw new Exception('Extension du fichier non valide (autorisé .jpg .png .gif) : ' . $extension);
 		}
 		if (filesize($_FILES['file']['tmp_name']) > 5000000) {
 			throw new Exception(__('Le fichier est trop gros (maximum 5Mo)', __FILE__));

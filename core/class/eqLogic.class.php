@@ -484,7 +484,8 @@ class eqLogic {
 			$return['html'] .= '<tr>';
 			for ($j = 1; $j <= $_nbColumn; $j++) {
 				$styletd = (isset($_options['style::td::' . $i . '::' . $j]) && $_options['style::td::' . $i . '::' . $j] != '') ? $_options['style::td::' . $i . '::' . $j] : $_options['styletd'];
-				$return['html'] .= '<td style="' . $styletd . '" data-line="' . $i . '" data-column="' . $j . '">';
+				$classTd = ($styletd != '') ? 'tableCmdcss' : '';
+				$return['html'] .= '<td class="'.$classTd.'" style="' . $styletd . '" data-line="' . $i . '" data-column="' . $j . '">';
 				if ($_options['center'] == 1) {
 					$return['html'] .= '<center>';
 				}
@@ -538,10 +539,10 @@ class eqLogic {
 		}
 		$classAttr = $level . ' ' . $battery . ' ' . $plugins . ' ' . $object_name;
 		$idAttr = $level . '__' . $battery . '__' . $plugins . '__' . $object_name;
-		$html .= '<div class="eqLogic eqLogic-widget ' . $classAttr . ' id="' . $idAttr . '">';
+		$html .= '<div class="eqLogic eqLogic-widget ' . $classAttr . '" id="' . $idAttr . '" data-eqlogic_id="'. $this->getId() . '">';
 		
 		$eqName = $this->getName();
-		if (strlen($eqName) > 23) $eqName = mb_substr($eqName,0,23)."...";
+		if (strlen($eqName) > 20) $eqName = mb_substr($eqName,0,20)."...";
 		if ($_version == 'mobile') {
 			$html .= '<div class="widget-name">' . $eqName . '<br/><span>' . $object_name . '</span></div>';
 		} else {
@@ -553,7 +554,11 @@ class eqLogic {
 		$html .= '</center>';
 		$html .= '<center>' . __('Le', __FILE__) . ' ' . date("Y-m-d H:i:s", strtotime($this->getStatus('batteryDatetime', __('inconnue', __FILE__)))) . '</center>';
 		$html .= '<span class="pull-left pluginName">' . ucfirst($this->getEqType_name()) . '</span>';
-		$html .= '<span class="pull-left batteryTime">';
+		if ($_version == 'mobile') {
+			$html .= '<span class="pull-left batteryTime">';
+		} else {
+			$html .= '<span class="pull-left batteryTime cursor">';
+		}
 		if ($this->getConfiguration('battery_danger_threshold') != '' || $this->getConfiguration('battery_warning_threshold') != '') {
 			$html .= '<i class="icon techno-fingerprint41 pull-right" title="Seuil manuel défini"></i>';
 		}
@@ -583,7 +588,7 @@ class eqLogic {
 			$cmd->event($_value, $_updateTime);
 			return true;
 		}
-		if ($_updateTime !== null) {
+		if ($_updateTime !== null && $_updateTime !== false) {
 			if (strtotime($cmd->getCollectDate()) < strtotime($_updateTime)) {
 				$cmd->event($_value, $_updateTime);
 				return true;
@@ -593,8 +598,10 @@ class eqLogic {
 			$cmd->event($_value, $_updateTime);
 			return true;
 		}
-		$cmd->setCache('collectDate', date('Y-m-d H:i:s'));
-		$this->setStatus(array('lastCommunication' => date('Y-m-d H:i:s'), 'timeout' => 0));
+		if ($_updateTime !== false) {
+			$cmd->setCache('collectDate', date('Y-m-d H:i:s'));
+			$this->setStatus(array('lastCommunication' => date('Y-m-d H:i:s'), 'timeout' => 0));
+		}
 		return false;
 	}
 	
@@ -656,10 +663,14 @@ class eqLogic {
 			}
 		}
 		$translate_category = trim($translate_category,',');
+		$name_display = $this->getName();
+		if (mb_strlen($name_display) > 25) {
+			$name_display = mb_substr($name_display,0,25)."...";
+		}
 		$replace = array(
 			'#id#' => $this->getId(),
 			'#name#' => $this->getName(),
-			'#name_display#' => (strlen($this->getName()) <25) ? $this->getName() : mb_substr($this->getName(),0,25)."...",
+			'#name_display#' => $name_display,
 			'#eqLink#' => $this->getLinkToConfiguration(),
 			'#category#' => $this->getPrimaryCategory(),
 			'#translate_category#' => $translate_category,

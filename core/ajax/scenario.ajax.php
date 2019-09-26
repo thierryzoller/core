@@ -188,6 +188,7 @@ try {
 		}
 		$content = str_replace(array_keys($converts), $converts, file_get_contents($path . '/' . init('template')));
 		$scenario_ajax = json_decode($content, true);
+      	$scenario_ajax['order'] = 9999;
 		if (isset($scenario_ajax['name'])) {
 			unset($scenario_ajax['name']);
 		}
@@ -336,7 +337,21 @@ try {
 		foreach ($scenario->getElement() as $element) {
 			$return['elements'][] = $element->getAjaxElement();
 		}
-		
+		$return['scenario_link'] = array('scenario' => array());
+		$usedBy = $scenario->getUsedBy();
+		foreach ($usedBy['scenario'] as $scenarioLink) {
+			if($scenarioLink->getId() == $scenario->getId()){
+				continue;
+			}
+			$return['scenario_link']['scenario'][$scenarioLink->getId()] = array('name' => $scenarioLink->getHumanName(),'isActive' => $scenarioLink->getIsActive());
+		}
+		$use = $scenario->getUse();
+		foreach ($use['scenario'] as $scenarioLink) {
+			if($scenarioLink->getId() == $scenario->getId()){
+				continue;
+			}
+			$return['scenario_link']['scenario'][$scenarioLink->getId()] = array('name' => $scenarioLink->getHumanName(),'isActive' => $scenarioLink->getIsActive());
+		}
 		ajax::success($return);
 	}
 	

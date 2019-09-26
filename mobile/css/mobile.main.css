@@ -2,6 +2,8 @@
 Theme Core 2019 @Jeedom
 */
 
+@import url("coreWidgets.css");
+
 /* _____________________________GLOBAL */
 ::-webkit-scrollbar{
   width:8px;
@@ -55,7 +57,20 @@ body {
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
-  scrollbar-color: var(--el-defaultColor) rgb(var(--bg-color)) !important;
+}
+
+html,
+body,
+textarea {
+  scrollbar-color: var(--txt-color) var(--sc-form-color) !important;
+  scrollbar-width: thin;
+  box-shadow: none !important;
+}
+
+a, .ui-link {
+  font-size: 16px;
+  color: var(--logo-primary-color) !important;
+  text-decoration: none;
 }
 
 .nd2-card{
@@ -83,6 +98,13 @@ body {
 
 .cursor {
   cursor: pointer;
+}
+
+
+[data-page="about"] textarea {
+  color: var(--linkHoverLight-color);
+  background-color: var(--bg-modal-color);
+  border: none !important;
 }
 
 .ui-btn {
@@ -173,6 +195,7 @@ body {
   display: inline-block;
   vertical-align: top;
   padding-bottom: 10px;
+  overflow: hidden;
 }
 .eqLogic.eqLogic-widget .ui-input-text input,
 .eqLogic.eqLogic-widget textarea {
@@ -215,6 +238,8 @@ body {
 .eqLogic.eqLogic-widget .widget-name .object_name {
   vertical-align: super;
   font-size: 11px !important;
+}
+.eqLogic.eqLogic-widget:not(.displayObjectName) .widget-name .object_name {
   display: none;
 }
 
@@ -226,6 +251,12 @@ body {
   text-decoration: none;
   color: var(--sc-lightTxt-color) !important;
   font-size: 16px !important;
+}
+
+.widget-name {
+  padding-right: 22px;
+  padding-left: 12px;
+  word-break: break-word;
 }
 
 .eqLogic.eqLogic-widget,
@@ -250,7 +281,15 @@ body {
   color: var(--link-color) !important;
   margin: 7px;
   font-size: 30px !important;
+  top: 5px !important;
+  position: relative;
 }
+
+.cmd[data-type="action"] .iconCmd {
+  line-height: 16px;
+  min-height: 36px !important;
+}
+
 .timeCmd {
   color: var(--txt-color);
   background-color: rgb(var(--bg-color)) !important;
@@ -267,6 +306,7 @@ body {
 }
 .cmdName {
   font-size: 14px !important;
+  font-weight: bold;
 }
 .cmdName:first-letter {
   text-transform: uppercase;
@@ -292,6 +332,9 @@ body {
 .state i {
   font-size: 35px !important;
   padding: 5px;
+}
+.scenario-widget  {
+  min-height: 72px !important;
 }
 .scenario-widget .state {
   padding-top: 12px;
@@ -382,11 +425,16 @@ p.state {
   background: transparent !important;
 }
 
+.iconCmdLine img{
+  max-width: 12px;
+  max-height: 12px;
+}
 
 .ui-page-theme-a .ui-btn.ui-btn-raised {
   color: var(--link-color) !important;
   background-color: rgb(var(--defaultBkg-color)) !important;
   box-shadow: none;
+  line-height: 12px !important;
 }
 .ui-link i:hover {
   color: var(--linkHover-color) !important;
@@ -634,6 +682,11 @@ a.action.ui-btn {
   color : var(--linkHoverLight-color) !important;
 }
 
+.alert-info {
+  background-color: var(--al-info-color);
+  color: var(--linkHoverLight-color);
+}
+
 .alert-sucess {
   background-color: var(--al-success-color);
   color: var(--linkHoverLight-color);
@@ -733,104 +786,6 @@ div.ui-header.ui-bar-inherit > a[data-rel=back]{
   display: none;
 }
 
-/* arc gauges and sliders */
-.highcharts-pane {
-  stroke-width: 0;
-}
-.highcharts-data-label > span > span {
-  font-size: 12px !important;
-}
-.highcharts-color-0 {
-  fill: var(--link-color);
-}
-.ui-slider-handle {
-  font-size: 1em;
-  border-radius: 1em !important;
-  cursor: pointer !important;
-}
-.ui-slider-horizontal{
-  height: 5px !important;
-}
-.ui-slider{
-  border:none !important;
-}
-
-/* less space under arc gauges */
-.gauge.cursor{ height: 85px !important; }
-.container-fluid.cmd-widget { min-height: 85px !important; }
-
-h4.modal-title {
-  font-size: 14px;
-}
-.highcharts-legend-item:not(.highcharts-legend-item-hidden) text{
-  font-weight: normal !important;
-}
-.highcharts-legend-item.highcharts-legend-item-hidden text {
-  font-weight: normal !important;
-  font-style: italic;
-}
-
-path.highcharts-graph {
-  stroke-width: 1;
-}
-
-
-/* ___________________________________________________________GAUGES */
-.hgauge-value,
-.shuttergauge-value {
-  background: var(--link-color);
-}
-
-.hgauge {
-  position: relative;
-  width: calc(100% - 16px);
-  height: 60px;
-  top: 12px;
-}
-.hgauge-bckg {
-  position:relative;
-  height: 5px;
-  top: -3px;
-  background: var(--el-defaultColor);
-}
-.hgauge-value {
-  height: 10px;
-  position: absolute;
-  left: 0;
-  margin-top: -4px;
-}
-.hgauge .state {
-  margin-top: 10px;
-}
-
-.shuttergauge {
-  position: relative;
-  width: 100% !important;
-  height: 120px;
-}
-.shuttergauge-bckg {
-  width: 42px;
-  height: 45px;
-  margin-left: -26px;
-  position: absolute;
-  top: 20px;
-}
-.shuttergauge-chart {
-  display: inline-block;
-  text-align: center !important;
-}
-.shuttergauge-state {
-  font-size: 16px;
-  position: absolute;
-  top: 70px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-}
-.shuttergauge .slider {
-  margin-top: 55px;
-}
-
 
 /* ___________________________________________________________ROUNDING */
 ::-moz-color-swatch {
@@ -854,7 +809,6 @@ path.highcharts-graph {
 #div_displayBattery .eqLogic-widget .widget-name span {
   border-radius: var(--border-radius) !important;
 }
-
 
 .panel,
 .panel-body,

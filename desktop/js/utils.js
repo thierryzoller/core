@@ -21,7 +21,7 @@ var NO_POPSTAT = false;
 var TOOLTIPSOPTIONS = {
   arrow: false,
   delay: 350,
-  interactive: true,
+  interactive: false,
   contentAsHTML: true
 }
 
@@ -102,7 +102,6 @@ function loadPage(_url,_noPushHistory){
   }
   jeedom.cmd.update = Array();
   jeedom.scenario.update = Array();
-  jeedom.eqLogic.changeDisplayObjectName(false);
   $('main').css('padding-right','').css('padding-left','').css('margin-right','').css('margin-left','');
   $('#div_pageContainer').add("#div_pageContainer *").off();
   $.hideAlert();
@@ -169,6 +168,11 @@ $(function () {
     initRowOverflow();
   }
   $('body').attr('data-page',getUrlVars('p'));
+  
+  //touch punch fix:
+  $('body').on('click','input', function() {
+    $(this).focus()
+  })
   
   $('body').off('jeedom_page_load').on('jeedom_page_load',function(){
     if (getUrlVars('saveSuccessFull') == 1) {
@@ -249,6 +253,9 @@ $(function () {
       return;
     }
     if($(this).attr('href') == undefined || $(this).attr('href') == '' || $(this).attr('href') == '#'){
+      return;
+    }
+    if($(this).attr('href').match("^data:")){
       return;
     }
     if ($(this).attr('href').match("^http")) {
@@ -617,6 +624,7 @@ $(function () {
     loadPage('index.php?v=d&p=dashboard&summary='+$(this).data('summary')+'&object_id='+$(this).data('object_id'));
   });
   
+  //theming:
   if (getCookie('currentTheme') == 'alternate') {
     var themeButton = '<i class="fas fa-sync-alt"></i> {{Thème principal}}'
     $('#bt_switchTheme').html(themeButton)
@@ -627,28 +635,29 @@ $(function () {
     $('body').attr('data-theme',jeedom.theme.currentTheme);
   }
   
-  $('body').on('click','#bt_switchTheme',function(){
-    var theme = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/' + jeedom.theme.default_bootstrap_theme_night + '.css';
-    var themShadows = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/shadows.css';
+  $('body').on('click','#bt_switchTheme',function() {
+    var theme = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/' + jeedom.theme.default_bootstrap_theme_night + '.css'
+    var themShadows = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/shadows.css'
     var themeCook = 'alternate'
-    var themeButton = '<i class="fas fa-sync-alt"></i> {{Thème principal}}';
-    $('body').attr('data-theme',jeedom.theme.default_bootstrap_theme_night);
+    var themeButton = '<i class="fas fa-sync-alt"></i> {{Thème principal}}'
+    $('body').attr('data-theme',jeedom.theme.default_bootstrap_theme_night)
     if ($('#bootstrap_theme_css').attr('href').split('?md5')[0] == theme) {
-      $('body').attr('data-theme',jeedom.theme.default_bootstrap_theme);
-      theme = 'core/themes/'+jeedom.theme.default_bootstrap_theme+'/desktop/' + jeedom.theme.default_bootstrap_theme + '.css';
+      $('body').attr('data-theme',jeedom.theme.default_bootstrap_theme)
+      theme = 'core/themes/'+jeedom.theme.default_bootstrap_theme+'/desktop/' + jeedom.theme.default_bootstrap_theme + '.css'
       themShadows = 'core/themes/'+jeedom.theme.default_bootstrap_theme+'/desktop/shadows.css';
       themeCook = 'default'
       themeButton = '<i class="fas fa-sync-alt"></i> {{Thème alternatif}}'
       $('#bootstrap_theme_css').attr('data-nochange',0)
     } else {
-      $('#bootstrap_theme_css').attr('data-nochange',1);
+      $('#bootstrap_theme_css').attr('data-nochange',1)
     }
     document.cookie = "currentTheme=" + themeCook + "; path=/"
-    $('#bootstrap_theme_css').attr('href', theme);
+    $('#bootstrap_theme_css').attr('href', theme)
     $('#bt_switchTheme').html(themeButton)
-    if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', themShadows);
-    setBackgroundImg(BACKGROUND_IMG);
-  });
+    if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', themShadows)
+    setBackgroundImg(BACKGROUND_IMG)
+    triggerThemechange()
+  })
   
   if(typeof jeedom.theme != 'undefined' && typeof jeedom.theme.css != 'undefined' && Object.keys(jeedom.theme.css).length > 0){
     for(var i in jeedom.theme.css){
@@ -684,35 +693,62 @@ setTimeout(function() {
   })
 }, 500)
 
-function changeThemeAuto(){
-  if(typeof jeedom.theme == 'undefined'){
-    return;
+function triggerThemechange() {
+  //set jeedom logo:
+  var currentTheme = $('body').attr('data-theme')
+  if (currentTheme === undefined) return
+  if (currentTheme.endsWith('Light')) {
+    $('#homeLogoImg').attr('src', jeedom.theme.logo_light)
+  } else {
+    $('#homeLogoImg').attr('src', jeedom.theme.logo_dark)
   }
-  if(typeof jeedom.theme.theme_changeAccordingTime == 'undefined' || jeedom.theme.theme_changeAccordingTime == 0){
-    return;
+  //trigger event for widgets:
+  if ( $('body').attr('data-page') && ['dashboard', 'view', 'plan','widgets'].includes($('body').attr('data-page')) ) {
+    if (currentTheme.endsWith('Light')) {
+      $('body').trigger('changeThemeEvent', ['Light'])
+    } else {
+      $('body').trigger('changeThemeEvent', ['Dark'])
+    }
   }
-  if(typeof jeedom.theme.default_bootstrap_theme == 'undefined' || typeof jeedom.theme.default_bootstrap_theme_night == 'undefined'){
-    return;
+}
+
+function changeThemeAuto() {
+  if (typeof jeedom.theme == 'undefined') {
+    return
   }
-  if(jeedom.theme.default_bootstrap_theme == jeedom.theme.default_bootstrap_theme_night){
-    return;
+  if (typeof jeedom.theme.theme_changeAccordingTime == 'undefined' || jeedom.theme.theme_changeAccordingTime == 0) {
+    return
   }
+  if (typeof jeedom.theme.default_bootstrap_theme == 'undefined' || typeof jeedom.theme.default_bootstrap_theme_night == 'undefined') {
+    return
+  }
+  if (jeedom.theme.default_bootstrap_theme == jeedom.theme.default_bootstrap_theme_night) {
+    return
+  }
+  
   setInterval(function () {
-    if($('#bootstrap_theme_css').attr('data-nochange') == 1){
-      return;
+    if (getCookie('currentTheme') == 'alternate') return
+    if ($('#bootstrap_theme_css').attr('data-nochange') == 1) {
+      return
     }
     var theme  = jeedom.theme.default_bootstrap_theme_night;
-    var themeCss = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/' + jeedom.theme.default_bootstrap_theme_night + '.css';
+    var themeCss = 'core/themes/'+jeedom.theme.default_bootstrap_theme_night+'/desktop/' + jeedom.theme.default_bootstrap_theme_night + '.css'
     var currentTime = parseInt((new Date()).getHours()*100+ (new Date()).getMinutes());
-    if(parseInt(jeedom.theme.theme_start_day_hour.replace(':','')) <  currentTime && parseInt(jeedom.theme.theme_end_day_hour.replace(':','')) >  currentTime){
-      theme  = jeedom.theme.default_bootstrap_theme;
-      themeCss = 'core/themes/'+jeedom.theme.default_bootstrap_theme+'/desktop/' + jeedom.theme.default_bootstrap_theme + '.css';
+    
+    if (parseInt(jeedom.theme.theme_start_day_hour.replace(':','')) <  currentTime && parseInt(jeedom.theme.theme_end_day_hour.replace(':','')) > currentTime) {
+      theme  = jeedom.theme.default_bootstrap_theme
+      themeCss = 'core/themes/'+jeedom.theme.default_bootstrap_theme+'/desktop/' + jeedom.theme.default_bootstrap_theme + '.css'
     }
-    if($('#bootstrap_theme_css').attr('href') != themeCss){
-      $('#bootstrap_theme_css').attr('href', themeCss);
-      $('body').attr('data-theme',theme);
-      if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', 'core/themes/'+theme+'/desktop/shadows.css');
-      setBackgroundImg(BACKGROUND_IMG);
+    
+    currentTheme = $('#bootstrap_theme_css').attr('href')
+    currentTheme = currentTheme.substring(0, currentTheme.indexOf('?md5'))
+    
+    if (currentTheme != themeCss) {
+      $('#bootstrap_theme_css').attr('href', themeCss)
+      $('body').attr('data-theme',theme)
+      if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', 'core/themes/'+theme+'/desktop/shadows.css')
+      setBackgroundImg(BACKGROUND_IMG)
+      triggerThemechange()
     }
   }, 60000);
 }
@@ -1489,6 +1525,7 @@ function editWidgetCmdMode(_mode) {
     }
     return this.find(selector);
   };
+  
   
   function initCheckBox(){}
   

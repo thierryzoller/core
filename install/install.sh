@@ -47,6 +47,7 @@ step_2_mainpackage() {
   apt_install ntp ca-certificates unzip curl sudo cron
   apt-get -y install locate tar telnet wget logrotate fail2ban dos2unix ntpdate htop iotop vim iftop smbclient
   apt-get -y install git python python-pip
+  apt-get -y install python3 python3-pip
   apt-get -y install software-properties-common
   apt-get -y install libexpat1 ssl-cert
   apt-get -y install apt-transport-https
@@ -105,7 +106,7 @@ step_5_php() {
   echo "---------------------------------------------------------------------"
   echo "${JAUNE}Commence l'étape 5 php${NORMAL}"
   apt_install php libapache2-mod-php php-json php-mysql
-  apt install -y php-curl 
+  apt install -y php-curl
   apt install -y php-gd
   apt install -y php-imap
   apt install -y php-xml
@@ -334,7 +335,7 @@ distrib_1_spe(){
 }
 
 STEP=0
-VERSION=master
+VERSION=V4-stable
 WEBSERVER_HOME=/var/www/html
 HTML_OUTPUT=0
 MYSQL_ROOT_PASSWD=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 15)

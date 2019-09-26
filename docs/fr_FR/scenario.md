@@ -333,7 +333,7 @@ commandes) :
 Vous pouvez aussi déclencher un scénario quand une variable est mise à
 jour en mettant : #variable(nom_variable)# ou en utilisant l’API HTTP
 décrite
-[ici](https://github.com/jeedom/core/blob/master/doc/fr_FR/api_http.asciidoc).
+[ici](https://jeedom.github.io/core/fr_FR/api_http).
 
 Opérateurs de comparaison et liens entre les conditions
 -------------------------------------------------------
@@ -559,7 +559,7 @@ Plusieurs fonctions sont disponibles pour les équipements :
     pour l'équipement donnée en paramètre, le 2ème paramètre optionnel
     permet de spécifier le format de retour (détails
     [ici](http://php.net/manual/fr/function.date.php)). Un retour de -1
-    signifie que la commande est introuvable
+    signifie que l'équipment est introuvable
 
 -   color_gradient(couleur_debut,couleur_fin,valuer_min,valeur_max,valeur) : Renvoi une couleur calculé par rapport à valeur dans l'intervalle couleur_debut/couleur_fin. La valeur doit etre comprise entre valeur_min et valeur_max
 
@@ -646,6 +646,9 @@ effectuer des conversions ou des calculs :
 -   median(commande1,commande2…​.commandeN) : Renvoie la médiane
     des valeurs.
 
+-   avg(commande1,commande2…​.commandeN) : Renvoie la moyenne
+        des valeurs.
+
 -   time_op(time,value) : Permet de faire des opérations sur le temps,
     avec time=temps (ex : 1530) et value=valeur à ajouter ou à
     soustraire en minutes.
@@ -677,7 +680,8 @@ Et les exemples pratiques :
 | triggerValue(#[Salle de bain][Hydrometrie][Humidité]#) | 80 si l’hydrométrie de \#\[Salle de bain\]\[Hydrometrie\]\[Humidité\]\# est de 80 %.                         |
 | round(#[Salle de bain][Hydrometrie][Humidité]# / 10) | Renvoie 9 si le pourcentage d’humidité et 85                     |
 | odd(3)                             | Renvoie 1                            |
-| median(15,25,20)                   | Renvoie 20                           |
+| median(15,25,20)                   | Renvoie 20        
+| avg(10,15,18)                      | Renvoie 14.3                     |
 | time_op(#time#, -90)               | s’il est 16h50, renvoie : 1650 - 0130 = 1520                          |
 | formatTime(1650)                   | Renvoie 16h50                        |
 | floor(130/60)                      | Renvoie 2 (minutes si 130s, ou heures si 130m)                      |

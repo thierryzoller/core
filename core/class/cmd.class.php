@@ -102,6 +102,17 @@ class cmd {
 		return self::cast(DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__));
 	}
 	
+	public static function isHistorized($_state = true) {
+		$values = array(
+			'isHistorized' => ($_state) ? 1 : 0
+		);
+		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
+		FROM cmd
+		WHERE isHistorized=:isHistorized
+		ORDER BY id';
+		return self::cast(DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__));
+	}
+	
 	public static function allHistoryCmd() {
 		$sql = 'SELECT ' . DB::buildField(__CLASS__, 'c') . '
 		FROM cmd c
@@ -629,45 +640,7 @@ class cmd {
 	
 	public static function availableWidget($_version) {
 		global $JEEDOM_INTERNAL_CONFIG;
-		$path = __DIR__ . '/../template/' . $_version;
-		$files = ls($path, 'cmd.*', false, array('files', 'quiet'));
 		$return = array();
-		foreach ($files as $file) {
-			$informations = explode('.', $file);
-			if(count($informations) < 4){
-				continue;
-			}
-			if(stripos($informations[3],'tmpl') !== false){
-				continue;
-			}
-			if (!isset($return[$informations[1]])) {
-				$return[$informations[1]] = array();
-			}
-			if (!isset($return[$informations[1]][$informations[2]])) {
-				$return[$informations[1]][$informations[2]] = array();
-			}
-			if (isset($informations[3])) {
-				$return[$informations[1]][$informations[2]][$informations[3]] = array('name' => $informations[3], 'location' => 'core', 'type' => 'core');
-			}
-		}
-		$path = __DIR__ . '/../../plugins/widget/core/template/' . $_version;
-		if (file_exists($path)) {
-			$files = ls($path, 'cmd.*', false, array('files', 'quiet'));
-			foreach ($files as $file) {
-				$informations = explode('.', $file);
-				if (count($informations) > 3) {
-					if (!isset($return[$informations[1]])) {
-						$return[$informations[1]] = array();
-					}
-					if (!isset($return[$informations[1]][$informations[2]])) {
-						$return[$informations[1]][$informations[2]] = array();
-					}
-					if (!isset($return[$informations[1]][$informations[2]][$informations[3]])) {
-						$return[$informations[1]][$informations[2]][$informations[3]] = array('name' => $informations[3], 'location' => 'widget' ,  'type' => 'widget');
-					}
-				}
-			}
-		}
 		$path = __DIR__ . '/../../data/customTemplates/' . $_version;
 		if (file_exists($path)) {
 			$files = ls($path, 'cmd.*', false, array('files', 'quiet'));
@@ -730,6 +703,26 @@ class cmd {
 				$return[$widgets->getType()][$widgets->getSubtype()] = array();
 			}
 			$return[$widgets->getType()][$widgets->getSubtype()][$widgets->getName()] = array('name' => $widgets->getName(), 'location' => 'custom', 'type' => 'custom');
+		}
+		$path = __DIR__ . '/../template/' . $_version;
+		$files = ls($path, 'cmd.*', false, array('files', 'quiet'));
+		foreach ($files as $file) {
+			$informations = explode('.', $file);
+			if(count($informations) < 4){
+				continue;
+			}
+			if(stripos($informations[3],'tmpl') !== false){
+				continue;
+			}
+			if (!isset($return[$informations[1]])) {
+				$return[$informations[1]] = array();
+			}
+			if (!isset($return[$informations[1]][$informations[2]])) {
+				$return[$informations[1]][$informations[2]] = array();
+			}
+			if (isset($informations[3])) {
+				$return[$informations[1]][$informations[2]][$informations[3]] = array('name' => $informations[3], 'location' => 'core', 'type' => 'core');
+			}
 		}
 		return $return;
 	}
@@ -824,7 +817,7 @@ class cmd {
 	/*     * *********************Méthodes d'instance************************* */
 	
 	public function formatValue($_value, $_quote = false) {
-		if (is_array($_value)) {
+		if (is_array($_value) || is_object($_value)) {
 			return '';
 		}
 		if (trim($_value) == '' && $_value !== false && $_value !== 0) {
@@ -944,6 +937,10 @@ class cmd {
 		}
 		if($this->getType() == 'action' && $this->getIsHistorized() == 1){
 			$this->setIsHistorized(0);
+		}
+		if($this->getIsHistorized() == 0){
+			$this->setDisplay('showStatsOnmobile',0);
+			$this->setDisplay('showStatsOndashboard',0);
 		}
 		DB::save($this);
 		if ($this->_needRefreshWidget) {
@@ -1177,16 +1174,34 @@ class cmd {
 		if(isset($widget_template[$this->getType()]) && isset($widget_template[$this->getType()][$this->getSubType()]) && isset($widget_template[$this->getType()][$this->getSubType()][$widget_name])){
 			$template_conf = $widget_template[$this->getType()][$this->getSubType()][$widget_name];
 			$template_name = 'cmd.' . $this->getType() . '.' . $this->getSubType() . '.' . $template_conf['template'];
-			if(isset($template_conf['replace'])){
+			if(isset($template_conf['replace']) && is_array($template_conf['replace']) && count($template_conf['replace']) > 0){
 				$replace = $template_conf['replace'];
+				foreach ($replace as &$value) {
+					$value = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$value));
+				}
 			}else{
 				$replace = array();
 			}
 			$replace['#test#'] = '';
 			if(isset($template_conf['test']) && is_array($template_conf['test']) && count($template_conf['test']) > 0){
+				$i=0;
+				$replace['#change_theme#'] = '';
 				foreach ($template_conf['test'] as &$test) {
+					if(!isset($test['operation'])){
+						continue;
+					}
+					if(!isset($test['state_light'])){
+						$test['state_light'] = '';
+					}
+					if(!isset($test['state_dark'])){
+						$test['state_dark'] = '';
+					}
+					$test['state_light'] = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$test['state_light']));
+					$test['state_dark'] = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$test['state_dark']));
 					$test['operation'] = str_replace('#value#','_options.display_value',$test['operation']);
-					$replace['#test#'] .= 'if('. $test['operation'].'){state=\''.str_replace("'","\'",$test['state']).'\'}';
+					$replace['#test#'] .= 'if('. $test['operation'].'){cmd.attr("data-state",'.$i.');state=jeedom.widgets.getThemeImg(\''.$test['state_light'].'\',\''.$test['state_dark'].'\')}';
+					$replace['#change_theme#'] .= 'if(cmd.attr("data-state") == '.$i.'){state=jeedom.widgets.getThemeImg(\''.$test['state_light'].'\',\''.$test['state_dark'].'\')}';
+					$i++;
 				}
 			}
 		}
@@ -1302,13 +1317,13 @@ class cmd {
 				}
 			}
 			
-			$replace['#state#'] = str_replace(array("\'", "'"), array("'", "\'"), $replace['#state#']);
+			$replace['#state#'] = str_replace(array("\'", "'","\n"), array("'", "\'",'<br/>'), $replace['#state#']);
 			$replace['#collectDate#'] = $this->getCollectDate();
 			$replace['#valueDate#'] = $this->getValueDate();
 			$replace['#alertLevel#'] = $this->getCache('alertLevel', 'none');
 			if ($this->getIsHistorized() == 1) {
 				$replace['#history#'] = 'history cursor';
-				if (config::byKey('displayStatsWidget') == 1 && (strpos($template, '#averageHistoryValue#') !== false || strpos($template, '#maxHistoryValue#') !== false || strpos($template, '#minHistoryValue#') !== false || strpos($template, '#hide_history#') !== false) && $this->getDisplay('showStatsOn' . $_version, 1) == 1) {
+				if (config::byKey('displayStatsWidget') == 1 && strpos($template, '#hide_history#') !== false && $this->getDisplay('showStatsOn' . $_version, 1) == 1) {
 					$startHist = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . config::byKey('historyCalculPeriod') . ' hour'));
 					$replace['#hide_history#'] = '';
 					$historyStatistique = $this->getStatistique($startHist, date('Y-m-d H:i:s'));
@@ -1414,7 +1429,7 @@ class cmd {
 		}
 		$oldValue = $this->execCmd();
 		$repeat = ($oldValue === $value && $oldValue !== '' && $oldValue !== null);
-		$this->setCollectDate(($_datetime !== null) ? $_datetime : date('Y-m-d H:i:s'));
+		$this->setCollectDate(($_datetime !== null && $_datetime !== false) ? $_datetime : date('Y-m-d H:i:s'));
 		$this->setCache('collectDate', $this->getCollectDate());
 		$this->setValueDate(($repeat) ? $this->getValueDate() : $this->getCollectDate());
 		$eqLogic->setStatus(array('lastCommunication' => $this->getCollectDate(), 'timeout' => 0));
@@ -1563,51 +1578,58 @@ class cmd {
 		}
 	}
 	
-	public function checkAlertLevel($_value, $_allowDuring = true) {
+	public function checkAlertLevel($_value, $_allowDuring = true, $_checkLevel = 'none') {
 		if ($this->getType() != 'info' || ($this->getAlert('warningif') == '' && $this->getAlert('dangerif') == '')) {
 			return 'none';
 		}
 		global $JEEDOM_INTERNAL_CONFIG;
 		$currentLevel = 'none';
+		$returnLevel = 'none';
 		foreach ($JEEDOM_INTERNAL_CONFIG['alerts'] as $level => $value) {
-			if (!$value['check']) {
-				continue;
-			}
 			if ($this->getAlert($level . 'if') != '') {
 				$check = jeedom::evaluateExpression(str_replace('#value#', $_value, $this->getAlert($level . 'if')));
 				if ($check == 1 || $check || $check == '1') {
 					$currentLevel = $level;
+					if ($_allowDuring && $currentLevel != 'none' && $this->getAlert($currentLevel . 'during') != '' && $this->getAlert($currentLevel . 'during') > 0) {
+						$cron = cron::byClassAndFunction('cmd', 'duringAlertLevel', array('cmd_id' => intval($this->getId()),'level'=> $currentLevel));
+						$next = strtotime('+ ' . $this->getAlert($currentLevel . 'during', 1) . ' minutes ' . date('Y-m-d H:i:s'));
+						if ($currentLevel != $this->getCache('alertLevel')) {
+							if (!is_object($cron)) {
+								if (!( $currentLevel =='warning' && $this->getCache('alertLevel') == 'danger')) {
+									$cron = new cron();
+									$cron->setClass('cmd');
+									$cron->setFunction('duringAlertLevel');
+									$cron->setOnce(1);
+									$cron->setOption(array('cmd_id' => intval($this->getId()),'level' => $currentLevel));
+									$cron->setSchedule(cron::convertDateToCron($next));
+									$cron->setLastRun(date('Y-m-d H:i:s'));
+									$cron->save();
+								}else { //je suis en condition de warning et le cron n'existe pas mais j'etais en danger, je suppose que le cron a expiré
+									$returnLevel = $currentLevel;
+								}
+							}
+						}else { // il n'y a pas de cron mais j'etais deja dans ce niveau, j'y reste
+							$returnLevel = $this->getCache('alertLevel');
+						}
+					}
+					if (!($_allowDuring  && $this->getAlert($currentLevel . 'during') != '' && $this->getAlert($currentLevel . 'during') > 0)){ //je suis en alerte sans delai ou en execution de cron
+						if ($_checkLevel == $currentLevel || $_checkLevel == 'none') { //si c'etait un cron, je ne teste que le niveau demandé
+							if (!($_checkLevel == 'warning' && $this->getCache('alertLevel') == 'danger')){
+								$returnLevel = $currentLevel;
+							}else { // le cron me demande de passer en warning mais je suis deja en danger, je reste en danger
+								$returnLevel = $this->getCache('alertLevel');
+							}
+						}
+					}
+				}else { // je ne suis pas dans la condition, je supprime le cron
+					$cron = cron::byClassAndFunction('cmd', 'duringAlertLevel', array('cmd_id' => intval($this->getId()),'level'=> $level));
+					if (is_object($cron)) {
+						$cron->remove(false);
+					}
 				}
 			}
 		}
-		
-		if ($_allowDuring && $currentLevel != 'none' && $currentLevel !=$this->getCache('alertLevel')&& $this->getAlert($currentLevel . 'during') != '' && $this->getAlert($currentLevel . 'during') > 0) {
-			$cron = cron::byClassAndFunction('cmd', 'duringAlertLevel', array('cmd_id' => intval($this->getId())));
-			$next = strtotime('+ ' . $this->getAlert($currentLevel . 'during', 1) . ' minutes ' . date('Y-m-d H:i:s'));
-			if (!is_object($cron)) {
-				$cron = new cron();
-			} else {
-				$nextRun = $cron->getNextRunDate();
-				if ($nextRun !== false && $next > strtotime($nextRun) && strtotime($nextRun) > strtotime('now')) {
-					return $this->getCache('alertLevel');
-				}
-			}
-			$cron->setClass('cmd');
-			$cron->setFunction('duringAlertLevel');
-			$cron->setOnce(1);
-			$cron->setOption(array('cmd_id' => intval($this->getId())));
-			$cron->setSchedule(cron::convertDateToCron($next));
-			$cron->setLastRun(date('Y-m-d H:i:s'));
-			$cron->save();
-			return $this->getCache('alertLevel');
-		}
-		if ($_allowDuring && $currentLevel == 'none') {
-			$cron = cron::byClassAndFunction('cmd', 'duringAlertLevel', array('cmd_id' => intval($this->getId())));
-			if (is_object($cron)) {
-				$cron->remove(false);
-			}
-		}
-		return $currentLevel;
+		return $returnLevel;
 	}
 	
 	public static function duringAlertLevel($_options) {
@@ -1622,7 +1644,7 @@ class cmd {
 			return;
 		}
 		$value = $cmd->execCmd();
-		$level = $cmd->checkAlertLevel($value, false);
+		$level = $cmd->checkAlertLevel($value, false,$_options['level']);
 		if ($level != 'none') {
 			$cmd->actionAlertLevel($level, $value);
 		}
@@ -2073,19 +2095,28 @@ class cmd {
 	*/
 	public function setName($_name) {
 		$_name = cleanComponanteName($_name);
-		$this->_changed = utils::attrChanged($this->_changed,$this->name,$_name);
+		if ($this->name != $_name) {
+			$this->_needRefreshWidget = true;
+			$this->_changed = true;
+		}
 		$this->name = $_name;
 		return $this;
 	}
 	
 	public function setType($_type) {
-		$this->_changed = utils::attrChanged($this->_changed,$this->type,$_type);
+		if ($this->type != $_type) {
+			$this->_needRefreshWidget = true;
+			$this->_changed = true;
+		}
 		$this->type = $_type;
 		return $this;
 	}
 	
 	public function setSubType($_subType) {
-		$this->_changed = utils::attrChanged($this->_changed,$this->subType,$_subType);
+		if ($this->subType != $_subType) {
+			$this->_needRefreshWidget = true;
+			$this->_changed = true;
+		}
 		$this->subType = $_subType;
 		return $this;
 	}
@@ -2103,7 +2134,10 @@ class cmd {
 	}
 	
 	public function setUnite($_unite) {
-		$this->_changed = utils::attrChanged($this->_changed,$this->unite,$_unite);
+		if ($this->unite != $_unite) {
+			$this->_needRefreshWidget = true;
+			$this->_changed = true;
+		}
 		$this->unite = $_unite;
 		return $this;
 	}

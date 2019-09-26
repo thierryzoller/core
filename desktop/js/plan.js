@@ -269,7 +269,6 @@ if(deviceInfo.type == 'desktop' && user_isAdmin == 1){
             selected:  editOption.highlight,
             events: {
               click : function(e) {
-                console.log($(this).value())
                 editOption.highlight = ($(this).value() == 1) ? false : true;
                 initEditOption(1);
               }
@@ -475,12 +474,12 @@ if(deviceInfo.type == 'desktop' && user_isAdmin == 1){
         type: 'checkbox',
         events: {
           click : function(opt) {
-            console.log(opt);
             if($(this).value() == 1){
               opt.handleObj.data.$trigger.addClass('locked');
             }else{
               opt.handleObj.data.$trigger.removeClass('locked');
             }
+            $('.context-menu-root').hide()
           }
         }
       },
@@ -658,6 +657,12 @@ var dragClick = {x: 0, y: 0}
 var dragStartPos = {top: 0, left: 0}
 var dragStep = false
 function draggableStartFix(event, ui) {
+  isDragLocked = false
+  if ($(event.target).hasClass('locked')) {
+    isDragLocked = true
+    document.body.style.cursor = "default"
+    return false
+  }
   zoomScale = parseFloat($(ui.helper).attr('data-zoom'))
   if (editOption.grid == 1) {
     dragStep = editOption.gridSize[0]
@@ -686,6 +691,7 @@ function draggableStartFix(event, ui) {
   maxTop = containerHeight + minTop - (clientHeight * zoomScale)
 }
 function draggableDragFix(event, ui) {
+  if (isDragLocked == true) return false
   newLeft = event.clientX - dragClick.x + dragStartPos.left
   newTop = event.clientY - dragClick.y + dragStartPos.top
   
@@ -710,9 +716,9 @@ function initEditOption(_state) {
     $('.div_displayObject').addClass('editingMode')
     jeedom.cmd.disableExecute = true;
     $('.plan-link-widget,.view-link-widget,.graph-widget,.div_displayObject >.eqLogic-widget,.div_displayObject > .cmd-widget,.scenario-widget,.text-widget,.image-widget,.zone-widget,.summary-widget').draggable({
+      cancel: '.locked',
       containment: 'parent',
       cursor: 'move',
-      cancel : '.locked',
       start: draggableStartFix,
       drag: draggableDragFix,
       stop: function( event, ui ) {
@@ -730,7 +736,7 @@ function initEditOption(_state) {
       $('.div_grid').hide();
     }
     $('.plan-link-widget,.view-link-widget,.graph-widget,.div_displayObject >.eqLogic-widget,.scenario-widget,.text-widget,.image-widget,.zone-widget,.summary-widget').resizable({
-      cancel : '.locked',
+      cancel: '.locked',
       handles: 'n,e,s,w,se,sw,nw,ne',
       start: function( event, ui ) {
         zoomScale = parseFloat($(ui.helper).attr('data-zoom'))
@@ -879,12 +885,6 @@ function displayPlan(_code) {
           }catch(e) {
             
           }
-          if(isset(data.configuration) && isset(data.configuration.displayObjectName) && data.configuration.displayObjectName != '0'){
-            jeedom.eqLogic.changeDisplayObjectName(data.configuration.displayObjectName);
-          }else{
-            console.log('je passe');
-            jeedom.eqLogic.changeDisplayObjectName(false);
-          }
           initEditOption(editOption.state);
           initReportMode();
         }
@@ -971,15 +971,15 @@ function displayObject(_plan,_html, _noRender) {
   _plan = init(_plan, {});
   _plan.position = init(_plan.position, {});
   _plan.css = init(_plan.css, {});
-  if (_plan.link_type == 'eqLogic' || _plan.link_type == 'scenario' || _plan.link_type == 'text' || _plan.link_type == 'image') {
+  if (_plan.link_type == 'eqLogic' || _plan.link_type == 'scenario' || _plan.link_type == 'text' || _plan.link_type == 'image' || _plan.link_type == 'zone' || _plan.link_type == 'summary') {
     $('.div_displayObject .'+_plan.link_type+'-widget[data-'+_plan.link_type+'_id=' + _plan.link_id + ']').remove();
   }else if (_plan.link_type == 'view' || _plan.link_type == 'plan') {
     $('.div_displayObject .'+_plan.link_type+'-link-widget[data-link_id=' + _plan.link_id + ']').remove();
   }else if (_plan.link_type == 'cmd') {
     $('.div_displayObject > .cmd-widget[data-cmd_id=' + _plan.link_id + ']').remove();
   }else if (_plan.link_type == 'graph') {
-    for (var i in jeedom.history.chart) {
-      delete jeedom.history.chart[i];
+    if(jeedom.history.chart['graph'+_plan.link_id]){
+      delete jeedom.history.chart['graph'+_plan.link_id];
     }
     $('.div_displayObject .graph-widget[data-graph_id=' + _plan.link_id + ']').remove();
   }
@@ -1044,6 +1044,12 @@ function displayObject(_plan,_html, _noRender) {
     if (key == 'opacity'){
       continue;
     }
+    if (key == 'font-size' && _plan.link_type == 'summary'){
+      html.find('.objectSummaryParent').each(function(){
+        $(this).style(key, _plan.css[key], 'important');
+      });
+      continue;
+    }
     html.style(key, _plan.css[key], 'important');
   }
   if (_plan.css['opacity'] && _plan.css['opacity'] !== ''){
@@ -1051,7 +1057,10 @@ function displayObject(_plan,_html, _noRender) {
   }
   if(_plan.link_type == 'eqLogic'){
     if(isset(_plan.display.hideName) && _plan.display.hideName == 1){
-      html.find('.widget-name').remove();
+      html.addClass('hideEqLogicName')
+    }
+    if(isset(_plan.display.showObjectName) && _plan.display.showObjectName == 1){
+      html.addClass('displayObjectName')
     }
     if(isset(_plan.display.cmdHide)){
       for(var i in _plan.display.cmdHide){
@@ -1110,6 +1119,11 @@ function displayObject(_plan,_html, _noRender) {
   }
   if(_plan.display.css && _plan.display.css != ''){
     html.attr('style',html.attr('style')+';'+_plan.display.css);
+    if(_plan.display.cssApplyOn && _plan.display.cssApplyOn != ''){
+      html.find(_plan.display.cssApplyOn).each(function(){
+        $(this).attr('style',$(this).attr('style')+';'+_plan.display.css);
+      });
+    }
   }
   if(_plan.link_type == 'graph'){
     $('.div_displayObject').append(html);
@@ -1128,6 +1142,11 @@ function displayObject(_plan,_html, _noRender) {
             showNavigator : init(_plan.display.showNavigator, true),
             enableExport : false,
             global: false,
+            success : function(){
+              if(init(_plan.display.transparentBackground, false)){
+                $('#graph' + _plan.link_id).find('.highcharts-background').style('fill-opacity', '0', 'important')
+              }
+            }
           });
         }
       }
