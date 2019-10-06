@@ -33,6 +33,9 @@ var _observerConfig_ = {
   subtree: true
 }
 
+var userDeviceType = 'mobile'
+if (getDeviceType()['type'] == 'desktop') userDeviceType = 'desktop'
+
 window.addEventListener('error', function (evt) {
   if(evt.filename.indexOf('file=3rdparty/') != -1){
     return;
@@ -168,12 +171,6 @@ $(function () {
     initRowOverflow();
   }
   $('body').attr('data-page',getUrlVars('p'));
-  
-  //touch punch fix:
-  $('body').on('click','input', function() {
-    $(this).focus()
-  })
-  
   $('body').off('jeedom_page_load').on('jeedom_page_load',function(){
     if (getUrlVars('saveSuccessFull') == 1) {
       $('#div_alert').showAlert({message: '{{Sauvegarde effectuée avec succès}}', level: 'success'});
@@ -269,6 +266,9 @@ $(function () {
     }
     $('li.dropdown.open').click();
     $('.navbar-collapse').removeClass('in');
+    if (userDeviceType == 'mobile') {
+      $('.dropdown-toggle').dropdown("close")
+    }
     loadPage($(this).attr('href'));
     e.preventDefault();
     e.stopPropagation();
@@ -298,7 +298,7 @@ $(function () {
     $('.dropdown-menu').dropdown('toggle');
   });
   
-  if (getDeviceType()['type'] == 'desktop') {
+  if (userDeviceType == 'desktop') {
     $('ul.dropdown-menu [data-toggle=dropdown]').on('mouseenter', function (event) {
       if ($(window).width() < 768) return
       event.preventDefault();
@@ -695,13 +695,15 @@ setTimeout(function() {
 
 function triggerThemechange() {
   //set jeedom logo:
-  var currentTheme = $('body').attr('data-theme')
-  if (currentTheme === undefined) return
-  if (currentTheme.endsWith('Light')) {
-    $('#homeLogoImg').attr('src', jeedom.theme.logo_light)
-  } else {
-    $('#homeLogoImg').attr('src', jeedom.theme.logo_dark)
+  if ($('body')[0].hasAttribute('data-theme')) {
+    var currentTheme = $('body').attr('data-theme')
+    if (currentTheme.endsWith('Light')) {
+      $('#homeLogoImg').attr('src', jeedom.theme.logo_light)
+    } else {
+      $('#homeLogoImg').attr('src', jeedom.theme.logo_dark)
+    }
   }
+  
   //trigger event for widgets:
   if ( $('body').attr('data-page') && ['dashboard', 'view', 'plan','widgets'].includes($('body').attr('data-page')) ) {
     if (currentTheme.endsWith('Light')) {
@@ -744,11 +746,17 @@ function changeThemeAuto() {
     currentTheme = currentTheme.substring(0, currentTheme.indexOf('?md5'))
     
     if (currentTheme != themeCss) {
-      $('#bootstrap_theme_css').attr('href', themeCss)
-      $('body').attr('data-theme',theme)
-      if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', 'core/themes/'+theme+'/desktop/shadows.css')
-      setBackgroundImg(BACKGROUND_IMG)
-      triggerThemechange()
+      $.get(themeCss)
+        .done(function() {
+          $('#bootstrap_theme_css').attr('href', themeCss)
+          $('body').attr('data-theme',theme)
+          if ($("#shadows_theme_css").length > 0) $('#shadows_theme_css').attr('href', 'core/themes/'+theme+'/desktop/shadows.css')
+          setBackgroundImg(BACKGROUND_IMG)
+          triggerThemechange()
+      })
+        .fail(function() {
+          console.error("changeThemeAuto: can't find theme file " + themeCss)
+      })
     }
   }, 60000);
 }
