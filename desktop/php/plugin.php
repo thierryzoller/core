@@ -64,12 +64,12 @@ foreach (update::listRepo() as $key => $value) {
 	  if (!isset($value['scope']['pullInstall']) || !$value['scope']['pullInstall']) {
             continue;
           }
-	echo '<div class="cursor pullInstall" data-repo="' . $key . '" style="background-color : #ffffff; height : 130px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-    <center>
-      <i class="fas fa-sync" style="font-size : 5em;color:#94ca02;"></i>
-    </center>
-    <span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Sync}} ' . $value['name'] . '</center></span>
-  </div>';
+	//echo '<div class="cursor pullInstall" data-repo="' . $key . '" style="background-color : #ffffff; height : 130px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+   // <center>
+   //   <i class="fas fa-sync" style="font-size : 5em;color:#94ca02;"></i>
+   // </center>
+   // <span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Sync}} ' . $value['name'] . '</center></span>
+  //</div>';
 }
 ?>
 </div>
