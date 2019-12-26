@@ -30,7 +30,7 @@ class repo_market {
 		'backup' => true,
 		'hasConfiguration' => true,
 		'proxy' => true,
-		'sendPlugin' => true,
+		'sendPlugin' => false,
 		'hasStore' => true,
 		'hasScenarioStore' => true,
 		'test' => true,
@@ -476,6 +476,9 @@ public static function backup_restore($_backup) {
 	public static function monitoring_start() {
 		preg_match_all('/(\d\.\d\.\d)/m', shell_exec(system::getCmdSudo() . ' zabbix_agentd -V'), $matches);
 		self::monitoring_install();
+		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
+			return;
+		}
 		$cmd = system::getCmdSudo() . " chmod -R 777 /etc/zabbix;";
 		$cmd .= system::getCmdSudo() . " sed -i '/ServerActive=/d' /etc/zabbix/zabbix_agentd.conf;";
 		$cmd .= system::getCmdSudo() . " sed -i '/Hostname=/d' /etc/zabbix/zabbix_agentd.conf;";
@@ -815,7 +818,7 @@ public static function backup_restore($_backup) {
 				'hwkey' => jeedom::getHardwareKey(),
 				'localIp' => $internalIp,
 				'jeedom_name' => config::byKey('name'),
-				'plugin_install_list' => plugin::listPlugin(true, false, false, true),
+				'plugin_install_list' => plugin::listPlugin(false, false, false, true),
 				'information' => array(
 					'nbMessage' => message::nbMessage(),
 					'nbUpdate' => update::nbNeedUpdate(),

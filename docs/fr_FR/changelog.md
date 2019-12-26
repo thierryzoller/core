@@ -2,6 +2,24 @@
 Changelog
 =========
 
+3.3.40
+=====
+
+- Rotation automatique de la clef api des utilisateurs admin tous les 3 mois. il est possible de le désactiver (mais ce n'est pas recommandé) dans la gestion des utilisateurs. Attention cette mise à jour lance une rotation des clef api des utilisateurs admins
+
+3.3.39
+=====
+
+- Changement du nom de la variable $key en $key2 dans la class event
+- Nettoyage du code d'envoi de plugin/widget/scénario au market (permet de gagner plusieurs secondes sur l'affichage des plugins)
+- Correction d'un warning sur la fonction lastBetween
+- Meilleure prise en compte des widgets des plugins
+- Optimisation du calcul de la santé sur le swap
+
+>**IMPORTANT**
+>
+>Cette mise à jour corrige un soucis qui pourra e:pecher tout enregistrement d'historique au 1er janvier 2020, elle est plus que vivement recommandée
+
 3.3.38
 =====
 
