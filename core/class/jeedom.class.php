@@ -486,6 +486,9 @@ class jeedom {
 		}
 		$user = user::byHash($_apikey);
 		if (is_object($user)) {
+			if($user->getEnable() == 0){
+				return false;
+			}
 			if ($user->getOptions('localOnly', 0) == 1 && !self::apiModeResult('whiteip')) {
 				return false;
 			}
@@ -1342,6 +1345,9 @@ class jeedom {
 	}
 	
 	public static function forceSyncHour() {
+		if(config::byKey('disable_ntp','core',0) == 1){
+			return;
+		}
 		shell_exec(system::getCmdSudo() . 'service ntp stop;' . system::getCmdSudo() . 'ntpdate -s ' . config::byKey('ntp::optionalServer', 'core', '0.debian.pool.ntp.org') . ';' . system::getCmdSudo() . 'service ntp start');
 	}
 	
