@@ -34,7 +34,7 @@ $plugins_list = plugin::listPlugin(false, true);
         }
         $div .= '<div class="cursor pullInstall success" data-repo="' . $key . '">';
         $div .= '<center><i class="fas fa-sync"></i></center>';
-        $div .= '<span class="txtColor"><center>Synchroniser ' . $value['name'] . '</center></span>';
+        $div .= '<span class="txtColor"><center>{{Synchroniser}} ' . $value['name'] . '</center></span>';
         $div .= '</div>';
       }
       echo $div;
@@ -53,12 +53,23 @@ $plugins_list = plugin::listPlugin(false, true);
           <?php
           foreach (plugin::listPlugin() as $plugin) {
             $opacity = ($plugin->isActive()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-            echo '<div class="pluginDisplayCard cursor" data-pluginPath="' . $plugin->getFilepath() . '" data-plugin_id="' . $plugin->getId() . '" style="'.$opacity.'">';
-            echo '<center>';
-            echo '<img class="img-responsive" src="' . $plugin->getPathImgIcon() . '" />';
-            echo '</center>';
-            echo '<span class="name">' . $plugin->getName() . '</span>';
-            echo '</div>';
+            $div = '<div class="pluginDisplayCard cursor" data-pluginPath="' . $plugin->getFilepath() . '" data-plugin_id="' . $plugin->getId() . '" style="'.$opacity.'">';
+            $div .= '<center>';
+            $div .= '<img class="img-responsive" src="' . $plugin->getPathImgIcon() . '" />';
+            $div .= '</center>';
+            $lbl_version = false;
+            $update = $plugin->getUpdate();
+            if (is_object($update)) {
+              $version = $update->getConfiguration('version');
+              if ($version && $version != 'stable') $lbl_version = true;
+            }
+            if ($lbl_version) {
+              $div .= '<span class="name"><sub style="font-size:22px" class="warning">&#8226</sub>' . $plugin->getName() . '</span>';
+            } else {
+              $div .= '<span class="name">' . $plugin->getName() . '</span>';
+            }
+            $div .= '</div>';
+            echo $div;
           }
           ?>
         </div>

@@ -1,4 +1,4 @@
-Does Jeedom require a subscription?
+Jeedom nécessite-t-il un abonnement ?
 =====================================
 
 No, Jeedom is fully usable without any need of
@@ -6,8 +6,8 @@ subscription whatever. However, there are services offered for
 backups or calls / SMS but that actually stay
 optional.
 
-Does Jeedom use external servers to work?
-================================================== ============
+Jeedom utilise-t-il des serveurs extérieurs pour fonctionner ?
+==============================================================
 
 No, Jeedom does not use cloud infrastructure. Everything is done in
 local and you do not need our servers for your
@@ -15,53 +15,53 @@ installation works. Only services like the Market, the
 online backup or the Jeedom DNS require the use of our
 servers.
 
-Can we reorder orders for equipment?
+Peut-on réordonner les commandes d’un équipement ?
 ==================================================
 
 Yes it is possible, just drag and drop the commands of your
 object on its configuration.
 
-Can we edit the style of the widgets?
+Peut-on éditer le style des widgets ?
 =====================================
 
 Yes it is possible, either through the widget plugin, or in
 using the General → Display page
 
-Can we put the same equipment several times on a design?
-================================================== ==============
+Peut-on mettre plusieurs fois le même équipement sur un design ?
+================================================================
 
 No it is not possible, but you can duplicate it thanks to
 virtual plugin.
 
-How to change an erroneous data in the history?
-================================================== ==
+Comment changer une donnée erronée de l’historique ?
+====================================================
 
 It suffices, on a historical curve of the order, to click on the
 point in question. If you leave the field blank, then the value
 will be deleted.
 
-How long does a backup take?
+Combien de temps dure une sauvegarde ?
 ======================================
 
 There is no standard duration, it depends on the system and the volume of
 data to back up, but it can take more than 5 minutes, that's
 normal.
 
-Is there a dedicated mobile app?
+Y a-t-il une application mobile dédiée ?
 ========================================
 
 Jeedom has a mobile version suitable for use on mobile and
 Tablet. There is also a native app for Android and iOS.
 
-What are the credentials to login the first time?
-================================================== ==============
+Quels sont les identifiants pour me connecter la première fois ?
+================================================================
 
 When you first connect to Jeedom (and even if you do not
 have not changed), the default username and password
 are admin / admin. At the first connection, it is strongly
 recommended to modify these identifiers for more security.
 
-Can we put Jeedom in https?
+Peut-on mettre Jeedom en https ?
 ================================
 
 Oui : Soit vous avez un pack power ou plus, dans ce cas il vous
@@ -78,7 +78,7 @@ Voila une [documentation](https://www.alsacreations.com/tuto/lire/612-Premiere-c
 
 A noter que lorsque vous ecrirez le mot de passe vous ne verrez rien s'ecrire à l'écran c'est normal.
 
-Comment remettre à plat les droits ? 
+Comment remettre à plat les droits ?
 ====================================
 
 En SSH faites :
@@ -89,12 +89,12 @@ chmod -R 775 /var/www/html
 chown -R www-data:www-data /var/www/html
 ```
 
-Où se trouvent les sauvegardes de Jeedom ? 
+Où se trouvent les sauvegardes de Jeedom ?
 ==========================================
 
 Elles sont dans le dossier /var/www/html/backup
 
-Comment mettre à jour Jeedom en SSH ? 
+Comment mettre à jour Jeedom en SSH ?
 =====================================
 
 En SSH faites :
@@ -106,22 +106,22 @@ chmod -R 775 /var/www/html
 chown -R www-data:www-data /var/www/html
 ```
 
-La Webapp est-elle compatible Symbian ? 
+La Webapp est-elle compatible Symbian ?
 =======================================
 
 La webapp nécessite un smartphone supportant le HTML5 et le CSS3. Elle n’est donc malheureusement pas compatible Symbian.
 
-Sur quelles plateformes Jeedom peut-il fonctionner ? 
+Sur quelles plateformes Jeedom peut-il fonctionner ?
 ====================================================
 
 Pour que Jeedom fonctionne, il faut une plateforme linux avec les droits
 root ou un système type docker. Il ne fonctionne donc pas sur une
 plateforme android pure.
 
-Je ne peux mettre à jour certain plugin "Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)..." ? 
+Je ne peux mettre à jour certain plugin "Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)..." ?
 ====================================================
 
-Cela peut etre du à plusieurs chose, il faut : 
+Cela peut être dû à plusieurs choses, il faut :
 
 - Vérifier que votre Jeedom est toujours connecté au market (dans la page d'administration de jeedom, partie mise à jour vous avez un bouton de test)
 - Vérifier que le compte market à bien acheté le plugin en question
@@ -129,7 +129,7 @@ Cela peut etre du à plusieurs chose, il faut :
 - Vérifier que votre version de Jeedom est bien compatible avec le plugin
 - Vérifiez que votre Jeedom est toujours correctement connecté au market (Dans la configuration de Jeedom, onglet mise à jour)
 
-J’ai une page blanche 
+J’ai une page blanche
 =====================
 
 Il faut se connecter en SSH à Jeedom et lancer le script
@@ -145,7 +145,7 @@ pas, il vous l’indiquera.
 Vous pouvez aussi regarder le log /var/www/html/log/http.error. Très
 souvent, celui-ci indique le souci.
 
-J’ai un problème d’identifiant BDD 
+J’ai un problème d’identifiant BDD
 ==================================
 
 Il faut réinitialiser ceux-ci :
@@ -161,46 +161,46 @@ sudo sed -i -e "s/#PASSWORD#/${bdd_password}/g" core/config/common.config.php
 sudo chown www-data:www-data core/config/common.config.php
 ```
 
-J’ai des \{\{…​\}\} partout 
+J’ai des \{\{…​\}\} partout
 =======================
 
 La cause la plus fréquente est l’utilisation d’un plugin en version beta
 et Jeedom en stable, ou l’inverse. Pour avoir le détail de l’erreur, il
 faut regarder le log http.error (dans /var/www/html/log).
 
-Lors d’une commande j’ai une roue qui tourne sans s’arrêter 
+Lors d’une commande j’ai une roue qui tourne sans s’arrêter
 ===========================================================
 
 Encore une fois cela est souvent dû à un plugin en beta alors que Jeedom
 est en stable. Pour voir l’erreur, il faut faire F12 puis console.
 
-Je n’ai plus accès à Jeedom, ni par l’interface web ni en console par SSH 
+Je n’ai plus accès à Jeedom, ni par l’interface web ni en console par SSH
 =========================================================================
 
 Cette erreur n’est pas due à Jeedom, mais à un problème avec le système.
 Si celui-ci persiste suite à une réinstallation, il est conseillé de
 voir avec le SAV pour un souci hardware. Voici la [documentation](https://jeedom.github.io/documentation/howto/fr_FR/recovery_mode_jeedom_smart) pour la Smart
 
-Mon scénario ne s’arrête plus/pas 
+Mon scénario ne s’arrête plus/pas
 =================================
 
 Il est conseillé de regarder les commandes exécutées par le scénario,
 souvent cela vient d’une commande qui ne se termine pas.
 
-J’ai des instabilités ou des erreurs 504 
+J’ai des instabilités ou des erreurs 504
 ========================================
 
 Vérifiez si votre système de fichiers n’est pas corrompu, en SSH la
 commande est : "sudo dmesg | grep error" .
 
-Je ne vois pas tous mes équipements sur le dashboard 
+Je ne vois pas tous mes équipements sur le dashboard
 ====================================================
 
 Souvent cela est dû au fait que les équipements sont affectés à un objet
 qui n’est pas le fils ou l’objet lui-même du premier objet sélectionné à
 gauche dans l’arbre (vous pouvez configurer celui-ci dans votre profil).
 
-J’ai l’erreur suivante : SQLSTATE\[HY000\] \[2002\] Can’t connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' 
+J’ai l’erreur suivante : SQLSTATE\[HY000\] \[2002\] Can’t connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
 ====================================================================================================================================
 
 Cela est dû à MySQL qui s’est arrêté, ce n’est pas normal, les cas
@@ -228,7 +228,7 @@ mysqld --verbose
 
 Ou consulter le log : /var/log/mysql/error.log
 
-Les boutons Eteindre/Redémarrer ne fonctionnent pas 
+Les boutons Eteindre/Redémarrer ne fonctionnent pas
 ===================================================
 
 Sur une installation DIY c’est normal. En SSH, il faut faire la commande
@@ -239,7 +239,7 @@ NOPASSWD: ALL.
 sudo service apache2 restart
 ```
 
-Je ne vois pas certains plugins du Market 
+Je ne vois pas certains plugins du Market
 =========================================
 
 Ce genre de cas arrive si votre Jeedom n’est pas compatible avec le
@@ -250,16 +250,16 @@ J'ai un équipement en timeout mais je ne le vois pas sur le dashboard
 
 Les alerte sont classé par priorité, de la moins importante à la plus importante : timeout, batterie warning, batterie danger, alerte warning, alerte danger
 
-Mon Jeedom affiche en permanance "En cours de démarrage" même après 1h ? 
+Mon Jeedom affiche en permanance "En cours de démarrage" même après 1h ?
 =====================================
 
 Si vous etes en DIY et sous Debian 9 ou plus, vérifiez qu'il n'y a pas eu une mise à jour d'Apache et donc le retour du privateTmp (visible en faisant `ls /tmp` et voir si il y a un dossier private\*Apache). Si c'est le cas il faut faire :
 
-``` 
+```
 mkdir /etc/systemd/system/apache2.service.d
 echo "[Service]" > /etc/systemd/system/apache2.service.d/privatetmp.conf
 echo "PrivateTmp=no" >> /etc/systemd/system/apache2.service.d/privatetmp.conf
-``` 
+```
 
 J'ai un soucis d'heure sur mes historiques
 =========================================
@@ -285,9 +285,9 @@ Depuis Jeedom 3.2 il n'est plus possible de se connecter avec admin/admin à dis
 
 J'ai des erreurs de type "Class 'eqLogic' not found", des fichiers semblent etre manquant ou j'ai une page blanche
 =========================================
-C'est une erreur assez grave le plus simple est de faire 
+C'est une erreur assez grave le plus simple est de faire
 
-``` 
+```
 mkdir -p /root/tmp/
 cd /root/tmp
 wget https://github.com/jeedom/core/archive/master.zip
@@ -295,3 +295,23 @@ unzip master.zip
 cp -R /root/tmp/core-master/* /var/www/html
 rm -rf /root/tmp/core-master
 ```
+
+J'ai l'erreurs dans scenario_execution MYSQL_ATTR_INIT_COMMAND
+=========================================
+Dans l'administration de Jeedom partie OS/DB puis dans la console systeme il faut faire :
+
+```
+yes | sudo apt install -y php-mysql php-curl php-gd php-imap php-xml php-opcache php-soap php-xmlrpc php-common php-dev php-zip php-ssh2 php-mbstring php-ldap
+```
+
+# Je n'arrive pas a installer les dépendances d'un plugin j'ai une erreur du type : "E: dpkg a été interrompu. Il est nécessaire d'utiliser « sudo dpkg --configure -a » pour corriger le problème." ou "E: Could not get lock /var/lib/dpkg/lock"
+
+Il faut :
+
+- redemarrer Jeedom
+- aller dans l'administration de celui-ci (bouton roue cranté en haut a droite puis configuration en v3 ou Réglage -> Système -> Configuration en v4)
+- aller dans l'onglet OS/DB
+- lancer l'administration Système
+- cliquer sur Dpkg configure
+- attendre 10min
+- relancer les dépendances du plugins qui bloque

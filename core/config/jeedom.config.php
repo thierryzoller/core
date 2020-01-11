@@ -65,7 +65,7 @@ $JEEDOM_INTERNAL_CONFIG = array(
 		),
 	),
 	'alerts' => array(
-		'timeout' => array('name' => 'Timeout', 'icon' => 'far fa-clock', 'level' => 1, 'check' => false, 'color' => '#FF0000'),
+		'timeout' => array('name' => 'Timeout', 'icon' => 'far fa-clock', 'level' => 6, 'check' => false, 'color' => '#FF0000'),
 		'batterywarning' => array('name' => 'Batterie en Warning', 'icon' => 'fa fa-battery-quarter', 'level' => 2, 'check' => false, 'color' => '#FFAB00'),
 		'batterydanger' => array('name' => 'Batterie en Danger', 'icon' => 'fa fa-battery-empty', 'level' => 3, 'check' => false, 'color' => '#FF0000'),
 		'warning' => array('name' => 'Warning', 'icon' => 'fa fa-bell', 'level' => 4, 'check' => true, 'color' => '#FFAB00'),
@@ -76,7 +76,7 @@ $JEEDOM_INTERNAL_CONFIG = array(
 			'action' => array(
 				'other'=>array(
 					'light' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'icon_yellow icon jeedom-lumiere-on\'></i>','#_icon_off_#' => '<i class=\'icon jeedom-lumiere-off\'></i>')),
-					'circle' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'fas fa-circle\'></i>','#_icon_off_#' => '<i class=\'fas fa-circle-thin\'></i>')),
+					'circle' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'fas fa-circle\'></i>','#_icon_off_#' => '<i class=\'far fa-circle\'></i>')),
 					'fan' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'icon jeedom-ventilo\'></i>','#_icon_off_#' => '<i class=\'fas fa-times\'></i>')),
 					'garage' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'icon_green icon jeedom-garage-ferme\'></i>','#_icon_off_#' => '<i class=\'icon_red icon jeedom-garage-ouvert\'></i>')),
 					'lock' => array('template' => 'tmplicon','replace' => array('#_icon_on_#' => '<i class=\'icon_green icon jeedom-lock-ferme\'></i>','#_icon_off_#' => '<i class=\'icon_orange icon jeedom-lock-ouvert\'></i>')),

@@ -89,11 +89,11 @@ if (init('rescue', 0) == 0) {
 global $homeLogoSrc;
 function setTheme() {
 	global $jeedom_theme, $homeLogoSrc;
-	$homeLogoSrc = '../../'.config::byKey('logo_light');
+	$homeLogoSrc = config::byKey('logo_light');
 	$dataNoChange = false;
 	$themeCss = '<link id="bootstrap_theme_css" href="core/themes/core2019_Light/desktop/core2019_Light.css?md5='.md5(__DIR__ . '/../../core/themes/core2019_Light/desktop/core2019_Light.css').'" rel="stylesheet">';
 	$themeJs = 'core2019_Light/desktop/core2019_Light';
-	
+
 	$themeDefinition = $jeedom_theme['current_desktop_theme'];
 	if (isset($_COOKIE['currentTheme'])) {
 		if ($_COOKIE['currentTheme'] == 'alternate') {
@@ -209,10 +209,12 @@ function setTheme() {
 	include_file('3rdparty', 'jquery.contextMenu/jquery.contextMenu.min', 'js');
 	include_file('3rdparty', 'autosize/autosize.min', 'js');
 	include_file('desktop', 'bootstrap', 'css');
+	include_file('desktop', 'coreWidgets', 'css');
 	include_file('desktop', 'desktop.main', 'css');
-	
+
+
 	setTheme();
-	
+
 	if(init('report') == 1){
 		include_file('desktop', 'report', 'css');
 	}
@@ -272,7 +274,7 @@ function setTheme() {
 										<a class="dropdown-toggle" data-toggle="dropdown" id="bt_gotoDashboard" href="index.php?v=d&p=dashboard"><i class="fas fa-tachometer-alt"></i> {{Dashboard}}</a>
 										<ul class="dropdown-menu scrollable-menu" role="menu" style="height: auto;max-height: 600px; overflow-x: hidden;">
 											<?php foreach (jeeObject::buildTree(null, false) as $object_li) {
-												echo '<li><a href="index.php?v=d&p=dashboard&object_id=' . $object_li->getId() . '">' . $object_li->getHumanName(true) . '</a></li>';
+												echo '<li><a href="index.php?v=d&p=dashboard&object_id=' . $object_li->getId() . '">'.str_repeat('&nbsp;&nbsp;', $object_li->getConfiguration('parentNumber')).$object_li->getHumanName(true) . '</a></li>';
 											} ?>
 										</ul>
 									</li>
@@ -368,8 +370,8 @@ function setTheme() {
 												<li><a href="index.php?v=d&p=user"><i class="fas fa-users"></i> {{Utilisateurs}}</a></li>
 												<li class="divider"></li>
 												<?php	if (jeedom::isCapable('sudo') && isConnect('admin')) {
-													echo '<li class="cursor"><a id="bt_rebootSystem" state="0"><i class="fas fa-redo"></i> {{Redémarrer}}</a></li>';
-													echo '<li class="cursor"><a id="bt_haltSystem" state="0"><i class="fas fa-power-off"></i> {{Eteindre}}</a></li>';
+													echo '<li class="cursor"><a href="index.php?v=d&p=reboot"><i class="fas fa-redo"></i> {{Redémarrer}}</a></li>';
+													echo '<li class="cursor"><a href="index.php?v=d&p=shutdown"><i class="fas fa-power-off"></i> {{Eteindre}}</a></li>';
 												} ?>
 											</ul>
 										</li>
@@ -493,19 +495,8 @@ function setTheme() {
 				<div id="md_modal"></div>
 				<div id="md_modal2"></div>
 				<div id="md_modal3"></div>
-				<div id="md_pageHelp" style="display: none;" title="Aide">
-					<ul class="nav nav-tabs">
-						<li class="active"><a href="#div_helpWebsite" data-toggle="tab">{{Générale}}</a></li>
-						<li><a href="#div_helpSpe" data-toggle="tab">{{Détaillée}}</a></li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane active" id="div_helpWebsite" ></div>
-						<div class="tab-pane" id="div_helpSpe" ></div>
-					</div>
-				</div>
 				<div id="md_reportBug" title="{{Demande de support}}"></div>
 			</main>
 		<?php } 	?>
 	</body>
 	</html>
-	

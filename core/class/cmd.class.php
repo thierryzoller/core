@@ -677,6 +677,28 @@ class cmd {
 			}
 		}
 		foreach (plugin::listPlugin(true,false,false) as $plugin) {
+			$path = __DIR__ . '/../../plugins/'.$plugin->getId().'/core/template/' . $_version;
+			if (file_exists($path)) {
+				$files = ls($path, 'cmd.*', false, array('files', 'quiet'));
+				foreach ($files as $file) {
+					$informations = explode('.', $file);
+					if(count($informations) < 4){
+						continue;
+					}
+					if(stripos($informations[3],'tmpl') !== false){
+						continue;
+					}
+					if (!isset($return[$informations[1]])) {
+						$return[$informations[1]] = array();
+					}
+					if (!isset($return[$informations[1]][$informations[2]])) {
+						$return[$informations[1]][$informations[2]] = array();
+					}
+					if (isset($informations[3])) {
+						$return[$informations[1]][$informations[2]][$informations[3]] = array('name' => $informations[3], 'location' => $plugin->getId(), 'type' => $plugin->getId());
+					}
+				}
+			}
 			if (!method_exists($plugin->getId(), 'templateWidget')) {
 				continue;
 			}
@@ -690,7 +712,7 @@ class cmd {
 						if(!isset($return[$type][$subtype])){
 							$return[$type][$subtype] = array();
 						}
-						$return[$type][$subtype][$name] = array('name' => $name, 'location' => $plugin->getId() , 'type' => 'plugin');
+						$return[$type][$subtype][$plugin->getId().'::'.$name] = array('name' => $name, 'location' => $plugin->getId() , 'type' => 'plugin');
 					}
 				}
 			}
@@ -1180,7 +1202,7 @@ class cmd {
 			if(isset($template_conf['replace']) && is_array($template_conf['replace']) && count($template_conf['replace']) > 0){
 				$replace = $template_conf['replace'];
 				foreach ($replace as &$value) {
-					$value = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$value));
+					$value = str_replace('#value#','"+_options.display_value+"',str_replace('"',"'",$value));
 				}
 			}else{
 				$replace = array();
@@ -1199,11 +1221,11 @@ class cmd {
 					if(!isset($test['state_dark'])){
 						$test['state_dark'] = '';
 					}
-					$test['state_light'] = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$test['state_light']));
-					$test['state_dark'] = str_replace('#value#','"+_options.display_value+"',str_replace("'","\'",$test['state_dark']));
-					$test['operation'] = str_replace('#value#','_options.display_value',$test['operation']);
-					$replace['#test#'] .= 'if('. $test['operation'].'){cmd.attr("data-state",'.$i.');state=jeedom.widgets.getThemeImg(\''.$test['state_light'].'\',\''.$test['state_dark'].'\')}';
-					$replace['#change_theme#'] .= 'if(cmd.attr("data-state") == '.$i.'){state=jeedom.widgets.getThemeImg(\''.$test['state_light'].'\',\''.$test['state_dark'].'\')}';
+					$test['state_light'] = str_replace('#value#','"+_options.display_value+"',str_replace('"',"'",$test['state_light']));
+					$test['state_dark'] = str_replace('#value#','"+_options.display_value+"',str_replace('"',"'",$test['state_dark']));
+					$test['operation'] = str_replace('"',"'",str_replace('#value#','_options.display_value',$test['operation']));
+					$replace['#test#'] .= 'if('. $test['operation'].'){cmd.attr("data-state",'.$i.');state=jeedom.widgets.getThemeImg("'.$test['state_light'].'","'.$test['state_dark'].'")}';
+					$replace['#change_theme#'] .= 'if(cmd.attr("data-state") == '.$i.'){state=jeedom.widgets.getThemeImg("'.$test['state_light'].'","'.$test['state_dark'].'")}';
 					$i++;
 				}
 			}
@@ -1472,9 +1494,7 @@ class cmd {
 			if (is_array($value_cmd) && count($value_cmd) > 0) {
 				foreach ($value_cmd as $cmd) {
 					if ($cmd->getType() == 'action') {
-						if (!$repeat) {
-							$events[] = array('cmd_id' => $cmd->getId(), 'value' => $value, 'display_value' => $display_value, 'valueDate' => $this->getValueDate(), 'collectDate' => $this->getCollectDate());
-						}
+						$events[] = array('cmd_id' => $cmd->getId(), 'value' => $value, 'display_value' => $display_value, 'valueDate' => $this->getValueDate(), 'collectDate' => $this->getCollectDate());
 					} else {
 						if ($_loop > 1) {
 							$cmd->event($cmd->execute(), null, $_loop);
@@ -1723,6 +1743,7 @@ class cmd {
 			'#cmd_id#' => $this->getId(),
 			'#humanname#' => urlencode($this->getHumanName()),
 			'#eq_name#' => urlencode($this->getEqLogic()->getName()),
+			'"' => ''
 		);
 		$url = str_replace(array_keys($replace), $replace, $url);
 		log::add('event', 'info', __('Appels de l\'URL de push pour la commande ', __FILE__) . $this->getHumanName() . ' : ' . $url);
@@ -1822,8 +1843,8 @@ class cmd {
 		return $name;
 	}
 	
-	public function getHistory($_dateStart = null, $_dateEnd = null) {
-		return history::all($this->id, $_dateStart, $_dateEnd);
+	public function getHistory($_dateStart = null, $_dateEnd = null,$_groupingType = null) {
+		return history::all($this->id, $_dateStart, $_dateEnd,$_groupingType);
 	}
 	
 	public function getPluralityHistory($_dateStart = null, $_dateEnd = null, $_period = 'day', $_offset = 0) {

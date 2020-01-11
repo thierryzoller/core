@@ -29,13 +29,15 @@ user::isBan();
 			<div id="searchResult"></div>
 		</form>
 	</div>
-	
+
 	<ul class="nav nav-tabs nav-primary" role="tablist">
 		<li role="presentation" class="active"><a href="#generaltab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-wrench" title="{{Général}}"></i><span> {{Général}}</span></a></li>
 	    <!-- CHANGES -->
 		<li role="presentation"><a href="#luxsmarthome" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-wrench" title="{{LUX Smart Home}}"></i><span> {{LUX Smart Home}}</span></a></li>
 	    <!-- ====== -->		
      	<li role="presentation"><a href="#interfacetab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-laptop" title="{{Interface}}"></i><span> {{Interface}}</span></a></li>
+		<li role="presentation"><a href="#infotab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-info" title="{{Informations}}"></i><span> {{Informations}}</span></a></li>
+		<li role="presentation"><a href="#interfacetab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-laptop" title="{{Interface}}"></i><span> {{Interface}}</span></a></li>
 		<li role="presentation"><a href="#networktab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-rss" title="{{Réseaux}}"></i><span> {{Réseaux}}</span></a></li>
 		<li role="presentation"><a href="#logtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="far fa-file" title="{{Logs}}"></i><span> {{Logs}}</span></a></li>
 		<li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="icon divers-table29" title="{{Commandes}}"></i><span> {{Commandes}}</span></a></li>
@@ -289,6 +291,90 @@ user::isBan();
 			</form>
 		</div>
 		
+		<div role="tabpanel" class="tab-pane" id="infotab">
+			<br/>
+			<form class="form-horizontal">
+				<fieldset>
+					<legend>{{Coordonées}}</legend>
+					<div class="alert alert-info">{{Pour avoir les coordonnées de chez vous vous pouvez utiliser ce <a href="https://www.torop.net/coordonnees-gps.php" target="_blank">site</a>}}</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Latitude}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Coordonées géographique de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::latitude" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Longitude}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Coordonées géographique de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::longitude" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Altitude}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Coordonées géographique de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::altitude" />
+						</div>
+					</div>
+					<legend>{{Adresse}}</legend>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Code pays (FR,US...)}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Adresse de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::stateCode" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Code postal}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Adresse de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::postalCode" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Ville}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Adresse de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::city" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Adresse}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Adresse de votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::address" />
+						</div>
+					</div>
+					<legend>{{Divers}}</legend>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Surface habitable}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Surface habitable votre maison, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::livingSpace" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 col-md-3 col-sm-3 col-xs-6 control-label">{{Nombre d'occupant}}
+							<sup><i class="fas fa-question-circle" tooltip="{{Nombre d'occupant, permet de ne pas avoir à la remplir dans les plugins}}"></i></sup>
+						</label>
+						<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+							<input type="text" class="configKey form-control" data-l1key="info::nbOccupant" />
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+
 		<div role="tabpanel" class="tab-pane" id="apitab">
 			<br/>
 			<form class="form-horizontal">
@@ -339,7 +425,7 @@ user::isBan();
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label class="col-lg-2 col-md-3 col-sm-4 col-xs-12 control-label">{{Clé API Pro}}
 							<sup><i class="fas fa-question-circle" tooltip="{{Clé API Pro de}} <?php echo config::byKey('product_name'); ?>"></i></sup>
@@ -417,7 +503,7 @@ user::isBan();
 				</fieldset>
 			</form>
 		</div>
-		
+
 		<div role="tabpanel" class="tab-pane" id="ostab">
 			<br/>
 			<div class="alert alert-danger">{{ATTENTION : ces opérations sont risquées, vous pouvez perdre l'accès à votre système et à}} <?php echo config::byKey('product_name'); ?>{{. L'équipe}} <?php echo config::byKey('product_name'); ?> {{se réserve le droit de refuser toute demande de support en cas de mauvaise manipulation.}}</div>
@@ -466,7 +552,9 @@ user::isBan();
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-4 col-md-4 col-sm-5 col-xs-6 control-label">{{Vérification}}</label>
+						<label class="col-lg-4 col-md-4 col-sm-5 col-xs-6 control-label">{{Vérification}}
+                        	<sup><i class="fas fa-question-circle" tooltip="{{Nettoie la base de données (objets, commandes, historiques et autres informations non valides).}}"></i></sup>
+						</label>
 						<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
 							<a class="btn btn-warning" id="bt_checkDatabase"><i class="fas fa-check"></i> {{Lancer}}</a>
 						</div>
@@ -497,7 +585,7 @@ user::isBan();
 				</fieldset>
 			</form>
 		</div>
-		
+
 		<div role="tabpanel" class="tab-pane" id="securitytab">
 			<br/>
 			<form class="form-horizontal">
@@ -544,7 +632,7 @@ user::isBan();
 							<div class="form-group">
 								<label class="col-md-3 col-sm-4 col-xs-12 control-label">{{Mot de passe}}</label>
 								<div class="col-md-3 col-sm-4 col-xs-12">
-									<input type="password" autocomplete="new-password"  class="configKey form-control" data-l1key="ldap:password" />
+									<input type="text" class="inputPassword configKey form-control" data-l1key="ldap:password" />
 								</div>
 							</div>
 							<div class="form-group">
@@ -598,7 +686,7 @@ user::isBan();
 							<sup><i class="fas fa-question-circle" tooltip="{{Temps en secondes}}"></i></sup>
 							<sub>s</sub>
 						</label>
-						
+
 						<div class="col-md-3 col-sm-4 col-xs-12">
 							<input type="text" class="configKey form-control" data-l1key="security::timeLoginFailed" />
 						</div>
@@ -620,7 +708,7 @@ user::isBan();
 							<input type="text" class="configKey form-control" data-l1key="security::whiteips" />
 						</div>
 					</div>
-					
+
 				</fieldset>
 			</form>
 			<form class="form-horizontal">
@@ -657,7 +745,7 @@ user::isBan();
 							?>
 						</tbody>
 					</table>
-					
+
 				</fieldset>
 			</form>
 		</div>
@@ -754,6 +842,12 @@ user::isBan();
 														<input type="text"  class="configKey form-control" data-l1key="network::localip" />
 													</div>
 												</div>
+												<div class="form-group col-xs-12">
+													<label class="col-xs-6 control-label">{{Ma connexion internet est en 4g}}</label>
+													<div class="col-xs-6">
+														<input type="checkbox" class="configKey" data-l1key="connection::4g" />
+													</div>
+												</div>
 											</fieldset>
 										</form>
 									</div>
@@ -831,7 +925,7 @@ user::isBan();
 												<div class="form-group">
 													<label class="col-xs-4 control-label">{{Mot de passe}}</label>
 													<div class="col-xs-4">
-														<input class="configKey form-control" type="password" autocomplete="new-password" data-l1key="proxyPassword" >
+														<input class="inputPassword configKey form-control" type="text" data-l1key="proxyPassword" >
 													</div>
 												</div>
 											</fieldset>
@@ -965,7 +1059,7 @@ user::isBan();
 												<input type="checkbox" class="configKey form-control" data-l1key="interface::advance::coloredIcons" />
 											</div>
 										</div>
-										
+
 										<legend>{{Personnalisation}}</legend>
 										<div class="form-group">
 											<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">{{Activer}}
@@ -1004,7 +1098,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="commandtab">
 								<br/>
 								<legend>{{Historique}}</legend>
@@ -1104,7 +1198,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="cachetab">
 								<br/>
 								<form class="form-horizontal">
@@ -1205,7 +1299,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="interacttab">
 								<br/>
 								<form class="form-horizontal">
@@ -1259,8 +1353,8 @@ user::isBan();
 												<textarea type="text" class="configKey form-control" data-l1key="interact::regexpExcludGlobal"></textarea>
 											</div>
 										</div>
-                                        
-                                        
+
+
 										<legend>{{Interaction automatique, contextuelle & avertissement}}</legend>
 										<div class="form-group">
 											<label class="col-lg-3 col-md-4 col-sm-4 col-xs-6 control-label">{{Activer les interactions automatiques}}</label>
@@ -1298,7 +1392,7 @@ user::isBan();
 												<input class="configKey form-control" data-l1key="interact::warnme::start" />
 											</div>
 										</div>
-										
+
 										<div class="form-group">
 											<label class="col-lg-3 col-md-4 col-sm-4 col-xs-6 control-label">{{Commande de retour par défaut}}</label>
 											<div class="col-lg-8 col-md-8 col-sm-8 col-xs-6">
@@ -1310,7 +1404,7 @@ user::isBan();
 												</div>
 											</div>
 										</div>
-										
+
 										<div class="form-group">
 											<label class="col-lg-3 col-md-4 col-sm-4 col-xs-6 control-label">{{Synonymes pour les objets}}</label>
 											<div class="col-lg-8 col-md-8 col-sm-8 col-xs-6">
@@ -1347,9 +1441,9 @@ user::isBan();
 												<input class="configKey form-control" data-l1key="interact::autoreply::cmd::slider::min" />
 											</div>
 										</div>
-										
+
 										<legend>{{Couleurs}}<i class="fas fa-plus-circle pull-right cursor" id="bt_addColorConvert"></i></legend>
-										
+
 										<table class="table table-condensed table-bordered" id="table_convertColor" >
 											<thead>
 												<tr>
@@ -1366,7 +1460,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="repporttab">
 								<br/>
 								<form class="form-horizontal">
@@ -1390,7 +1484,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="graphlinktab">
 								<br/>
 								<form class="form-horizontal">
@@ -1454,7 +1548,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="summarytab">
 								<br/>
 								<form class="form-horizontal">
@@ -1480,7 +1574,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="logtab">
 								<br/>
 								<form class="form-horizontal">
@@ -1514,7 +1608,7 @@ user::isBan();
 										<div class="form-group">
 											<div class="col-sm-2 hidden-xs"></div>
 											<div class="col-sm-10 col-xs-12">
-												
+
 											</div>
 										</div>
 									</fieldset>
@@ -1526,7 +1620,7 @@ user::isBan();
 									<li role="presentation" class="active"><a href="#log_alertes" role="tab" data-toggle="tab"><i class="fas fa-bell"></i> {{Alertes}}</a></li>
 									<li role="presentation"><a href="#log_log" role="tab" data-toggle="tab"><i class="fas fa-file"></i> {{Logs}}</a></li>
 								</ul>
-								
+
 								<div class="tab-content">
 									<div role="tabpanel" class="tab-pane active" id="log_alertes">
 										<form class="form-horizontal">
@@ -1559,7 +1653,7 @@ user::isBan();
 											</fieldset>
 										</form>
 									</div>
-									
+
 									<div role="tabpanel" class="tab-pane" id="log_log">
 										<form class="form-horizontal">
 											<fieldset>
@@ -1653,7 +1747,7 @@ user::isBan();
 									</div>
 								</div>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="eqlogictab">
 								<br/>
 								<form class="form-horizontal">
@@ -1691,7 +1785,7 @@ user::isBan();
 									</fieldset>
 								</form>
 							</div>
-							
+
 							<div role="tabpanel" class="tab-pane" id="updatetab">
 								<br/>
 								<div class="row">
@@ -1793,7 +1887,7 @@ user::isBan();
 																	$div .= '<input type="number" class="configKey form-control" data-l1key="' . $key . '::' . $pKey . '" value="' . $default . '" />';
 																	break;
 																	case 'password':
-																	$div .= '<input type="password" autocomplete="new-password"  class="configKey form-control" data-l1key="' . $key . '::' . $pKey . '" value="' . $default . '" />';
+																	$div .= '<input type="text" class="inputPassword configKey form-control" data-l1key="' . $key . '::' . $pKey . '" value="' . $default . '" />';
 																	break;
 																	case 'select':
 																	$div .= '<select class="form-control configKey" data-l1key="' . $key . '::' . $pKey . '">';
@@ -1827,6 +1921,6 @@ user::isBan();
 								</div>
 							</div>
 						</div>
-						
+
 						<?php include_file("desktop", "administration", "js");?>
-						
+

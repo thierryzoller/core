@@ -65,7 +65,11 @@ $(function(){
         for(i=0; i<_objects.length; i++)
         {
           ob = _objects[i]
-          contextmenuitems[i] = {'name': ob.name, 'id' : ob.id}
+          var decay = 0
+          if (isset(ob.configuration) && isset(ob.configuration.parentNumber)) {
+            decay = ob.configuration.parentNumber
+          }
+          contextmenuitems[i] = {'name': '\u00A0\u00A0\u00A0'.repeat(decay) + ob.name, 'id' : ob.id}
         }
 
         $('.nav.nav-tabs').contextMenu({
@@ -352,14 +356,14 @@ $('.addSummary').on('click',function(){
 
 $('.bt_checkAll').on('click',function(){
   $(this).closest('tr').find('input[type="checkbox"]').each(function () {
-      $(this).prop( "checked", true )
-    })
+    $(this).prop( "checked", true )
+  })
 })
 
 $('.bt_checkNone').on('click',function(){
   $(this).closest('tr').find('input[type="checkbox"]').each(function () {
-      $(this).prop( "checked", false )
-    })
+    $(this).prop( "checked", false )
+  })
 });
 
 $('#div_pageContainer').delegate(".listCmdInfo", 'click', function () {

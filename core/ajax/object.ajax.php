@@ -99,11 +99,17 @@ try {
 				$objects = json_decode(init('id'), true);
 			} else {
 				$objects = array();
-				foreach (jeeObject::all() as $object) {
-					if ($object->getConfiguration('hideOnDashboard', 0) == 1) {
-						continue;
+				if(init('summary') == ''){
+					foreach (jeeObject::buildTree(null, true) as $object) {
+						if ($object->getConfiguration('hideOnDashboard', 0) == 1) {
+							continue;
+						}
+						$objects[] = $object->getId();
 					}
-					$objects[] = $object->getId();
+				}else{
+					foreach (jeeObject::all() as $object) {
+						$objects[] = $object->getId();
+					}
 				}
 			}
 			$return = array();
@@ -278,7 +284,7 @@ try {
 			$extension = strtolower(strrchr(init('file'), '.'));
 			$upfilepath = init('file');
 		}
-		$files = ls(__DIR__ . '/../../data/object/','object'.$object->getId().'*');
+		$files = ls(__DIR__ . '/../../data/object/','object'.$object->getId().'-*');
 		if(count($files)  > 0){
 			foreach ($files as $file) {
 				unlink(__DIR__ . '/../../data/object/'.$file);

@@ -40,39 +40,45 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 				<form class="form-horizontal">
 					<fieldset>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID}}</label>
+							<label class="col-sm-6 control-label">{{ID}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="id"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Nom}}</label>
+							<label class="col-sm-6 control-label">{{Nom}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="name"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID logique}}</label>
+							<label class="col-sm-6 control-label">{{ID logique}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="logicalId"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID de l'objet}}</label>
+							<label class="col-sm-6 control-label">{{ID de l'objet}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="object_id"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Création}}</label>
+							<label class="col-sm-6 control-label">{{Création}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="configuration" data-l2key="createtime"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Changement de pile}}</label>
+							<label class="col-sm-6 control-label">{{Changement de pile}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="configuration" data-l2key="batterytime"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-6 control-label">{{Tag(s)}}</label>
+							<div class="col-sm-6">
+								<input class="eqLogicAttr form-control" data-l1key="tags" />
 							</div>
 						</div>
 					</fieldset>
@@ -117,14 +123,6 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 						</div>
 					</fieldset>
 				</form>
-			</div>
-			<div class="col-sm-12" >
-				<div class="form-group">
-					<label class="col-sm-1 control-label">{{Tag(s)}}</label>
-					<div class="col-sm-11">
-						<input class="eqLogicAttr form-control" data-l1key="tags" />
-					</div>
-				</div>
 			</div>
 			<div class="col-sm-12" >
 				<legend>{{Commandes}}</legend>
@@ -268,7 +266,7 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 			<?php }
 			?>
 		</div>
-
+		
 	<?php }
 	?>
 	<div role="tabpanel" class="tab-pane" id="eqLogic_alert">
@@ -405,7 +403,7 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 						echo $string_cmd . '</center>';
 						echo '<input class="eqLogicAttr form-control input-sm" data-l1key="display" data-l2key="layout::dashboard::table::parameters" data-l3key="text::td::' . $i . '::' . $j . '" placeholder="{{Texte de la case}}" style="margin-top:3px;"/>';
 						echo '<input class="eqLogicAttr form-control input-sm" data-l1key="display" data-l2key="layout::dashboard::table::parameters" data-l3key="style::td::' . $i . '::' . $j . '" placeholder="{{Style de la case (CSS)}}" style="margin-top:3px;"/>';
-
+						
 						echo '</td>';
 					}
 					echo '</tr>';
@@ -420,8 +418,8 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 <script>
 $(function() {
 	if ($('body').attr('data-page')=="eqAnalyse") {
-      $('a[href="#eqLogic_alert"]').click()
-    }
+		$('a[href="#eqLogic_alert"]').click()
+	}
 })
 
 $('#tableCmdLayoutConfiguration tbody td .cmdLayoutContainer').sortable({
@@ -525,8 +523,7 @@ $('.bt_displayWidget').off('click').on('click',function(){
 	$('#md_modal2').load('index.php?v=d&modal=eqLogic.displayWidget&eqLogic_id=' + eqLogic.id+'&version='+$(this).attr('data-version')).dialog('open');
 });
 
-$('#bt_eqLogicConfigureSave').on('click', function () {
-
+$('#bt_eqLogicConfigureSave').on('click', function (event) {
 	var eqLogic = $('#div_displayEqLogicConfigure').getValues('.eqLogicAttr')[0];
 	if (!isset(eqLogic.display)) {
 		eqLogic.display = {};
@@ -563,6 +560,14 @@ $('#bt_eqLogicConfigureSave').on('click', function () {
 				},
 				success : function(){
 					$('#md_displayEqLogicConfigure').showAlert({message: '{{Enregistrement réussi}}', level: 'success'});
+					if (event.ctrlKey) {
+						setTimeout(function() { $('#md_modal').dialog('close') }, 500);
+					}else{
+						var tab = $('#md_modal > ul.nav li.active a').attr('href')
+						$('#md_modal').load('index.php?v=d&modal=eqLogic.configure&eqLogic_id=' + eqLogic.id,function(){
+							$('#md_modal > ul.nav a[href="' + tab + '"]').click();
+						});
+					}
 				}
 			});
 		}

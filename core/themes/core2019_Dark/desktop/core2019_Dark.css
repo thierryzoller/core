@@ -4,10 +4,14 @@ Theme Core 2019 @Jeedom
 
 @import url("colors.css");
 
+::-webkit-scrollbar-thumb {
+  background: var(--btn-default-color) !important;
+}
+
 html,
 body,
 textarea {
-  scrollbar-color: rgb(var(--bg-color)) var(--btnEq-default-color) !important;
+  scrollbar-color: var(--btn-default-color) transparent !important;
 }
 
 a,
@@ -110,6 +114,10 @@ a:focus {
 .scenario.scenario-widget .btn:hover,
 #div_displayObject .btn:hover {
   color: var(--linkHoverLight-color) !important;
+}
+
+.timeCmd.label {
+  background: rgba(var(--bg-color),0.7);
 }
 
 /* CodeMirror */

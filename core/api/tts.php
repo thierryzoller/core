@@ -25,11 +25,11 @@ if (!jeedom::apiAccess(init('apikey'))) {
 	die();
 }
 log::add('tts', 'debug', 'Call tts api : ' . print_r($_GET, true));
-if (class_exists('gcp')) {
-	$engine = 'gcp';
+if (class_exists('dataservice')) {
+	$engine = 'dataservice';
 } else {
 	$engine = init('engine', 'pico');
-	if ($engine == 'gcp') {
+	if ($engine == 'dataservice') {
 		$engine = 'pico';
 	}
 }
@@ -46,8 +46,10 @@ if(substr(init('text'), -1) == '#' && substr(init('text'), 0,1) == '#' && class_
 		if (init('path') == 1) {
 			echo $song->getPath();
 		} else {
-			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . $song->getName() . '.mp3');
+			header('Content-Type: audio/mpeg');
+			header("Content-Transfer-Encoding: binary");
+			header("Pragma: no-cache");
+			header('Content-length: '.filesize($song->getPath()));
 			readfile($song->getPath());
 		}
 		die();
@@ -63,25 +65,40 @@ if (file_exists($filename)) {
 		echo $filename;
 		die();
 	}
-	header('Content-Type: application/octet-stream');
-	header('Content-Disposition: attachment; filename=' . $md5 . '.mp3');
+	header('Content-Type: audio/mpeg');
+	header("Content-Transfer-Encoding: binary");
+	header("Pragma: no-cache");
+	header('Content-length: '.filesize($filename));
 	readfile($filename);
 	die();
 }
-log::add('tts', 'debug', 'Generate tts for ' . $filename . ' (' . $text . ')');
+log::add('tts', 'debug', 'Generate tts for ' . $filename . ' (' . $text . ') with engine '.$engine);
 try {
 	switch ($engine) {
-		case 'gcp':
-		gcp::tts($text);
+		case 'dataservice':
+		dataservice::tts($text);
 		break;
 		case 'espeak':
 		$voice = init('voice', 'fr+f4');
-		shell_exec('espeak -v' . $voice . ' "' . $text . '" --stdout | avconv -i - -ar 44100 -ac 2 -ab 192k -f mp3 ' . $filename . ' > /dev/null 2>&1');
+		$avconv = 'avconv';
+		if(!com_shell::commandExists('avconv')){
+			$avconv = 'ffmpeg';
+		}
+		$cmd = 'espeak -v' . $voice . ' "' . $text . '" --stdout | '.$avconv.' -i - -ar 44100 -ac 2 -ab 192k -f mp3 ' . $filename . ' > /dev/null 2>&1';
+		log::add('tts', 'debug', $cmd);
+		shell_exec($cmd);
 		break;
 		case 'pico':
 		$volume = '-af "volume=' . init('volume', '6') . 'dB"';
 		$lang = init('lang', 'fr-FR');
-		shell_exec('pico2wave -l=' . $lang . ' -w=' . $md5 . '.wav "' . $text . '" > /dev/null 2>&1;avconv -i ' . $md5 . '.wav -ar 44100 ' . $volume . ' -ac 2 -ab 192k -f mp3 ' . $filename . ' > /dev/null 2>&1;rm ' . $md5 . '.wav');
+		$avconv = 'avconv';
+		if(!com_shell::commandExists('avconv')){
+			$avconv = 'ffmpeg';
+		}
+		$cmd = 'pico2wave -l=' . $lang . ' -w=' . $md5 . '.wav "' . $text . '" > /dev/null 2>&1;';
+		$cmd .= $avconv.' -i ' . $md5 . '.wav -ar 44100 ' . $volume . ' -ac 2 -ab 192k -f mp3 ' . $filename . ' > /dev/null 2>&1;rm ' . $md5 . '.wav';
+		log::add('tts', 'debug', $cmd);
+		shell_exec($cmd);
 		break;
 		default:
 		echo __('Moteur de voix inconnu : ', __FILE__) . $engine;
@@ -97,8 +114,10 @@ try {
 if (init('path') == 1) {
 	echo $filename;
 } else {
-	header('Content-Type: application/octet-stream');
-	header('Content-Disposition: attachment; filename=' . $md5 . '.mp3');
+	header('Content-Type: audio/mpeg');
+	header("Content-Transfer-Encoding: binary");
+	header("Pragma: no-cache");
+	header('Content-length: '.filesize($filename));
 	readfile($filename);
 }
 try {

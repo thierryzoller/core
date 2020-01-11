@@ -3,8 +3,6 @@ Theme Core 2019 @Jeedom
 Mobile WebApp
 */
 
-@import url("coreWidgets.css");
-
 /* _____________________________GLOBAL */
 ::-webkit-scrollbar{
   width:8px;
@@ -208,6 +206,10 @@ a, .ui-link {
   text-shadow: none !important;
   min-height: 20px;
 }
+.cmd.refresh {
+  position: absolute;
+  right: 0;
+}
 .eqLogic.eqLogic-widget .ui-input-text input[type=color],
 .action_colorpicker_change {
   width: 34px;
@@ -253,13 +255,13 @@ a, .ui-link {
   color: var(--sc-lightTxt-color) !important;
   font-size: 16px !important;
 }
-
 .widget-name {
   padding-right: 22px;
   padding-left: 12px;
   word-break: break-word;
+  max-height: 41px;
+  overflow: hidden;
 }
-
 .eqLogic.eqLogic-widget,
 .scenario.scenario-widget  {
   margin-top: 5px !important;
@@ -279,9 +281,11 @@ a, .ui-link {
   color: var(--link-color) !important;
   min-height: 45px;
 }
+.iconCmd > span {
+  vertical-align: middle !important;
+}
 .iconCmd i {
   color: var(--link-color) !important;
-  margin: 7px;
   font-size: 30px !important;
   top: 5px !important;
   position: relative;
@@ -298,6 +302,9 @@ a, .ui-link {
   padding-left: 5px !important;
   padding-right: 5px !important;
   font-size: 12.5px;
+}
+.iconCmd + .timeCmd {
+  line-height: 25px;
 }
 .statusCmd {
   position: absolute;
@@ -359,16 +366,23 @@ p.state {
 .btn.action {
   margin-top: 2px;
 }
-.cmd.refresh {
-  margin-top: 2px;
-}
+
 .cmd.refresh i {
   font-size: 12px;
   color: var(--sc-lightTxt-color) !important;
+  margin-top: 6px !important;
 }
 .cmd.refresh i:hover {
   color: var(--linkHoverLight-color) !important;
 }
+.cmd.refresh.spinning i {
+  animation: spin-animation 1s infinite linear;
+}
+@keyframes spin-animation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1turn); }
+}
+
 .label {
   font-size: 12px !important;
   font-weight: normal;
@@ -381,6 +395,7 @@ p.state {
   background-color:var(--al-warning-color) !important;
   color : var(--linkHoverLight-color) !important;
 }
+.state.label-info,
 .label-info {
   color: var(--linkHoverLight-color) !important;
   background-color: var(--al-info-color) !important;
@@ -445,7 +460,8 @@ p.state {
   color: var(--link-color) !important;
   background-color: rgb(var(--defaultBkg-color)) !important;
   box-shadow: none;
-  line-height: 10px !important;
+  line-height: 15px !important;
+  min-height: 17px;
 }
 .ui-link i:hover {
   color: var(--linkHover-color) !important;
@@ -579,7 +595,9 @@ select option {
 /* buttons */
 a.action.ui-btn {
   min-width: 15px;
+  min-height: 15px;
 }
+
 .ui-slider-bg {
   height: 5px;
 }
@@ -979,6 +997,11 @@ pre,
 a.ui-table-columntoggle-btn {
   display: none;
 }
+[data-page="message"] .removeMessage {
+  font-size: 20px;
+  padding: 5px;
+}
+
 @media only screen and (max-width:30em) {
   #table_message th.ui-table-priority-1 {
     display: none;
@@ -990,7 +1013,7 @@ a.ui-table-columntoggle-btn {
     display: table-cell;
   }
   #table_message td:not(.datetime) {
-    margin-left: -30px;
+    margin-left: -40px;
   }
   #table_message td.plugin:before {
     content: 'Source: ';

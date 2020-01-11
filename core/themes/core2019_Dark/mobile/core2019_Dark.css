@@ -5,10 +5,14 @@ Mobile Dark
 
 @import url("colors.css");
 
+::-webkit-scrollbar-thumb {
+  background: var(--btn-default-color) !important;
+}
+
 html,
 body,
 textarea {
-  scrollbar-color: rgb(var(--bg-color)) var(--btnEq-default-color) !important;
+  scrollbar-color: var(--btn-default-color) transparent !important;
 }
 
 /* _____________________________DASHBOARD CATEGORIES title coloring */
@@ -60,6 +64,12 @@ textarea {
 }
 
 /* ___________________________________________________________EQs */
+.timeCmd {
+	background-color: var(--el-defaultColor) !important;
+	color: var(--linkHoverLight-color);
+	opacity: 0.5;
+}
+
 .iconCmd > i {
 	color: var(--link-color) !important;
 }

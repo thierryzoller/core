@@ -30,7 +30,6 @@ class repo_market {
 		'backup' => true,
 		'hasConfiguration' => true,
 		'proxy' => true,
-		'sendPlugin' => true,
 		'hasStore' => true,
 		'test' => true,
 		'pullInstall' => true,
@@ -114,7 +113,7 @@ class repo_market {
 		}
 		$results = $market->getResult();
 		if(!is_array($results) || count($results) == 0 || !is_array($results['plugins']) || count($results['plugins']) == 0){
-			return 0;
+			return array('number' => 0);
 		}
 		$nbInstall = 0;
 		$lastInstallDate = config::byKey('market::lastDatetimePluginInstall','core',0);
@@ -133,7 +132,7 @@ class repo_market {
 				if (!is_object($update)) {
 					$update = new update();
 				}
-				$update->setSource(init('repo'));
+				$update->setSource('market');
 				$update->setLogicalId($repo->getLogicalId());
 				$update->setType($repo->getType());
 				$update->setLocalVersion($repo->getDatetime($plugin['version']));
@@ -267,7 +266,7 @@ class repo_market {
 			}
 		}
 		if (!$found) {
-			$filesystem->createDir('/remote.php/webdav/' . config::byKey('market::cloud::backup::name'));
+			$filesystem->createDir('/remote.php/webdav/' . rawurldecode(config::byKey('market::cloud::backup::name')));
 		}
 	}
 	
@@ -369,7 +368,7 @@ class repo_market {
 		$cmd = system::getCmdSudo() . ' PASSPHRASE="' . config::byKey('market::cloud::backup::password') . '"';
 		$cmd .= ' duplicity remove-all-but-n-full ' . $_nb . ' --force ';
 		$cmd .= ' --ssl-no-check-certificate';
-		$cmd .= ' --num-retries 1';
+		$cmd .= ' --num-retries 3';
 		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
 		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
 		try {
@@ -397,7 +396,7 @@ class repo_market {
 		$cmd = system::getCmdSudo();
 		$cmd .= ' duplicity collection-status';
 		$cmd .= ' --ssl-no-check-certificate';
-		$cmd .= ' --num-retries 1';
+		$cmd .= ' --num-retries 2';
 		$cmd .= ' --timeout 60';
 		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
 		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
@@ -440,7 +439,8 @@ public static function backup_restore($_backup) {
 		$cmd = system::getCmdSudo() . ' PASSPHRASE="' . config::byKey('market::cloud::backup::password') . '"';
 		$cmd .= ' duplicity --file-to-restore /';
 		$cmd .= ' --time ' . $timestamp;
-		$cmd .= ' --num-retries 1';
+		$cmd .= ' --ssl-no-check-certificate';
+		$cmd .= ' --num-retries 3';
 		$cmd .= ' --tempdir '.$base_dir;
 		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
 		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
@@ -485,6 +485,9 @@ public static function backup_restore($_backup) {
 	public static function monitoring_start() {
 		preg_match_all('/(\d\.\d\.\d)/m', shell_exec(system::getCmdSudo() . ' zabbix_agentd -V'), $matches);
 		self::monitoring_install();
+		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
+			return;
+		}
 		$cmd = system::getCmdSudo() . " chmod -R 777 /etc/zabbix;";
 		$cmd .= system::getCmdSudo() . " sed -i '/ServerActive=/d' /etc/zabbix/zabbix_agentd.conf;";
 		$cmd .= system::getCmdSudo() . " sed -i '/Hostname=/d' /etc/zabbix/zabbix_agentd.conf;";
@@ -515,7 +518,7 @@ public static function backup_restore($_backup) {
 		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
 			return false;
 		}
-		if(exec('grep "jeedom.com" /etc/zabbix/zabbix_agentd.conf | wc -l') == 0){
+		if(exec('grep "jeedom.com" /etc/zabbix/zabbix_agentd.conf | grep -v "zabbix.jeedom.com" | wc -l') == 0){
 			return false;
 		}
 		return (count(system::ps('zabbix')) > 0);
@@ -548,6 +551,13 @@ public static function backup_restore($_backup) {
 			self::test();
 		} catch (Exception $e) {
 			
+		}
+	}
+	
+	public static function sendHealth(){
+		$market = self::getJsonRpc();
+		if (!$market->sendRequest('register::health',array('health' => jeedom::health()))) {
+			throw new Exception($market->getError(), $market->getErrorCode());
 		}
 	}
 	
@@ -804,7 +814,7 @@ public static function backup_restore($_backup) {
 				'market_api_key' => jeedom::getApiKey('apimarket'),
 				'localIp' => $internalIp,
 				'jeedom_name' => config::byKey('name'),
-				'plugin_install_list' => plugin::listPlugin(true, false, false, true),
+				'plugin_install_list' => plugin::listPlugin(false, false, false, true),
 			);
 			if (config::byKey('market::allowDNS') != 1 || config::byKey('network::disableMangement') == 1) {
 				$params['url'] = network::getNetworkAccess('external');

@@ -46,7 +46,7 @@ $('#bt_clearGraph').on('click',function(){
     jeedom.history.chart['div_graph'].chart.series[0].remove(true);
   }
   delete jeedom.history.chart['div_graph'];
-  $(this).closest('.li_history').removeClass('active');
+  $('#ul_history').find('.li_history.active').removeClass('active');
 });
 
 
@@ -101,6 +101,14 @@ $('#bt_openCmdHistoryConfigure, #bt_openCmdHistoryConfigure2').on('click',functi
   $('#md_modal').dialog({title: "{{Configuration de l'historique des commandes}}"});
   $("#md_modal").load('index.php?v=d&modal=cmd.configureHistory').dialog('open');
 });
+
+if (is_numeric(getUrlVars('cmd_id'))) {
+  let li = $('.li_history[data-cmd_id='+getUrlVars('cmd_id')+']');
+  if(li){
+    li.find('.history').click();
+    $('.displayObject[data-object_id='+li.closest('.cmdList').attr('data-object_id')+']').click();
+  }
+}
 
 function emptyHistory(_cmd_id,_date) {
   $.ajax({
@@ -310,9 +318,9 @@ function displayTimeline(){
         tr += '<td>'
         if (data[i].group && data[i].plugins) {
           if (data[i].group == 'action') {
-            tr += data[i].type + '&#160&#160<i class="warning fas fa-terminal"></i>'
+            tr += data[i].type + '&#160&#160<i class="warning fas fa-terminal"></i><span class="hidden">action</span>'
           } else {
-            tr += data[i].type + '&#160&#160<i class="info fas fa-info-circle"></i>'
+            tr += data[i].type + '&#160&#160<i class="info fas fa-info-circle"></i><span class="hidden">info</span>'
           }
           tr += '&#160&#160' + data[i].plugins
         }
@@ -328,7 +336,7 @@ function displayTimeline(){
       $('#table_timeline tbody').empty().append(tr).trigger('update')
       $('#table_timeline').on('sortEnd', function(){
         sepDays()
-	  })
+      })
       $('#timelinetab #table_timeline').find('th[data-column="0"]').trigger('sort').trigger('sort')
     }
   });
