@@ -157,6 +157,7 @@ $backup_name2 = 'backup-' . $jeedom_name . '-' . $LSHUID . '-' . date("Y-m-d-H\h
 		'tests',
 		'support',
 		'backup',
+		'script/tunnel',
 		'.git',
 		'.log',
 		'core/config/common.config.php',
