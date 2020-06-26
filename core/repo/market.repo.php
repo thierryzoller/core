@@ -30,9 +30,7 @@ class repo_market {
 		'backup' => true,
 		'hasConfiguration' => true,
 		'proxy' => true,
-		'sendPlugin' => false,
 		'hasStore' => true,
-		'hasScenarioStore' => true,
 		'test' => true,
 		'pullInstall' => true,
 	);
@@ -218,26 +216,18 @@ class repo_market {
 	}
 	
 	public static function objectInfo($_update) {
-		$url = 'https://jeedom.github.io/documentation/plugins/' . $_update->getLogicalId() . '/' . config::byKey('language', 'core', 'fr_FR') . '/index.html';
-		if ($_update->getConfiguration('third_plugin', null) === null) {
-			$_update->setConfiguration('third_plugin', 0);
-			$header = get_headers($url);
-			if (strpos($header[0], '200') === false) {
-				$_update->setConfiguration('third_plugin', 1);
-				$url = 'https://jeedom.github.io/documentation/third_plugin/' . $_update->getLogicalId() . '/' . config::byKey('language', 'core', 'fr_FR') . '/index.html';
-			}
-			$_update->save();
-		} elseif ($_update->getConfiguration('third_plugin', 0) == 1) {
-			$url = 'https://jeedom.github.io/documentation/third_plugin/' . $_update->getLogicalId() . '/' . config::byKey('language', 'core', 'fr_FR') . '/index.html';
-		}
 		return array(
-			'doc' => $url,
-			'changelog' => $url . '#_changelog',
-			'display' => 'https://jeedom.com/market/index.php?v=d&p=market&type=plugin&plugin_id=' . $_update->getLogicalId(),
+			'doc' => 'https://doc.jeedom.com',
+			'changelog' => 'https://doc.jeedom.com',
+			'display' => 'https://market.jeedom.com/index.php?v=d&p=market&type=plugin&plugin_id=' . $_update->getLogicalId(),
 		);
 	}
 	
 	/*     * ***********************BACKUP*************************** */
+	
+	public static function beckup_serverPath(){
+		return ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::password').'@' .str_replace('https://','',config::byKey('service::backup::url')) . '/webdav/'. config::byKey('market::username').'/'. config::byKey('market::cloud::backup::name').'"';
+	}
 	
 	public static function backup_install(){
 		if (exec('which duplicity | wc -l') == 0) {
@@ -251,13 +241,13 @@ class repo_market {
 	
 	public static function backup_createFolderIsNotExist() {
 		$client = new Sabre\DAV\Client(array(
-			'baseUri' => 'https://' . config::byKey('market::backupServer'),
+			'baseUri' => config::byKey('service::backup::url'),
 			'userName' => config::byKey('market::username'),
-			'password' => config::byKey('market::backupPassword'),
+			'password' => config::byKey('market::password'),
 		));
 		$adapter = new League\Flysystem\WebDAV\WebDAVAdapter($client);
 		$filesystem = new League\Flysystem\Filesystem($adapter);
-		$folders = $filesystem->listContents('/remote.php/webdav/');
+		$folders = $filesystem->listContents('/webdav/'.config::byKey('market::username'));
 		$found = false;
 		if (count($folders) > 0) {
 			foreach ($folders as $folder) {
@@ -268,12 +258,12 @@ class repo_market {
 			}
 		}
 		if (!$found) {
-			$filesystem->createDir('/remote.php/webdav/' . rawurldecode(config::byKey('market::cloud::backup::name')));
+			$filesystem->createDir('/webdav/'.config::byKey('market::username').'/'.rawurldecode(config::byKey('market::cloud::backup::name')));
 		}
 	}
 	
 	public static function backup_send($_path) {
-		if (config::byKey('market::backupServer') == '' || config::byKey('market::backupPassword') == '') {
+		if (!config::byKey('service::backup::enable')) {
 			throw new Exception(__('Aucun serveur de backup defini. Avez vous bien un abonnement au backup cloud ?', __FILE__));
 		}
 		if (config::byKey('market::cloud::backup::password') == '') {
@@ -310,8 +300,8 @@ class repo_market {
 		$cmd .= ' --num-retries 2';
 		$cmd .= ' --ssl-no-check-certificate';
 		$cmd .= ' --tempdir '.$base_dir . '/tmp';
-		$cmd .= ' ' . $base_dir . '  "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
-		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
+		$cmd .= ' ' . $base_dir;
+		$cmd .= self::beckup_serverPath();
 		try {
 			com_shell::execute($cmd);
 		} catch (Exception $e) {
@@ -337,14 +327,23 @@ class repo_market {
 	}
 	
 	public static function backup_clean($_nb = null) {
-		if (config::byKey('market::backupServer') == '' || config::byKey('market::backupPassword') == '') {
-			return;
-		}
-		if (config::byKey('market::cloud::backup::password') == '') {
+		if (!config::byKey('service::backup::enable') || config::byKey('market::cloud::backup::password') == '') {
 			return;
 		}
 		self::backup_install();
 		shell_exec(system::getCmdSudo() . ' rm -rf /tmp/duplicity-*-tempdir');
+		
+		$cmd = system::getCmdSudo() . ' PASSPHRASE="' . config::byKey('market::cloud::backup::password') . '"';
+		$cmd .= ' duplicity cleanup --force ';
+		$cmd .= ' --ssl-no-check-certificate';
+		$cmd .= ' --num-retries 3';
+		$cmd .= self::beckup_serverPath();
+		try {
+			com_shell::execute($cmd);
+		} catch (Exception $e) {
+			
+		}
+		
 		if ($_nb == null) {
 			$_nb = 0;
 			$lists = self::backup_list();
@@ -359,8 +358,7 @@ class repo_market {
 		$cmd .= ' duplicity remove-all-but-n-full ' . $_nb . ' --force ';
 		$cmd .= ' --ssl-no-check-certificate';
 		$cmd .= ' --num-retries 3';
-		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
-		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
+		$cmd .= self::beckup_serverPath();
 		try {
 			com_shell::execute($cmd);
 		} catch (Exception $e) {
@@ -374,10 +372,7 @@ class repo_market {
 	}
 	
 	public static function backup_list() {
-		if (config::byKey('market::backupServer') == '' || config::byKey('market::backupPassword') == '') {
-			return array();
-		}
-		if (config::byKey('market::cloud::backup::password') == '') {
+		if (!config::byKey('service::backup::enable') || config::byKey('market::cloud::backup::password') == '') {
 			return array();
 		}
 		self::backup_createFolderIsNotExist();
@@ -388,8 +383,7 @@ class repo_market {
 		$cmd .= ' --ssl-no-check-certificate';
 		$cmd .= ' --num-retries 2';
 		$cmd .= ' --timeout 60';
-		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
-		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
+		$cmd .= self::beckup_serverPath();
 		try {
 			$results = explode("\n", com_shell::execute($cmd));
 		} catch (\Exception $e) {
@@ -406,7 +400,7 @@ class repo_market {
 		return array_reverse($return);
 	}
 	
-public static function backup_restore($_backup) {
+	public static function backup_restore($_backup) {
 		$backup_dir = calculPath(config::byKey('backup::path'));
 		if (!file_exists($backup_dir)) {
 			mkdir($backup_dir, 0770, true);
@@ -414,7 +408,7 @@ public static function backup_restore($_backup) {
 		if (!is_writable($backup_dir)) {
 			throw new Exception('Impossible d\'accéder au dossier de sauvegarde. Veuillez vérifier les droits : ' . $backup_dir);
 		}
-		$restore_dir = '/tmp/jeedom_cloud_restore';
+		$restore_dir = '/usr/jeedom_cloud_restore';
 		if (file_exists($restore_dir)) {
 			com_shell::execute(system::getCmdSudo() . ' rm -rf ' . $restore_dir);
 		}
@@ -430,11 +424,10 @@ public static function backup_restore($_backup) {
 		$cmd = system::getCmdSudo() . ' PASSPHRASE="' . config::byKey('market::cloud::backup::password') . '"';
 		$cmd .= ' duplicity --file-to-restore /';
 		$cmd .= ' --time ' . $timestamp;
-	        $cmd .= ' --ssl-no-check-certificate';
+		$cmd .= ' --ssl-no-check-certificate';
 		$cmd .= ' --num-retries 3';
 		$cmd .= ' --tempdir '.$base_dir;
-		$cmd .= ' "webdavs://' . config::byKey('market::username') . ':' . config::byKey('market::backupPassword');
-		$cmd .= '@' . config::byKey('market::backupServer') . '/remote.php/webdav/' . config::byKey('market::cloud::backup::name').'"';
+		$cmd .= self::beckup_serverPath();
 		$cmd .= ' ' . $restore_dir;
 		try {
 			com_shell::execute($cmd);
@@ -452,85 +445,6 @@ public static function backup_restore($_backup) {
 		jeedom::restore($backup_dir . '/' . $backup_name, true);
 	}
 	
-	/******************************MONITORING********************************/
-	
-	public static function monitoring_install() {
-		if (file_exists('/etc/zabbix')) {
-			return;
-		}
-		$logfile = log::getPathToLog('market_zabbix_installation');
-		if (strpos(php_uname(), 'x86_64') !== false) {
-			if (file_exists('/etc/debian_version')) {
-				$deb_version = file_get_contents('/etc/debian_version');
-				if (version_compare($deb_version, '9', '>=')) {
-					shell_exec('cd /tmp/;' . system::getCmdSudo() . ' wget http://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-2%2Bstretch_all.deb >> ' . $logfile . ' 2>&1;' . system::getCmdSudo() . ' dpkg -i zabbix-release_3.4-1+stretch_all.deb  >> ' . $logfile . ' 2>&1;' . system::getCmdSudo() . ' rm zabbix-release_3.4-1+stretch_all.deb  >> ' . $logfile . ' 2>&1');
-				} else {
-					shell_exec('cd /tmp/;' . system::getCmdSudo() . ' wget http://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-2%2Bjessie_all.deb  >> ' . $logfile . ' 2>&1;' . system::getCmdSudo() . ' dpkg -i zabbix-release_3.4-1+jessie_all.deb  >> ' . $logfile . ' 2>&1;' . system::getCmdSudo() . ' rm zabbix-release_3.4-1+jessie_all.deb  >> ' . $logfile . ' 2>&1');
-				}
-			}
-		}
-		shell_exec(system::getCmdSudo() . ' apt-get update  >> ' . $logfile . ' 2>&1');
-		shell_exec(system::getCmdSudo() . ' apt-get -y install zabbix-agent  >> ' . $logfile . ' 2>&1');
-	}
-	
-	public static function monitoring_start() {
-		preg_match_all('/(\d\.\d\.\d)/m', shell_exec(system::getCmdSudo() . ' zabbix_agentd -V'), $matches);
-		self::monitoring_install();
-		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
-			return;
-		}
-		$cmd = system::getCmdSudo() . " chmod -R 777 /etc/zabbix;";
-		$cmd .= system::getCmdSudo() . " sed -i '/ServerActive=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . " sed -i '/Hostname=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . " sed -i '/TLSConnect=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . " sed -i '/TLSAccept=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . " sed -i '/TLSPSKIdentity=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . " sed -i '/TLSPSKFile=/d' /etc/zabbix/zabbix_agentd.conf;";
-		$cmd .= system::getCmdSudo() . ' echo "ServerActive=' . config::byKey('market::monitoringServer') . '" >> /etc/zabbix/zabbix_agentd.conf;';
-		$cmd .= system::getCmdSudo() . ' echo "Hostname=' . config::byKey('market::monitoringName') . '" >> /etc/zabbix/zabbix_agentd.conf;';
-		if (!file_exists('/var/log/zabbix')) {
-			$cmd .= system::getCmdSudo() . ' mkdir /var/log/zabbix;';
-		}
-		$cmd .= system::getCmdSudo() . ' chmod 777 -R /var/log/zabbix;';
-		if (!file_exists('/var/log/zabbix-agent')) {
-			$cmd .= system::getCmdSudo() . ' mkdir /var/log/zabbix-agent;';
-		}
-		$cmd .= system::getCmdSudo() . ' chmod 777 -R /var/log/zabbix-agent;';
-		if (!file_exists('/etc/zabbix/zabbix_agentd.conf.d')) {
-			$cmd .= system::getCmdSudo() . ' mkdir /etc/zabbix/zabbix_agentd.conf.d;';
-			$cmd .= system::getCmdSudo() . ' chmod 777 -R /etc/zabbix/zabbix_agentd.conf.d;';
-		}
-		$cmd .= system::getCmdSudo() . ' systemctl restart zabbix-agent;';
-		$cmd .= system::getCmdSudo() . ' systemctl enable zabbix-agent;';
-		shell_exec($cmd);
-	}
-	
-	public static function monitoring_status() {
-		if(!file_exists('/etc/zabbix/zabbix_agentd.conf')){
-			return false;
-		}
-		if(exec('grep "jeedom.com" /etc/zabbix/zabbix_agentd.conf | grep -v "zabbix.jeedom.com" | wc -l') == 0){
-			return false;
-		}
-		return (count(system::ps('zabbix')) > 0);
-	}
-	
-	public static function monitoring_stop() {
-		$cmd = system::getCmdSudo() . ' systemctl stop zabbix-agent;';
-		$cmd .= system::getCmdSudo() . ' systemctl disable zabbix-agent;';
-		shell_exec($cmd);
-	}
-	
-	public static function monitoring_allow() {
-		if (config::byKey('market::monitoringServer') == '') {
-			return false;
-		}
-		if (config::byKey('market::monitoringName') == '') {
-			return false;
-		}
-		return true;
-	}
-	
 	/*     * ***********************CRON*************************** */
 	
 	public static function cronHourly() {
@@ -545,53 +459,31 @@ public static function backup_restore($_backup) {
 		}
 	}
 	
-	public static function sendHealth(){
-		$market = self::getJsonRpc();
-		if (!$market->sendRequest('register::health',array('health' => jeedom::health()))) {
-			throw new Exception($market->getError(), $market->getErrorCode());
-		}
-	}
-	
 	public static function cron5() {
 		try {
-			$monitoring_state = self::monitoring_status();
-			if (self::monitoring_allow() && !$monitoring_state) {
-				self::monitoring_start();
-			}
-			if (!self::monitoring_allow() && $monitoring_state) {
-				self::monitoring_stop();
+			if(config::byKey('service::monitoring::enable')){
+				$data = array(
+					'health' => jeedom::health(),
+					'name' => config::byKey('name'),
+					'hwkey' => jeedom::getHardwareKey(),
+					'language' => config::byKey('language')
+				);
+				$url = config::byKey('service::monitoring::url').'/service/monitoring';
+				$request_http = new com_http($url);
+				$request_http->setHeader(array(
+					'Content-Type: application/json',
+					'Autorization: '.sha512(strtolower(config::byKey('market::username')).':'.config::byKey('market::password'))
+				));
+				$request_http->setPost(json_encode($data));
+				try {
+					$request_http->exec(10,1);
+				} catch (\Exception $e) {
+					
+				}
 			}
 		} catch (Exception $e) {
 			
 		}
-	}
-	
-	public static function cronDaily(){
-		try {
-			$monitoring_state = self::monitoring_status();
-			if (self::monitoring_allow() && $monitoring_state){
-				self::monitoring_stop();
-				self::monitoring_start();
-			}
-		} catch (\Exception $e) {
-			
-		}
-	}
-	
-	/*******************************health********************************/
-	
-	public static function health() {
-		$return = array();
-		if (config::byKey('market::monitoringServer') != '') {
-			$monitoring_state = self::monitoring_status();
-			$return[] = array(
-				'name' => __('Cloud monitoring actif', __FILE__),
-				'state' => $monitoring_state,
-				'result' => ($monitoring_state) ? __('OK', __FILE__) : __('NOK', __FILE__),
-				'comment' => ($monitoring_state) ? '' : __('Attendez 10 minutes si le service ne redémarre pas contacter le support', __FILE__),
-			);
-		}
-		return $return;
 	}
 	
 	/*     * ***********************INFO*************************** */
@@ -765,6 +657,15 @@ public static function backup_restore($_backup) {
 		}
 	}
 	
+	public static function sendTunnelClientId($_client_id) {
+		$market = self::getJsonRpc();
+		if ($market->sendRequest('service::tunnel::setClientId',array('client_id' => $_client_id))) {
+			return $market->getResult();
+		} else {
+			throw new Exception($market->getError(), $market->getErrorCode());
+		}
+	}
+	
 	public static function getPurchaseInfo() {
 		$market = self::getJsonRpc();
 		if ($market->sendRequest('purchase::getInfo')) {
@@ -802,6 +703,7 @@ public static function backup_restore($_backup) {
 					'nbUpdate' => update::nbNeedUpdate(),
 					'hardware' => (method_exists('jeedom', 'getHardwareName')) ? jeedom::getHardwareName() : '',
 					'uname' => $uname,
+					'language' => config::byKey('language'),
 				),
 				'market_api_key' => jeedom::getApiKey('apimarket'),
 				'localIp' => $internalIp,
@@ -824,6 +726,7 @@ public static function backup_restore($_backup) {
 					'nbUpdate' => update::nbNeedUpdate(),
 					'hardware' => (method_exists('jeedom', 'getHardwareName')) ? jeedom::getHardwareName() : '',
 					'uname' => $uname,
+					'language' => config::byKey('language'),
 				),
 			));
 		}
@@ -854,32 +757,23 @@ public static function backup_restore($_backup) {
 				config::save('vpn::port', $_result['register::vpnPort']);
 				$restart_dns = true;
 			}
-			if (isset($_result['user::backupServer']) && config::byKey('market::backupServer') != $_result['user::backupServer']) {
-				config::save('market::backupServer', $_result['user::backupServer']);
-				$restart_monitoring = true;
+			if (isset($_result['service::monitoring::enable']) && config::byKey('service::monitoring::enable') != $_result['service::monitoring::enable']) {
+				config::save('service::monitoring::enable', $_result['service::monitoring::enable']);
 			}
-			if (isset($_result['user::backupPassword']) && config::byKey('market::backupPassword') != $_result['user::backupPassword']) {
-				config::save('market::backupPassword', $_result['user::backupPassword']);
-				$restart_monitoring = true;
+			if (isset($_result['service::backup::enable']) && config::byKey('service::backup::enable') != $_result['service::backup::enable']) {
+				config::save('service::backup::enable', $_result['service::backup::enable']);
 			}
-			if (isset($_result['user::monitoringServer']) && config::byKey('market::monitoringServer') != $_result['user::monitoringServer']) {
-				config::save('market::monitoringServer', $_result['user::monitoringServer']);
-				$restart_monitoring = true;
+			if (isset($_result['service::tunnel::enable']) && config::byKey('service::tunnel::enable') != $_result['service::tunnel::enable']) {
+				config::save('service::tunnel::enable', $_result['service::tunnel::enable']);
 			}
-			if (isset($_result['register::monitoringPsk']) && config::byKey('market::monitoringPsk') != $_result['register::monitoringPsk']) {
-				config::save('market::monitoringPsk', $_result['register::monitoringPsk']);
-				$restart_monitoring = true;
+			if (isset($_result['service::tunnel::host']) && config::byKey('service::tunnel::host') != $_result['service::tunnel::host']) {
+				config::save('service::tunnel::host', $_result['service::tunnel::host']);
 			}
-			if (isset($_result['register::monitoringPskIdentity']) && config::byKey('market::monitoringPskIdentity') != $_result['register::monitoringPskIdentity']) {
-				config::save('market::monitoringPskIdentity', $_result['register::monitoringPskIdentity']);
-				$restart_monitoring = true;
+			if (isset($_result['register::id']) && config::byKey('register::id') != $_result['register::id']) {
+				config::save('register::id', $_result['register::id']);
 			}
-			if (isset($_result['register::monitoringName']) && config::byKey('market::monitoringName') != $_result['register::monitoringName']) {
-				config::save('market::monitoringName', $_result['register::monitoringName']);
-				$restart_monitoring = true;
-			}
-			if ($restart_monitoring) {
-				self::monitoring_stop();
+			if (isset($_result['username']) && config::byKey('market::username') != $_result['username']) {
+				config::save('market::username', $_result['username']);
 			}
 			if ($restart_dns && config::byKey('market::allowDNS') == 1) {
 				network::dns_start();
