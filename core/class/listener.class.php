@@ -46,6 +46,7 @@ class listener {
 				$events = $listener->getEvent();
 			}
 			if(count($events) == 0){
+				log::add('listener','debug','Remove listener : '.json_encode(utils::o2a($listener)));
 				$listener->remove();
 			}
 		}
@@ -158,7 +159,7 @@ class listener {
 	
 	public static function check($_event, $_value, $_datetime = null) {
 		$listeners = self::searchEvent($_event);
-		if (count($listeners) > 0) {
+		if (is_array($listeners) && count($listeners) > 0) {
 			foreach ($listeners as $listener) {
 				$listener->run(str_replace('#', '', $_event), $_value, $_datetime);
 			}

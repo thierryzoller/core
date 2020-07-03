@@ -1,15 +1,9 @@
 /*
 Theme Core 2019 @Jeedom
+Mobile Legacy
 */
 
 @import url("colors.css");
-
-.ui-link[data-title=Accueil] {
-	background: url(./jeedom_home.png);
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: 32px 32px;
-}
 
 /* ___________________________________________________________DASHBOARD CATEGORIES coloring */
 
@@ -84,13 +78,13 @@ Theme Core 2019 @Jeedom
 #div_displayBattery .eqLogic-widget {
   color: var(--eqTitle-color);
 }
-#div_displayBattery .eqLogic-widget.critical { 
+#div_displayBattery .eqLogic-widget.critical {
   background-color: var(--al-danger-color);
 }
-#div_displayBattery .eqLogic-widget.warning { 
+#div_displayBattery .eqLogic-widget.warning {
   background-color: var(--al-warning-color);
 }
-#div_displayBattery .eqLogic-widget.good { 
+#div_displayBattery .eqLogic-widget.good {
   background-color: var(--al-success-color);
 }
 #div_displayBattery .eqLogic-widget .jeedom-batterie,
@@ -103,16 +97,20 @@ Theme Core 2019 @Jeedom
   color: var(--eqTitle-color);
 }
 
-
+.ui-grid-a {
+  color: var(--link-color);
+}
 /* ___________________________________________________________EQs */
-.eqLogic.eqLogic-widget,
+
 .ui-overlay-a,
 .ui-page-theme-a,
 .ui-page-theme-a .ui-panel-wrapper,
-.cmdName {
-	color: var(--linkHoverLight-color) !important;
+{
+  color: var(--link-color) !important;
 }
 
+.eqLogic.eqLogic-widget,
+.cmdName,
 .state,
 .state i,
 p.state,
@@ -120,6 +118,7 @@ p.state,
 .iconCmd i,
 .iconCmd span,
 .cmd .iconCmd i:not([class*="icon_"]),
+[data-coloredicons="0"] .cmd .iconCmd i[class*="icon_"],
 .cmd {
   color: var(--linkHoverLight-color) !important;
 }
@@ -195,6 +194,13 @@ p.state,
   color: var(--link-color);
 }
 
+.ui-slider-track .ui-slider-handle {
+  background-color: var(--linkHoverLight-color) !important;
+}
+.ui-slider-handle:hover {
+  background-color: var(--linkHoverLight-color) !important;
+}
+
 /* ___________________________________________________________GAUGES */
 .shuttergauge-value {
   background: var(--linkHoverLight-color);
@@ -206,55 +212,4 @@ p.state,
   border-top: 6px solid var(--el-defaultColor) !important;
   border-left: 4px solid var(--el-defaultColor) !important;
   border-right: 4px solid var(--el-defaultColor) !important;
-}
-
-.highcharts-legend-item:not(.highcharts-legend-item-hidden) text{
-  fill: var(--link-color) !important;
-}
-.highcharts-legend-item.highcharts-legend-item-hidden text {
-  fill: var(--txt-color) !important;
-}
-.highcharts-background {
-  fill: var(--defaultBkg-color) !important;
-}
-.gauge .highcharts-background {
-  fill: transparent !important;
-}
-.highcharts-range-selector-buttons > text {
-  fill: var(--link-color) !important;
-}
-.highcharts-container {
-  color: var(--txt-color) !important;
-}
-.highcharts-plot-band {
-  fill: rgb(var(--bg-color)) !important;
-}
-.highcharts-grid-line {
-  stroke: var(--defaultBkg-color);
-}
-.highcharts-button-box {
-  fill: var(--el-defaultColor) !important;
-}
-.highcharts-button > text,
-.highcharts-button-disabled > text{
-  fill: var(--link-color) !important;
-}
-.highcharts-axis-labels > text {
-  fill: var(--link-color) !important;
-}
-
-.highcharts-pane {
-  fill: var(--el-defaultColor);
-}
-.highcharts-data-label > span > span {
-  color: var(--txt-color) !important;
-}
-.highcharts-color-0 {
-  fill: var(--link-color);
-}
-.ui-slider-track .ui-slider-handle {
-  background-color: var(--linkHoverLight-color) !important;
-}
-.ui-slider-handle:hover {
-  background-color: var(--linkHoverLight-color) !important;
 }

@@ -1,4 +1,4 @@
-<div class="tooltips hgauge cmd cmd-widget cursor #history#" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+<div class="cmd cmd-widget hgauge #history#" data-type="info" data-subtype="numeric" data-template="horizontal" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
   <div class="title #hide_name#">
     <div class="cmdName">#name_display#</div>
   </div>
@@ -15,12 +15,14 @@
 
   <script>
     jeedom.cmd.update['#id#'] = function(_options){
-      $('.cmd[data-cmd_id=#id#]').attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
-
-      width = ((_options.display_value - #minValue#) * 100) / (#maxValue# - #minValue#)
+      var cmd = $('.cmd[data-cmd_id=#id#]')
+      var minValue = ('#minValue#' == '') ? 0 : parseInt('#minValue#')
+      var maxValue = ('#maxValue#' == '') ? 100 : parseInt('#maxValue#')
+      cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
+      var width = ((_options.display_value - minValue) * 100) / (maxValue - minValue)
       width = Math.round(parseFloat(width) * 10) / 10
-      $('.cmd[data-cmd_uid=#uid#] .hgauge-value').width(width+'%')
-      $('.cmd[data-cmd_uid=#uid#] .state strong').first().text(_options.display_value)
+      cmd.find('.hgauge-value').width(width+'%')
+      cmd.find('.state strong').first().text(_options.display_value)
     }
 
     jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#'});

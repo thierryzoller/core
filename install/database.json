@@ -46,7 +46,7 @@
         },
         {
           "name": "name",
-          "type": "varchar(45)",
+          "type": "varchar(127)",
           "null": "YES",
           "key": "MUL",
           "default": null,
@@ -265,7 +265,7 @@
         },
         {
           "name": "key",
-          "type": "varchar(255)",
+          "type": "varchar(127)",
           "null": "NO",
           "key": "PRI",
           "default": null,
@@ -746,7 +746,7 @@
         },
         {
           "name": "name",
-          "type": "varchar(45)",
+          "type": "varchar(127)",
           "null": "YES",
           "key": "UNI",
           "default": null,
@@ -1264,7 +1264,7 @@
         },
         {
           "name": "name",
-          "type": "varchar(45)",
+          "type": "varchar(127)",
           "null": "NO",
           "key": "UNI",
           "default": null,

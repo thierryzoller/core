@@ -87,7 +87,7 @@ $(function(){
         if(scenarios.length == 0){
           return;
         }
-        scenarioGroups = []
+        var scenarioGroups = []
         for(i=0; i<scenarios.length; i++){
           group = scenarios[i].group
           if (group == null) continue
@@ -97,9 +97,8 @@ $(function(){
         }
         scenarioGroups = Array.from(new Set(scenarioGroups))
         scenarioGroups.sort()
-        scenarioList = []
-        for(i=0; i<scenarioGroups.length; i++)
-        {
+        var scenarioList = []
+        for(i=0; i<scenarioGroups.length; i++){
           group = scenarioGroups[i]
           scenarioList[group] = []
           for(j=0; j<scenarios.length; j++)
@@ -112,20 +111,23 @@ $(function(){
             scenarioList[group].push([sc.name, sc.id])
           }
         }
+
         //set context menu!
         var contextmenuitems = {}
+        var uniqId = 0
         for (var group in scenarioList) {
           groupScenarios = scenarioList[group]
           items = {}
           for (var index in groupScenarios) {
             sc = groupScenarios[index]
-            scName = sc[0]
+            scName = sc[0] + '  ('+sc[1]+')'
             scId = sc[1]
-            items[scId] = {'name': scName}
+            items[uniqId] = {'name': scName, 'id' : scId}
+            uniqId ++
           }
           contextmenuitems[group] = {'name':group, 'items':items}
         }
-        
+
         if (Object.entries(contextmenuitems).length > 0 && contextmenuitems.constructor === Object)
         {
           $('.nav.nav-tabs').contextMenu({
@@ -134,7 +136,7 @@ $(function(){
             zIndex: 9999,
             className: 'scenario-context-menu',
             callback: function(key, options) {
-              url = 'index.php?v=d&p=scenario&id=' + key;
+              url = 'index.php?v=d&p=scenario&id=' + options.commands[key].id;
               if (document.location.toString().match('#')) {
                 url += '#' + document.location.toString().split('#')[1];
               }
@@ -153,18 +155,19 @@ var editor = [];
 
 autoCompleteCondition = [
   {val: 'rand(MIN,MAX)'},
+  {val: '#minute#'},
   {val: '#heure#'},
   {val: '#jour#'},
+  {val: '#semaine#'},
   {val: '#mois#'},
   {val: '#annee#'},
+  {val: '#sjour#'},
   {val: '#date#'},
   {val: '#time#'},
   {val: '#timestamp#'},
-  {val: '#semaine#'},
-  {val: '#sjour#'},
-  {val: '#minute#'},
   {val: '#IP#'},
   {val: '#hostname#'},
+  {val: 'tag(montag,defaut)'},
   {val: 'variable(mavariable,defaut)'},
   {val: 'delete_variable(mavariable)'},
   {val: 'tendance(commande,periode)'},
@@ -178,6 +181,7 @@ autoCompleteCondition = [
   {val: 'stateDuration(commande)'},
   {val: 'lastChangeStateDuration(commande,value)'},
   {val: 'median(commande1,commande2)'},
+  {val: 'avg(commande1,commande2)'},
   {val: 'time(value)'},
   {val: 'collectDate(cmd)'},
   {val: 'valueDate(cmd)'},
@@ -204,7 +208,7 @@ $('#bt_scenarioThumbnailDisplay').off('click').on('click', function () {
     }
     modifyWithoutSave = false
   }
-  
+
   $('#div_editScenario').hide();
   $('#scenarioThumbnailDisplay').show();
   $('.scenarioListContainer').packery();
@@ -445,44 +449,30 @@ $pageContainer.off('change','.expressionAttr[data-l1key=options][data-l2key=enab
   }
 });
 
-$pageContainer.off('click','.helpSelectCron').on('click','.helpSelectCron',function(){
-  var el = $(this).closest('.schedule').find('.scenarioAttr[data-l1key=schedule]');
-  jeedom.getCronSelectModal({},function (result) {
-    el.value(result.value);
-  });
-});
-
 $pageContainer.off('click','.bt_addScenarioElement').on( 'click','.bt_addScenarioElement', function (event) {
   if (!window.location.href.includes('#scenariotab')) $('#bt_scenarioTab').trigger('click')
-  
-  //is scenario empty:
+  var expression = false
+  var insertAfter = false
   var elementDiv = $(this).closest('.element')
+
+  //is scenario empty:
   if ($('#div_scenarioElement').children('.element').length == 0) {
     elementDiv = $('#div_scenarioElement')
     $('#div_scenarioElement .span_noScenarioElement').remove()
   } else {
-    var expression = false
-    var insertAfter = false
-    
-    //Is triggerred from element button:
-    if ($(this).hasClass('fromSubElement')) {
-      elementDiv = $(this).closest('.subElement').find('.expressions').eq(0)
-      expression = true
-    } else {
-      //had focus ?
-      if (PREV_FOCUS != null && $(PREV_FOCUS).closest('div.element').html() != undefined) {
-        insertAfter = true
-        elementDiv = $(PREV_FOCUS).closest('div.element')
-        if (elementDiv.parent().attr('id') != 'div_scenarioElement') {
-          elementDiv = elementDiv.parents('.expression').eq(0)
-          expression = true
-        }
-      } else {
-        elementDiv = $('#div_scenarioElement')
+    //had focus ?
+    if (PREV_FOCUS != null && $(PREV_FOCUS).closest('div.element').html() != undefined) {
+      insertAfter = true
+      elementDiv = $(PREV_FOCUS).closest('div.element')
+      if (elementDiv.parent().attr('id') != 'div_scenarioElement') {
+        elementDiv = elementDiv.parents('.expression').eq(0)
+        expression = true
       }
+    } else {
+      elementDiv = $('#div_scenarioElement')
     }
   }
-  
+
   $('#md_addElement').modal('show')
   $("#bt_addElementSave").off('click').on('click', function (event) {
     setUndoStack()
@@ -503,32 +493,38 @@ $pageContainer.off('click','.bt_addScenarioElement').on( 'click','.bt_addScenari
     $('#md_addElement').modal('hide')
     modifyWithoutSave = true
     updateTooltips()
+    setAutocomplete()
     setTimeout(function(){ newEL.removeClass('disableElement') }, 600)
   })
+
 })
 
 $pageContainer.off('click','.bt_removeElement').on('click','.bt_removeElement',  function (event) {
-  setUndoStack()
   var button = $(this);
   if(event.ctrlKey) {
     if (button.closest('.expression').length != 0) {
-      button.closest('.expression').remove();
+      setUndoStack()
+      button.closest('.expression').remove()
     } else {
-      button.closest('.element').remove();
+      setUndoStack()
+      button.closest('.element').remove()
     }
   }else{
     bootbox.confirm("{{Êtes-vous sûr de vouloir supprimer ce bloc ?}}", function (result) {
       if (result) {
         if (button.closest('.expression').length != 0) {
-          button.closest('.expression').remove();
+          setUndoStack()
+          button.closest('.expression').remove()
         } else {
-          button.closest('.element').remove();
+          setUndoStack()
+          button.closest('.element').remove()
         }
       }
-    });
+    })
   }
-  modifyWithoutSave = true;
-});
+  modifyWithoutSave = true
+  PREV_FOCUS = null
+})
 
 $pageContainer.off('click','.bt_copyElement').on('click','.bt_copyElement',  function (event) {
   clickedBloc = $(this).closest('.element')
@@ -554,7 +550,7 @@ $pageContainer.off('click','.bt_pasteElement').on('click','.bt_pasteElement',  f
   newBloc.find('input[data-l1key="id"]').attr("value", "")
   newBloc.find('input[data-l1key="scenarioElement_id"]').attr("value", "")
   newBloc.find('input[data-l1key="scenarioSubElement_id"]').attr("value", "")
-  
+
   clickedBloc = $(this).closest('.element')
   //Are we pasting inside an expresion:
   if (clickedBloc.parent('#div_scenarioElement').length) {
@@ -576,7 +572,7 @@ $pageContainer.off('click','.bt_pasteElement').on('click','.bt_pasteElement',  f
       $('#insertHere').removeAttr('id')
     }
   }
-  
+
   if(event.ctrlKey) {
     clickedBloc.remove()
   }
@@ -608,20 +604,38 @@ $pageContainer.off('click','.bt_showElse').on( 'click','.bt_showElse', function 
 });
 
 $pageContainer.off('click','.bt_collapse').on( 'click','.bt_collapse', function (event) {
-  changeThis = $(this)
-  if (event.ctrlKey) changeThis = $('.element').find('.bt_collapse');
-  
-  if($(this).children('i').hasClass('fa-eye')){
-    changeThis.children('i').removeClass('fa-eye').addClass('fa-eye-slash');
-    changeThis.closest('.element').addClass('elementCollapse');
-    changeThis.attr('value',1);
-    changeThis.attr('title',"{{Afficher ce bloc.<br>Ctrl+click: tous.}}");
-  }else{
-    changeThis.children('i').addClass('fa-eye').removeClass('fa-eye-slash');
-    changeThis.closest('.element').removeClass('elementCollapse');
-    changeThis.attr('value',0);
-    changeThis.attr('title',"{{Masquer ce bloc.<br>Ctrl+click: tous.}}");
-    setEditor();
+  var changeThis = $(this)
+  if (event.ctrlKey) changeThis = $('.element').find('.bt_collapse')
+
+  if ($(this).children('i').hasClass('fa-eye')) {
+    changeThis.children('i').removeClass('fa-eye').addClass('fa-eye-slash')
+    changeThis.closest('.element').addClass('elementCollapse')
+    changeThis.attr('value',1)
+    changeThis.attr('title',"{{Afficher ce bloc.<br>Ctrl+click: tous.}}")
+    //update action, comment and code blocPreview:
+    changeThis.closest('.element').find('.blocPreview').each(function() {
+      var txt = '<i>Unfound</i>'
+      var _el = $(this).closest('.element')
+      if (_el.hasClass('elementACTION')) {
+        txt = _el.find('.expressions .expression').first().find('input.form-control').first().val()
+        if (!txt) txt = _el.find('.expression textarea').val()
+      } else if (_el.hasClass('elementCODE')) {
+        var id = _el.find('.expressionAttr[data-l1key=expression]').attr('id')
+        if (isset(editor[id])) txt = editor[id].getValue()
+      } else {
+        //comment
+        txt = _el.find('.expression textarea').val()
+        txt = '<b>' + txt.split('\n')[0] + '</b>' + txt.replace(txt.split('\n')[0], '')
+        if (!txt) txt = _el.find('.expression input.form-control').val()
+      }
+      if (txt) $(this).html(txt.substring(0,200))
+    })
+  } else {
+    changeThis.children('i').addClass('fa-eye').removeClass('fa-eye-slash')
+    changeThis.closest('.element').removeClass('elementCollapse')
+    changeThis.attr('value',0)
+    changeThis.attr('title',"{{Masquer ce bloc.<br>Ctrl+click: tous.}}")
+    setEditor()
   }
 });
 
@@ -742,7 +756,7 @@ $pageContainer.off('click','.bt_selectCmdExpression').on('click','.bt_selectCmdE
         '</div> </div>' +
         '</form> </div>  </div>';
       }
-      
+
       bootbox.dialog({
         title: "{{Ajout d'une nouvelle condition}}",
         message: message,
@@ -907,7 +921,7 @@ $pageContainer.off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable', 
       } else {
         ui.placeholder.removeClass('sortable-placeholderLast')
       }
-      
+
       getClass = true
       if (ui.placeholder.parent().hasClass('subElement')) {
         getClass = false
@@ -915,12 +929,12 @@ $pageContainer.off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable', 
       if (ui.helper.hasClass('expressionACTION') && ui.placeholder.parent().attr('id') == 'div_scenarioElement') {
         getClass = false
       }
-      
+
       thisSub = ui.placeholder.parents('.expressions').parents('.subElement')
       if(thisSub.hasClass('subElementCOMMENT') || thisSub.hasClass('subElementCODE')) {
         getClass = false
       }
-      
+
       if (getClass) {
         ui.placeholder.addClass('sortable-placeholder')
       } else {
@@ -934,7 +948,7 @@ $pageContainer.off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable', 
       if (ui.item.findAtDepth('.element', 2).length == 1 && ui.item.parent().attr('id') == 'div_scenarioElement') {
         ui.item.replaceWith(ui.item.findAtDepth('.element', 2));
       }
-      
+
       if (ui.item.hasClass('element') && ui.item.parent().attr('id') != 'div_scenarioElement') {
         ui.item.find('.expressionAttr,.subElementAttr,.elementAttr').each(function(){
           var value = $(this).value();
@@ -952,16 +966,18 @@ $pageContainer.off('mouseenter','.bt_sortable').on('mouseenter','.bt_sortable', 
         })
         ui.item.parent().replaceWith(el);
       }
-      
+
       if (ui.item.hasClass('expression') && ui.item.parent().attr('id') == 'div_scenarioElement') {
         $("#div_scenarioElement").sortable("cancel");
       }
       if (ui.item.closest('.subElement').hasClass('noSortable')) {
         $("#div_scenarioElement").sortable("cancel");
       }
-      
       updateTooltips()
       updateSortable()
+    },
+    stop: function(event, ui) {
+      $("#div_scenarioElement").sortable("disable");
     }
   });
   $("#div_scenarioElement").sortable("enable");
@@ -980,6 +996,11 @@ $('#bt_graphScenario').off('click').on('click', function () {
   $("#md_modal").load('index.php?v=d&modal=graph.link&filter_type=scenario&filter_id='+$('.scenarioAttr[data-l1key=id]').value()).dialog('open');
 });
 
+jwerty.key('ctrl+l', function (e) {
+  $('#md_modal').dialog({title: "{{Log d'exécution du scénario}}"});
+  $("#md_modal").load('index.php?v=d&modal=scenario.log.execution&scenario_id=' + $('.scenarioAttr[data-l1key=id]').value()).dialog('open');
+})
+
 $('#bt_logScenario').off('click').on('click', function () {
   $('#md_modal').dialog({title: "{{Log d'exécution du scénario}}"});
   $("#md_modal").load('index.php?v=d&modal=scenario.log.execution&scenario_id=' + $('.scenarioAttr[data-l1key=id]').value()).dialog('open');
@@ -995,6 +1016,15 @@ $('#bt_templateScenario').off('click').on('click', function () {
   $("#md_modal").load('index.php?v=d&modal=scenario.template&scenario_id=' + $('.scenarioAttr[data-l1key=id]').value()).dialog('open');
 });
 
+$pageContainer.on('click','.subElementAttr[data-l1key=options][data-l2key=allowRepeatCondition]',function(){
+  if($(this).attr('value') == 0){
+    $(this).attr('value',1);
+    $(this).html('<span><i class="fas fa-ban text-danger"></i></span>');
+  }else{
+    $(this).attr('value',0);
+    $(this).html('<span><i class="fas fa-sync"></span>');
+  }
+});
 
 /**************** Initialisation **********************/
 $pageContainer.off('change','.scenarioAttr').on('change','.scenarioAttr:visible',  function () {
@@ -1053,11 +1083,12 @@ function updateElementCollpase() {
 
 function setEditor() {
   $('.expressionAttr[data-l1key=type][value=code]').each(function () {
-    var expression = $(this).closest('.expression');
-    var code = expression.find('.expressionAttr[data-l1key=expression]');
+    var expression = $(this).closest('.expression')
+    var code = expression.find('.expressionAttr[data-l1key=expression]')
+    $(this).find('.blocPreview').html(code.val())
     if (code.attr('id') == undefined && code.is(':visible')) {
-      code.uniqueId();
-      var id = code.attr('id');
+      code.uniqueId()
+      var id = code.attr('id')
       setTimeout(function () {
         editor[id] = CodeMirror.fromTextArea(document.getElementById(id), {
           lineNumbers: true,
@@ -1065,10 +1096,10 @@ function setEditor() {
           mode: 'text/x-php',
           matchBrackets: true,
           viewportMargin : Infinity
-        });
-      }, 1);
+        })
+      }, 1)
     }
-  });
+  })
 }
 
 function setAutocomplete() {
@@ -1086,8 +1117,8 @@ function setAutocomplete() {
     }
   });
 }
-
 function printScenario(_id) {
+  $.hideAlert()
   $.showLoading();
   jeedom.scenario.update[_id] =function(_options){
     if(_options.scenario_id =! $pageContainer.getValues('.scenarioAttr')[0]['id']){
@@ -1127,13 +1158,13 @@ function printScenario(_id) {
     },
     success: function (data) {
       $('.scenarioAttr').value('');
-      
+
       $('.scenarioAttr[data-l1key=object_id] option').first().attr('selected',true);
       $('.scenarioAttr[data-l1key=object_id]').val('');
       $pageContainer.setValues(data, '.scenarioAttr');
       data.lastLaunch = (data.lastLaunch == null) ? '{{Jamais}}' : data.lastLaunch;
       $('#span_lastLaunch').text(data.lastLaunch);
-      
+
       $('#div_scenarioElement').empty();
       $('.provokeMode').empty();
       $('.scheduleMode').empty();
@@ -1169,6 +1200,18 @@ function printScenario(_id) {
           addSchedule(data.schedule);
         }
       }
+      $('.scenario_link').empty();
+      html = '';
+      if(data.scenario_link.scenario){
+        for(var i in data.scenario_link.scenario){
+          if(data.scenario_link.scenario[i].isActive == 1){
+            html  += '<span class="label label-success cursor scenario_link" data-scenario_id="'+i+'">'+data.scenario_link.scenario[i].name+'</span><br/>';
+          }else{
+            html  += '<span class="label label-danger cursor scenario_link" data-scenario_id="'+i+'">'+data.scenario_link.scenario[i].name+'</span><br/>';
+          }
+        }
+      }
+      $('.scenario_link').append(html);
       if(data.elements.length == 0){
         $('#div_scenarioElement').append('<center class="span_noScenarioElement"><span>Pour constituer votre scénario veuillez ajouter des blocs</span></center>')
       }
@@ -1205,9 +1248,12 @@ function printScenario(_id) {
       if(data.name){
         title = data.name +' - Jeedom';
       }
-      addOrUpdateUrl('id',data.id,title);
-      if(window.location.hash == ''){
-        $('.nav-tabs a[href="#generaltab"]').click();
+      var hash = window.location.hash
+      addOrUpdateUrl('id',data.id,title)
+      if (hash == '') {
+        $('.nav-tabs a[href="#generaltab"]').click()
+      } else {
+        window.location.hash = hash
       }
       setTimeout(function () {
         setEditor();
@@ -1282,7 +1328,7 @@ function addSchedule(_schedule) {
   div += '<div class="input-group">';
   div += '<input class="scenarioAttr input-sm form-control roundedLeft" data-l1key="schedule" value="' + _schedule.replace(/"/g,'&quot;') + '">';
   div += '<span class="input-group-btn">';
-  div += '<a class="btn btn-default btn-sm cursor helpSelectCron"><i class="fas fa-question-circle"></i></a>';
+  div += '<a class="btn btn-default btn-sm cursor jeeHelper" data-helper="cron"><i class="fas fa-question-circle"></i></a>';
   div += '<a class="btn btn-default btn-sm cursor bt_removeSchedule roundedRight"><i class="fas fa-minus-circle"></i></a>';
   div += '</span>';
   div += '</div>';
@@ -1296,15 +1342,16 @@ function addExpression(_expression) {
     return '';
   }
   var sortable = 'sortable';
-  if (_expression.type == 'condition') {
+  if (_expression.type == 'condition' || _expression.type == 'code') {
     sortable = 'noSortable';
   }
-  
+
+  var retour = '<div class="expression ' + sortable + ' col-xs-12" >'
+
   if (_expression.type == 'action') {
-    var retour = '<div class="expression expressionACTION ' + sortable + ' col-xs-12" >';
-  } else {
-    var retour = '<div class="expression ' + sortable + ' col-xs-12" >';
+    retour = '<div class="expression expressionACTION ' + sortable + ' col-xs-12" >';
   }
+
   retour += '<input class="expressionAttr" data-l1key="id" style="display : none;" value="' + init(_expression.id) + '"/>';
   retour += '<input class="expressionAttr" data-l1key="scenarioSubElement_id" style="display : none;" value="' + init(_expression.scenarioSubElement_id) + '"/>';
   retour += '<input class="expressionAttr" data-l1key="type" style="display : none;" value="' + init(_expression.type) + '"/>';
@@ -1321,7 +1368,7 @@ function addExpression(_expression) {
     retour += '<button type="button" class="btn btn-default cursor bt_selectEqLogicExpression roundedRight"  tooltip="{{Rechercher un équipement}}"><i class="fas fa-cube"></i></button>';
     retour += '</span>';
     retour += '</div>';
-    
+
     break;
     case 'element' :
     retour += '<div class="col-xs-12" >';
@@ -1374,7 +1421,7 @@ function addExpression(_expression) {
     });
     break;
     case 'code' :
-    retour += '<div class="col-xs-12">';
+    retour += '<div>';
     retour += '<textarea class="expressionAttr form-control" data-l1key="expression">' + init(_expression.expression) + '</textarea>';
     retour += '</div>';
     break;
@@ -1385,16 +1432,6 @@ function addExpression(_expression) {
   retour += '</div>';
   return retour;
 }
-
-$pageContainer.on('click','.subElementAttr[data-l1key=options][data-l2key=allowRepeatCondition]',function(){
-  if($(this).attr('value') == 0){
-    $(this).attr('value',1);
-    $(this).html('<span><i class="fas fa-ban text-danger"></i></span>');
-  }else{
-    $(this).attr('value',0);
-    $(this).html('<span><i class="fas fa-sync"></span>');
-  }
-});
 
 function addSubElement(_subElement) {
   if (!isset(_subElement.type) || _subElement.type == '') {
@@ -1407,7 +1444,7 @@ function addSubElement(_subElement) {
   if (_subElement.type == 'if' || _subElement.type == 'for' || _subElement.type == 'code') {
     noSortable = 'noSortable';
   }
-  
+
   blocClass = '';
   switch (_subElement.type) {
     case 'if':
@@ -1445,7 +1482,7 @@ function addSubElement(_subElement) {
   retour += '<input class="subElementAttr" data-l1key="id" style="display : none;" value="' + init(_subElement.id) + '"/>';
   retour += '<input class="subElementAttr" data-l1key="scenarioElement_id" style="display : none;" value="' + init(_subElement.scenarioElement_id) + '"/>';
   retour += '<input class="subElementAttr" data-l1key="type" style="display : none;" value="' + init(_subElement.type) + '"/>';
-  
+
   switch (_subElement.type) {
     case 'if' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
@@ -1466,7 +1503,7 @@ function addSubElement(_subElement) {
     retour += '<legend >{{SI}}';
     retour += '</legend>';
     retour += '</div>';
-    
+
     retour += '<div >';
     if(!isset(_subElement.options) || !isset(_subElement.options.allowRepeatCondition) || _subElement.options.allowRepeatCondition == 0) {
       retour += '<a class="bt_repeat cursor subElementAttr" tooltip="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="0"><span><i class="fas fa-sync"></i></span></a>';
@@ -1474,7 +1511,7 @@ function addSubElement(_subElement) {
       retour += '<a class="bt_repeat cursor subElementAttr" tooltip="{{Autoriser ou non la répétition des actions si l\'évaluation de la condition est la même que la précédente}}" data-l1key="options" data-l2key="allowRepeatCondition" value="1"><span><i class="fas fa-ban text-danger"></i></span></a>';
     }
     retour += '</div>';
-    
+
     retour += '<div class="expressions" >';
     var expression = {type: 'condition'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
@@ -1484,28 +1521,12 @@ function addSubElement(_subElement) {
     retour += '  </div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'then' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
     retour += '<div class="subElementFields">';
     retour += '<legend >{{ALORS}}</legend>';
-    retour += '<div class="input-group">';
-    retour += '<button class="bt_showElse btn btn-xs btn-default roundedLeft" type="button" data-toggle="dropdown" tooltip="{{Afficher/masquer le bloc Sinon}}" aria-haspopup="true" aria-expanded="true">';
-    retour += '<i class="fas fa-chevron-down"></i>';
-    retour += '</button>';
-    retour += '<span class="input-group-btn">';
-    retour += '<div class="dropdown" >';
-    retour += '<button class="btn btn-default dropdown-toggle roundedRight" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
-    retour += '<i class="fas fa-plus-circle"></i> {{Ajouter}}';
-    retour += '<span class="caret"></span>';
-    retour += '</button>';
-    retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
-    retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
-    retour += '</ul>';
-    retour += '</div>';
-    retour += '</span>';
-    retour += '</div>';
+    retour += getAddButton(true);
     retour += '</div>';
     retour += '<div class="expressions">';
     retour += '<div class="sortable empty" ></div>';
@@ -1516,21 +1537,12 @@ function addSubElement(_subElement) {
     }
     retour += '</div>';
     break;
-    
+
     case 'else' :
     retour += '<input class="subElementAttr subElementElse" data-l1key="subtype" style="display : none;" value="action"/>';
     retour += '<div class="subElementFields">';
     retour += '<legend >{{SINON}}</legend>';
-    retour += '<div class="dropdown">';
-    retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
-    retour += '<i class="fas fa-plus-circle"></i> Ajouter';
-    retour += '<span class="caret"></span>';
-    retour += '</button>';
-    retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
-    retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
-    retour += '</ul>';
-    retour += '</div>';
+    retour += getAddButton();
     retour += '</div>';
     retour += '<div class="expressions">';
     retour += '<div class="sortable empty" ></div>';
@@ -1541,7 +1553,7 @@ function addSubElement(_subElement) {
     }
     retour += '</div>';
     break;
-    
+
     case 'for' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
     retour += '<div>';
@@ -1569,7 +1581,7 @@ function addSubElement(_subElement) {
     retour += '</div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'in' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
     retour += '<div>';
@@ -1597,7 +1609,7 @@ function addSubElement(_subElement) {
     retour += '</div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'at' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="condition"/>';
     retour += '<div>';
@@ -1625,21 +1637,12 @@ function addSubElement(_subElement) {
     retour += '</div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'do' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
     retour += '<div class="subElementFields">';
     retour += '<legend >{{FAIRE}}</legend>';
-    retour += '<div class="dropdown">';
-    retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
-    retour += '<i class="fas fa-plus-circle"></i> Ajouter';
-    retour += '<span class="caret"></span>';
-    retour += '</button>';
-    retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (ex. : SI/ALORS….)}}">{{Bloc}}</a></li>';
-    retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
-    retour += '</ul>';
-    retour += '</div>';
+    retour += getAddButton();
     retour += '</div>';
     retour += '<div class="expressions">';
     retour += '<div class="sortable empty" ></div>';
@@ -1650,7 +1653,7 @@ function addSubElement(_subElement) {
     }
     retour += '</div>';
     break;
-    
+
     case 'code' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
     retour += '<div>';
@@ -1668,18 +1671,20 @@ function addSubElement(_subElement) {
     retour += '</div>';
     retour += '<div>';
     retour += '<legend >{{CODE}}</legend>';
-    retour += '</div>';
-    retour += '<div class="expressions">';
-    retour += '<div class="sortable empty" ></div>';
     var expression = {type: 'code'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
+      retour += '<div class="blocPreview">'+expression.expression.substring(0,200)+'</div>';
+    } else {
+      retour += '<div class="blocPreview"></div>';
     }
+    retour += '</div>';
+    retour += '<div class="expressions">';
     retour += addExpression(expression);
     retour += '</div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'comment' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="comment"/>';
     retour += '<div>';
@@ -1692,18 +1697,22 @@ function addSubElement(_subElement) {
     retour += '</div>';
     retour += '<div>';
     retour += '<legend >{{COMMENTAIRE}}</legend>';
-    retour += '</div>';
-    retour += '<div class="expressions">';
-    retour += '<div class="sortable empty" ></div>';
     var expression = {type: 'comment'};
     if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
       expression = _subElement.expressions[0];
+      var txt = expression.expression.substring(0,200)
+      txt = '<b>' + txt.split('\n')[0] + '</b>' + txt.replace(txt.split('\n')[0], '')
+      retour += '<div class="blocPreview">'+txt+'</div>';
+    } else {
+      retour += '<div class="blocPreview"></div>';
     }
+    retour += '</div>';
+    retour += '<div class="expressions">';
     retour += addExpression(expression);
     retour += '</div>';
     retour = addElButtons(retour)
     break;
-    
+
     case 'action' :
     retour += '<input class="subElementAttr" data-l1key="subtype" style="display : none;" value="action"/>';
     retour += '<div>';
@@ -1718,20 +1727,21 @@ function addSubElement(_subElement) {
     }else{
       retour += '<input type="checkbox" class="subElementAttr" data-l1key="options" data-l2key="enable" tooltip="{{Décocher pour désactiver l\'élément}}" />';
     }
-    retour += '<legend class="legendHidden">ACTION</legend>';
+    retour += '<legend class="legendHidden">{{ACTION}}</legend>';
+    if (isset(_subElement.expressions) && isset(_subElement.expressions[0])) {
+      expression = _subElement.expressions[0]
+      if (expression.type == 'element' && isset(expression.element.subElements) && isset(expression.element.subElements[0]) && isset(expression.element.subElements[0].expressions[0])) {
+        retour += '<div class="blocPreview">'+expression.element.subElements[0].expressions[0].expression.substring(0,200)+'</div>'
+      } else {
+        retour += '<div class="blocPreview">'+_subElement.expressions[0].expression.substring(0,200)+'</div>'
+      }
+    } else {
+      retour += '<div class="blocPreview"></div>'
+    }
     retour += '</div>';
     retour += '<div class="subElementFields">';
     retour += '<legend >{{ACTION}}</legend><br/>';
-    retour += '<div class="dropdown">';
-    retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
-    retour += ' <i class="fas fa-plus-circle"></i> Ajouter';
-    retour += '<span class="caret"></span>';
-    retour += '</button>';
-    retour += '<ul class="dropdown-menu">';
-    retour += '<li><a class="bt_addScenarioElement fromSubElement tootlips" tooltip="{{Permet d\'ajouter des éléments fonctionnels essentiels pour créer vos scénarios (Ex: SI/ALORS….)}}">{{Bloc}}</a></li>';
-    retour += '<li><a class="bt_addAction">{{Action}}</a></li>';
-    retour += '</ul>';
-    retour += '</div>';
+    retour += getAddButton();
     retour += '</div>';
     retour += '<div class="expressions">';
     retour += '<div class="sortable empty" ></div>';
@@ -1762,7 +1772,7 @@ function addElement(_element) {
   if (!isset(_element.type) || _element.type == '') {
     return '';
   }
-  
+
   elementClass = ''
   switch (_element.type) {
     case 'if' :
@@ -1786,9 +1796,9 @@ function addElement(_element) {
     case 'action' :
     elementClass = 'elementACTION'
   }
-  
+
   var div = '<div class="element ' + elementClass + '">';
-  
+
   div += '<input class="elementAttr" data-l1key="id" style="display : none;" value="' + init(_element.id) + '"/>';
   div += '<input class="elementAttr" data-l1key="type" style="display : none;" value="' + init(_element.type) + '"/>';
   switch (_element.type) {
@@ -1872,7 +1882,7 @@ function getElement(_element) {
   }
   element = element[0];
   element.subElements = [];
-  
+
   _element.findAtDepth('.subElement', 2).each(function () {
     var subElement = $(this).getValues('.subElementAttr', 2);
     subElement = subElement[0];
@@ -1894,7 +1904,7 @@ function getElement(_element) {
         }
       }
       subElement.expressions.push(expression);
-      
+
     });
     element.subElements.push(subElement);
   });
@@ -1909,6 +1919,62 @@ function updateTooltips() {
   $('[tooltip]:not(.tooltipstered)').tooltipster(TOOLTIPSOPTIONS)
 }
 
+function getAddButton(_caret) {
+  if (!isset(_caret)) _caret = false
+  retour = ''
+  if (_caret) {
+    retour += '<div class="input-group">'
+    retour += '<button class="bt_showElse btn btn-xs btn-default roundedLeft" type="button" data-toggle="dropdown" tooltip="{{Afficher/masquer le bloc Sinon}}" aria-haspopup="true" aria-expanded="true">'
+    retour += '<i class="fas fa-chevron-down"></i>'
+    retour += '</button>'
+    retour += '<span class="input-group-btn">'
+  }
+  retour += '<div class="dropdown">'
+  if (_caret) {
+    retour += '<button class="btn btn-default dropdown-toggle roundedRight" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'
+  } else {
+    retour += '<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'
+  }
+  retour += '<i class="fas fa-plus-circle"></i> {{Ajouter}}'
+  retour += '<span class="caret"></span>'
+  retour += '</button>'
+  retour += '<ul class="dropdown-menu">'
+
+  retour += '<li><a class="bt_addAction">{{Action}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="if">{{Bloc Si/Alors/Sinon}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="action">{{Bloc Action}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="for">{{Bloc Boucle}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="in">{{Bloc Dans}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="at">{{Bloc A}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="code">{{Bloc Code}}</a></li>'
+  retour += '<li><a class="fromSubElement" data-type="comment">{{Bloc Commentaire}}</a></li>'
+
+  retour += '</ul>'
+  retour += '</div>'
+  if (_caret) {
+    retour += '</span>'
+    retour += '</div>'
+  }
+  return retour
+}
+$pageContainer.off('click','.fromSubElement').on( 'click','.fromSubElement ', function (event) {
+  var elementType = $(this).attr('data-type')
+  setUndoStack()
+
+  var elementDiv = $(this).closest('.subElement').find('.expressions').eq(0)
+  var newEL = $(addExpression({type: 'element', element: {type: elementType}}))
+  elementDiv.append(newEL.addClass('disableElement'))
+
+  setEditor()
+  updateSortable()
+  updateElseToggle()
+  modifyWithoutSave = true
+  updateTooltips()
+  setAutocomplete()
+  setTimeout(function(){ newEL.removeClass('disableElement') }, 600)
+})
+
+
 //UNDO Management
 var _undoStack_ = new Array()
 var _undoState_ = -1
@@ -1916,12 +1982,12 @@ var _firstState_ = 0
 var _undoLimit_ = 12
 var _redo_ = 0
 
-jwerty.key('ctrl+shift+z', function (e) {
+jwerty.key('ctrl+shift+z/⌘+shift+z', function (e) {
   e.preventDefault()
   undo()
   PREV_FOCUS = null
 })
-jwerty.key('ctrl+shift+y', function (e) {
+jwerty.key('ctrl+shift+y/⌘+shift+y', function (e) {
   e.preventDefault()
   redo()
   PREV_FOCUS = null
@@ -1931,7 +1997,7 @@ function setUndoStack(state=0) {
   syncEditors()
   newStack = $('#div_scenarioElement').clone()
   newStack.find('.tooltipstered').removeClass('tooltipstered')
-  
+
   if (newStack ==  $(_undoStack_[state-1])) return
   if (state == 0) {
     state = _undoState_ = _undoStack_.length
@@ -1991,16 +2057,16 @@ function syncEditors() {
 }
 function resetEditors() {
   editor = []
-  
+
   $('.expressionAttr[data-l1key=type][value=code]').each(function () {
     var expression = $(this).closest('.expression')
     var code = expression.find('.expressionAttr[data-l1key=expression]')
     var element = expression.parents('elementCODE').first()
-    
+
     code.show()
     code.removeAttr('id')
     expression.find('.CodeMirror-wrap').remove()
   })
-  
+
   setEditor()
 }

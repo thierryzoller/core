@@ -36,6 +36,8 @@ $js_file = array(
 	'core/js/scenario.class.js',
 	'core/js/plan.class.js',
 	'core/js/plan3d.class.js',
+	'core/js/log.class.js',
+	'core/js/widgets.class.js',
 	'3rdparty/jquery.packery/jquery.packery.js',
 );
 if (file_exists(__DIR__ . '/mobile/custom/custom.js')) {
@@ -44,6 +46,7 @@ if (file_exists(__DIR__ . '/mobile/custom/custom.js')) {
 
 $other_file = array(
 	'core/php/icon.inc.php',
+	'mobile/css/coreWidgets.css',
 	'mobile/css/mobile.main.css',
 	'3rdparty/jquery.mobile/jquery.mobile.min.css',
 	'3rdparty/jquery.mobile/css/nativedroid2.css',
@@ -174,9 +177,9 @@ foreach ($js_file as $file) {
 		echo '#' . md5_file(__DIR__ . '/' . $file);
 		echo "\n";
 	}
-	echo 'core/php/getJS.php?file=' . $file;
+	echo 'core/php/getJS.php?file=' . urlencode($file);
 	echo "\n";
-	echo 'core/php/getJS.php?file=' . $file . '&md5=' . md5_file(__DIR__ . '/' . $file);
+	echo 'core/php/getJS.php?file=' . urlencode($file) . '&md5=' . md5_file(__DIR__ . '/' . $file);
 	echo "\n";
 }
 foreach ($other_file as $file) {
@@ -194,7 +197,7 @@ foreach (ls('mobile/js', '*.js') as $file) {
 		echo '#' . md5_file(__DIR__ . '/mobile/js/' . $file);
 		echo "\n";
 	}
-	echo 'core/php/getResource.php?file=mobile/js/' . $file;
+	echo 'core/php/getResource.php?file=mobile/js/' . urlencode($file);
 	echo "\n";
 }
 foreach (ls('mobile/html', '*.html') as $file) {
@@ -213,7 +216,7 @@ foreach (ls('mobile/modal', '*.html') as $file) {
 		echo '#' . md5_file(__DIR__ . '/mobile/modal/' . $file);
 		echo "\n";
 	}
-	echo 'index.php?v=m&ajax=1&modal=' . substr($file, 0, -5);
+	echo 'index.php?v=m&ajax=1&modal=' . substr(urlencode($file), 0, -5);
 	echo "\n";
 }
 

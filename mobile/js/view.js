@@ -70,11 +70,8 @@ function displayView(html) {
   }catch(err) {
     console.log(err)
   }
-  if(isset(html.raw) && isset(html.raw.configuration) && isset(html.raw.configuration.displayObjectName)){
-    console.log(html.raw);
-    jeedom.eqLogic.changeDisplayObjectName(html.raw.configuration.displayObjectName);
-  }else{
-    jeedom.eqLogic.changeDisplayObjectName(false);
+  if(isset(html.raw) && isset(html.raw.configuration) && isset(html.raw.configuration.displayObjectName) && html.raw.configuration.displayObjectName == 1){
+    $('.eqLogic-widget').addClass('displayObjectName');
   }
   if (deviceInfo.type == 'phone') {
     $('.chartContainer').width((deviceInfo.width - 20))
@@ -85,7 +82,7 @@ function displayView(html) {
   $('.eqLogicZone').packery({gutter : 0})
   setTimeout(function(){
     $('.eqLogicZone').packery({gutter : 0})
-  }, 50)
+  }, 750)
   $('#div_displayView .ui-table-columntoggle-btn').remove()
   var screenWidth = $(window).width() - 5
   $('.div_viewZone .table-responsive').each(function(){

@@ -37,6 +37,7 @@ class plugin {
 	private $eventjs;
 	private $hasDependency;
 	private $maxDependancyInstallTime;
+	private $hasTtsEngine;
 	private $hasOwnDeamon;
 	private $issue = '';
 	private $changelog = '';
@@ -78,6 +79,7 @@ class plugin {
 		$plugin->installation = (isset($data['installation'])) ? $data['installation'] : '';
 		$plugin->hasDependency = (isset($data['hasDependency'])) ? $data['hasDependency'] : 0;
 		$plugin->hasOwnDeamon = (isset($data['hasOwnDeamon'])) ? $data['hasOwnDeamon'] : 0;
+		$plugin->hasTtsEngine = (isset($data['hasTtsEngine'])) ? $data['hasTtsEngine'] : 0;
 		$plugin->maxDependancyInstallTime = (isset($data['maxDependancyInstallTime'])) ? $data['maxDependancyInstallTime'] : 30;
 		$plugin->eventjs = (isset($data['eventjs'])) ? $data['eventjs'] : 0;
 		$plugin->require = (isset($data['require'])) ? $data['require'] : '';
@@ -151,7 +153,7 @@ class plugin {
 		}
 	}
 	
-	public static function listPlugin($_activateOnly = false, $_orderByCaterogy = false, $_translate = true, $_nameOnly = false) {
+		public static function listPlugin($_activateOnly = false, $_orderByCaterogy = false, $_translate = true, $_nameOnly = false) {
 		$listPlugin = array();
 		if ($_activateOnly) {
 			$sql = "SELECT plugin
@@ -182,14 +184,21 @@ class plugin {
 					if (!file_exists($pathInfoPlugin)) {
 						continue;
 					}
-					try {
-						$listPlugin[] = plugin::byId($pathInfoPlugin);
-					} catch (Exception $e) {
-						log::add('plugin', 'error', $e->getMessage(), 'pluginNotFound::' . $pathInfoPlugin);
-					} catch (Error $e) {
-						log::add('plugin', 'error', $e->getMessage(), 'pluginNotFound::' . $pathInfoPlugin);
+					if ($_nameOnly) {
+						$listPlugin[] = str_replace('/','',$dirPlugin);
+					}else{
+						try {
+							$listPlugin[] = plugin::byId($pathInfoPlugin);
+						} catch (Exception $e) {
+							log::add('plugin', 'error', $e->getMessage(), 'pluginNotFound::' . $pathInfoPlugin);
+						} catch (Error $e) {
+							log::add('plugin', 'error', $e->getMessage(), 'pluginNotFound::' . $pathInfoPlugin);
+						}
 					}
 				}
+			}
+			if ($_nameOnly) {
+				return $listPlugin;
 			}
 		}
 		if ($_orderByCaterogy) {
@@ -222,6 +231,9 @@ class plugin {
 	}
 	
 	public static function getTranslation($_plugin, $_language) {
+		if(in_array(trim($_plugin),array('','core','fr_FR','.','..'))){
+			return array();
+		}
 		$dir = __DIR__ . '/../../plugins/' . $_plugin . '/core/i18n';
 		if (!file_exists($dir)) {
 			@mkdir($dir, 0775, true);
@@ -234,14 +246,6 @@ class plugin {
 			return is_json($return, array());
 		}
 		return array();
-	}
-	
-	public static function saveTranslation($_plugin, $_language, $_translation) {
-		$dir = __DIR__ . '/../../plugins/' . $_plugin . '/core/i18n';
-		if (!file_exists($dir)) {
-			mkdir($dir, 0775, true);
-		}
-		file_put_contents($dir . '/' . $_language . '.json', json_encode($_translation, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 	}
 	
 	public static function orderPlugin($a, $b) {
@@ -773,10 +777,13 @@ class plugin {
 					$info = $inprogress->getValue(array('datetime' => strtotime('now') - 60));
 					$info['datetime'] = (isset($info['datetime'])) ? $info['datetime'] : strtotime('now') - 60;
 					if (abs(strtotime('now') - $info['datetime']) < 45) {
+						if($_auto){
+							return;
+						}
 						throw new Exception(__('Vous devez attendre au moins 45 secondes entre deux lancements du démon. Dernier lancement : ', __FILE__) . date("Y-m-d H:i:s", $info['datetime']));
 					}
 					if (config::byKey('deamonRestartNumber', $plugin_id, 0) > 3) {
-						log::add($plugin_id, 'error', __('Attention je pense qu\'il y a un soucis avec le démon que j\'ai relancé plus de 3 fois consecutivement', __FILE__));
+						log::add($plugin_id, 'error', __('Attention je pense qu\'il y a un soucis avec le démon que j\'ai relancé plus de 3 fois consécutivement', __FILE__));
 					}
 					if (!$_forceRestart) {
 						config::save('deamonRestartNumber', config::byKey('deamonRestartNumber', $plugin_id, 0) + 1, $plugin_id);
@@ -1066,6 +1073,15 @@ class plugin {
 	
 	public function setHasOwnDeamony($hasOwnDeamon) {
 		$this->hasOwnDeamon = $hasOwnDeamon;
+		return $this;
+	}
+	
+	public function getHasTtsEngine() {
+		return $this->hasTtsEngine;
+	}
+	
+	public function setHasTtsEngine($hasTtsEngine) {
+		$this->hasTtsEngine = $hasTtsEngine;
 		return $this;
 	}
 	

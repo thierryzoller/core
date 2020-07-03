@@ -1,84 +1,75 @@
-Una de las páginas principales Jeedom muestra un informe de todos
-su automatización del hogar. Este informe (contrariamente a las opiniones y diseño) es
-auto-generado por Jeedom.
+# Dashboard
+**Inicio → Tablero**
 
-Se accede haciendo clic en Inicio → ** ** tablero de instrumentos
+<small>[Raccourcis clavier/souris](shortcuts.md)</small>
 
-> **Tip**
+El tablero de instrumentos es una de las páginas principales de Jeedom, muestra un informe de toda la automatización de su hogar.
+Este informe (a diferencia de las vistas y los diseños) es autogenerado por Jeedom e incluye todos los objetos visibles y sus equipos.
+
+> **Punta**
 >
-> Es posible ir directamente a un elemento de la domótica.
-> Esto sólo tendrá el equipo que le interesan y
-> Así cargar la página más rápido
+> El orden de visualización de los objetos en el Tablero es el visible en **Análisis → Resumen de domótica**. Puede modificar este orden en esta página arrastrando y soltando.
 
--   Tiene la parte superior izquierda un pequeño icono para
-    mostrar / ocultar el árbol de objetos (También muestra
-    resúmenes de objetos de información)
+Para que el equipo aparezca en el Tablero, debe :
+- Estar activo.
+- Ser visible.
+- Tener como objeto principal un objeto visible en el Tablero.
 
--   En el centro, puede elegir filtrar sólo en ciertos tipos
-    equipo
+Cuando el equipo aparece por primera vez en el Tablero, Jeedom intenta dimensionar correctamente su mosaico para mostrar todos los comandos y sus widgets.
+Para mantener un tablero equilibrado, puede cambiar al modo Editar con el lápiz en la parte superior derecha de la barra de búsqueda, para cambiar el tamaño y / o reordenar los mosaicos del equipo.
 
--   A la derecha, un primer botón para cambiar al modo de edición, para por
-    tales como cambiar el orden de widgets (utilizando un depositados hecho clic
-    el widget), también se puede en este modo de edición
-    cambiar el tamaño de algunos widgets y reorganizar los comandos
-    interior de la misma
+Al mover el mouse sobre un pedido, aparece un marcador de color en la parte inferior izquierda del mosaico:
+- Azul para un pedido de información. Si está registrado, un clic en él abre la ventana de registro.
+- Naranja para un comando de acción. Un clic activará la acción.
 
--   Un segundo botón para mostrar escenarios / ocultar
+Además, puede hacer clic en el título del mosaico (el nombre del equipo) para abrir directamente la página de configuración de este equipo.
 
--   Al hacer clic en un resumen de objetos, filtra para mostrar sólo
-    equipos cuyos padres se oponen y la preocupación de que
-    objeto abstracto.
-
--   Al hacer clic en un comando muestra información de tipo
-    la historia de la orden (si historizada)
-
-> **Tip**
+> **Punta**
 >
-> Es posible, desde su perfil, configurar Jeedom para
-> que el árbol de objetos y/o los escenarios sean visibles por defecto
-> cuando estás en el Dashboard
+> Es posible ir directamente a un solo objeto en su domótica, a través del menú **Inicio → Panel de control → Nombre del objeto**.
+> Esto le permite tener solo el equipo que le interesa y cargar la página más rápido.
 
-> **Tip**
+- Tienes en la parte superior izquierda un pequeño icono para mostrar / ocultar el árbol de objetos.
+- El segundo icono a la izquierda permite mostrar solo la información de los resúmenes de los objetos.
+- En el medio, un campo de búsqueda le permite buscar equipos por nombre, categoría, complemento, etiqueta, etc.
+- A la derecha, un botón le permite cambiar al modo de edición, modificar el orden de los mosaicos (hacer clic - soltar en el widget) o cambiar su tamaño. También puede reorganizar el orden de los pedidos en un mosaico,
+- Al hacer clic en el resumen de un objeto, filtra para mostrar solo el equipo relacionado con este objeto y que está relacionado con este resumen de objeto.
+- Un clic en un pedido de tipo de información muestra el historial del pedido (si es histórico).
+
+> **Punta**
 >
-> desde el movil, una pulsación prolongada de un comando info permite
-> mostrar un menú que le ofrece la posibilidad de mostrar el historial de los
-> comandos, o para poner una alerta para que jeedom pueda enviarle
-> un aviso (sólo una vez) cuando el valor supera un determinado umbral
+> Es posible, desde su perfil, configurar Jeedom para que el árbol de objetos y / o los escenarios sean visibles de forma predeterminada cuando llegue al Tablero.
 
-el modo de edición
-============
-
-En el modo de edición, puedes cambiar el tamaño de los widgets y su
-disposición en el dashboard.
-
-También puede editar el diseño interno de los controles de widget
-:
-
--   o reorganizar arrastrando / drop
-
--   ya sea haciendo clic derecho en el widget. A continuación, ir a:
-
-    -   ** ** Configuración avanzada: permite el acceso a la configuración
-        Mando avanzado
-
-    -   ** ** Estándar: diseño predeterminado, todo es automático
-        con sólo la posibilidad de reorganizar los comandos
-
-    -   **Tabla** : permite poner los comandos en una tabla :
-        se añaden las columnas y filas y suprimen por clic
-        bien, entonces basta con mover los controles en
-        casillas correspondientes. Puede poner varios comandos por cuadro
-
-    -   ** ** Añadir Columna: añade una columna a la tabla (accesible
-        sólo si está disponible la tabla)
-
-    -   ** ** línea Añadir: agrega una fila a la tabla (accesible
-        sólo si está disponible la tabla)
-
-    -   ** ** Eliminar columna: elimina una columna en la tabla
-        (Accesible sólo si está disponible la tabla)
-
-    -   ** ** Borrar línea: elimina una fila en la tabla (accesible
-        sólo si está disponible la tabla)
+> **Punta**
+>
+> En dispositivos móviles, al presionar un comando de tipo de información se muestra un menú que le ofrece mostrar el historial del pedido o poner una alerta en él para que Jeedom le avise (una vez) tan pronto como sea posible. que el valor pasa un cierto umbral.
 
 
+## Modo de edición
+
+En modo edición (*el lápiz en la esquina superior derecha*), puede cambiar el tamaño de los mosaicos y su disposición en el Tablero.
+
+También puede editar el diseño interno de los controles en el mosaico :
+
+- O bien reorganícelos arrastrando y soltando.
+- Ya sea haciendo clic derecho en el widget. Entonces accedes :
+    - **Configuración avanzada** : da acceso a la configuración avanzada del comando.
+    - **Estándar** : diseño predeterminado, todo es automático con solo la posibilidad de reorganizar el orden de los pedidos.
+    - **Mesa** : permite poner los comandos en una tabla : Las columnas y filas se agregan y eliminan haciendo clic derecho, luego simplemente mueva los comandos en los cuadros deseados. Puedes poner múltiples pedidos por caja
+    - **Agregar columna** : agregar una columna a la tabla (accesible solo si está en el diseño de la tabla)
+    - **Agregar línea** : agregar una fila a la tabla (accesible solo si está en el diseño de la tabla)
+    - **Eliminar columna** : eliminar una columna de la tabla (accesible solo si está en el diseño de la tabla)
+    - **Eliminar linea** : eliminar una fila en la tabla (accesible solo si está en el diseño de la tabla)
+
+A la derecha de cada objeto, un icono le permite :
+
+- Clic : Todas las fichas de este objeto adoptarán una altura igual a la ficha más alta.
+
+## Barra de menú Jeedom
+
+> **Punta**
+>
+> - Haga clic en el reloj (barra de menú) : Abre la línea de tiempo.
+> - Haga clic en el nombre de Jeedom (barra de menú) : Abre Configuración → Sistema → Configuración.
+> - Haga clic en ? (Barra de menú) : Abre la ayuda en la página actual.
+> - Escapar en un campo de investigación : Borrar el campo y cancelar esta búsqueda .

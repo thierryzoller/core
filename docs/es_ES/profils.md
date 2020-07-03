@@ -1,112 +1,93 @@
-La page Profil vous permet de configurer certains comportements de
-Jeedom spécifiques à l’utilisateur : page d’accueil, thèmes de la
-version desktop, de la version mobile, des graphiques…​ Elle permet
-aussi de changer votre mot de passe.
+# Preferencias
+**Configuración → Preferencias**
 
-A encontrar la parte superior derecha hacer clic en el icono del hombre
-y Perfil (seguido de su identificación).
+La página de Preferencias le permite configurar ciertos comportamientos de Jeedom específicos del usuario.
 
-temas
-======
+## Pestaña de preferencias
 
-El panel de temas le permite ajustar los parámetros de la interfaz:
+### Interface
 
--   **Desktop** : thèmes à utiliser en mode desktop, attention seul le
-    tema por defecto es apoyado oficialmente por Jeedom
+Define ciertos comportamientos de interfaz
 
--   ** ** móvil de color: elegir el color de la interfaz
-    (Aquí todo es compatible)
+- **Panel de objetos en el tablero** : Muestra el panel de objetos (a la izquierda) en el Panel, sin tener que hacer clic en el botón dedicado.
+- **Página predeterminada** : Página para mostrar de forma predeterminada para mostrar cuando se conecta a una computadora de escritorio o móvil.
+- **Objeto predeterminado** : Objeto para mostrar por defecto al llegar al Tablero / móvil.
 
--   ** ** gráficos de escritorio: Establecer el tema por defecto
-    la moda de escritorio gráficos
+- **Vista predeterminada** : Ver para mostrar de forma predeterminada a la llegada en el Panel de control / móvil.
+- **Despliegue el panel de vista** : Se usa para hacer que el menú de vista (izquierda) sea visible en las vistas de forma predeterminada.
 
--   **móviles** Gráfico: establecer el tema predeterminado
-    gráficos en modo móvil
+- **Diseño por defecto** : Diseñe para mostrar por defecto a su llegada al Tablero / móvil.
+- **Diseño de pantalla completa** : Visualización predeterminada en pantalla completa al llegar a los diseños.
 
--   ** ** La opacidad de los widgets del Dashboard: para dar opacidad
-    (Entre 0 y 1) de los widgets en el tablero de instrumentos
+- **Diseño 3D por defecto** : Diseño 3D para mostrar por defecto al llegar al Tablero / móvil.
+- **Diseño de pantalla completa en 3D** : Visualización predeterminada en pantalla completa a la llegada en diseños 3D.
 
--   **La opacidad Diseño de los widgets**: dar opacidad
-    (Entre 0 y 1) de widgets en diseños
+### Notifications
 
--   **La opacidad de los widgets Vista**: para dar opacidad (entre
-    0 y 1) de widgets en vistas
+- **Comando de notificación del usuario** : Comando predeterminado para unirse a usted (comando de tipo de mensaje).
 
--   **La opacidad de los widgets móviles**: permite dar opacidad
-    (Entre 0 y 1) de widgets móviles
+## Pestaña de seguridad
 
-interfaz
----------
+- **Autenticación de 2 pasos** : permite configurar la autenticación en 2 pasos (como recordatorio, es un código que cambia cada X segundos que se muestra en una aplicación móvil, escriba *autenticador de google*). Tenga en cuenta que la autenticación doble solo se solicitará para conexiones externas. Por lo tanto, para conexiones locales, no se solicitará el código.
 
-Se puede definir ciertos comportamientos de la interfaz:
+  **Importante** si durante la configuración de la autenticación doble tiene un error, debe verificar que Jeedom (consulte la página de salud) y su teléfono estén al mismo tiempo (una diferencia de 1 minuto es suficiente para que no funcione).
 
--   **General**
+- **Contraseña** : Le permite cambiar su contraseña (no olvide volver a escribirla a continuación)).
 
-    -   ** ** Muestra los menús dice panel de visualización Jeedom
-        la izquierda, en su caso, para devolver este panel es
-        disponible sur la plupart des pages des plugins, ainsi que la
-        page des scénarii, des interactions, des objets…​.
+- **Hash de usuario** : Su clave de API de usuario.
 
--   **Page par défaut** : page par défaut à afficher lors de la
-    connexion en desktop/mobile
+-   **Ver los menús** : dile a Jeedom que muestre el panel
+    izquierda, cuando existe, como recordatorio de que este panel es
+    disponible en la mayoría de las páginas de complementos, así como en
+    página de escenarios, interacciones, objetos.
 
--   **Objet par défaut sur le dashboard** : objet à afficher par défaut
-    lors de l’arrivée sur le dashboard/mobile
+-   **Página predeterminada** : página predeterminada para mostrar cuando
+    conexión de escritorio / móvil
 
--   **Vue par défaut** : vue à afficher par défaut lors de l’arrivée sur
-    le dashboard/mobile
+-   **Objeto predeterminado en el dashboard** : objeto de visualización predeterminado
+    a su llegada en el tablero de instrumentos / móvil
 
--   **Design par défaut** : design à afficher par défaut lors de
-    l’arrivée sur le dashboard/mobile
+-   **Vista predeterminada** : ver para mostrar por defecto al llegar
+    el tablero de instrumentos / móvil
 
-    -   **Plein écran** : affichage par défaut en plein écran lors de
-        l’arrivée sur les designs
+-   **Diseño por defecto** : diseño para mostrar por defecto cuando
+    la llegada al tablero / móvil
 
--   **Dashboard**
+    -   **Pantalla completa** : visualización predeterminada en pantalla completa cuando
+        la llegada de los diseños
 
-    -   **Déplier le panneau des scénarii** : permet de rendre visible
-        par défaut le menu des scénarii (à droite) sur le dashboard
+-   **Salpicadero**
 
-    -   **Déplier le panneau des objets** : permet de rendre visible par
-        défaut le menu des objets (à gauche) sur le dashboard
+    -   **Desplegar el panel de escenarios** : permite hacer visible
+        de manera predeterminada, el menú de escenario (a la derecha) en el tablero
 
--   **Vue**
+    -   **Desplegar el panel de los objetos** : permite hacer visible por
+        predeterminado el menú de objetos (a la izquierda) en el tablero
 
-    -   **Déplier le panneau des vues** : permet de rendre visible par
-        défaut le menu des vues (à gauche) sur les vues
+-   **Vista**
 
-Sécurité 
+    -   **Despliegue el panel de vista** : permite hacer visible por
+        menú de vistas predeterminado (izquierda) en vistas
+
+Seguridad
 --------
 
--   **Authentification en 2 étapes** : permet de configurer
-    l’authentification en 2 étapes (pour rappel, c’est un code changeant
-    toutes les X secondes qui s’affiche sur une application mobile, type
-    google authentificator). A noter que la double authentification ne sera demandée que pour les connexions externe. Pour les connexion local le code ne sera donc pas demandé.
+-   **Autenticación de 2 pasos** : permite configurar
+    Autenticación en 2 pasos (como recordatorio, este es un código cambiante
+    aparece cada X segundos en una aplicación móvil, escriba
+    Google Authenticator o Google Authenticator). Tenga en cuenta que la autenticación doble solo se solicitará para conexiones externas. Por lo tanto, para la conexión local, el código no será solicitado. Importante si durante la configuración de la autenticación doble tiene un error, compruebe que la libertad (consulte la página de estado) y su teléfono estén al mismo tiempo (una diferencia de 1 minuto es suficiente para que no funcione)
 
--   **Mot de passe** : permet de changer votre mot de passe (ne pas
-    oublier de le retaper en dessous)
+-   **Contraseña** : le permite cambiar su contraseña (no
+    olvide volver a escribirlo a continuación)
 
--   **Hash de l’utilisateur** : votre clef API d’utilisateur
-
-### Sessions actives 
-
-Vous avez ici la liste de vos sessions actuellement connecté, leur ID,
-leur IP ainsi que la date de derniere communication. En cliquant sur
-"Déconnecter" cela déconnectera l’utilisateur. Attention si il est sur
-un péripherique enregistré cela supprimera églagement l’enregistrement.
-
-### Péripherique enregistrés 
-
-Vous retrouvez ici la liste de tous les péripheriques enregistré (qui se
-connecte sans authentification) à votre Jeedom ainsi que la date de
-derniere utilisation. Vous pouvez ici supprimer l’enregistrement d’un
-peripherique. Attention cela ne le deconnecte pas mais empechera juste
-sa reconnection automatique.
-
-Notifications 
--------------
-
--   **Commande de notification utilisateur** : Commande par défaut pour
-    vous joindre (commande de type message)
+-   **Hash de usuario** : su clave de API de usuario
 
 
+### Sesiones activas
+
+Aquí tiene la lista de sus sesiones conectadas actualmente, su ID, su IP, así como la fecha de la última comunicación. Al hacer clic en &quot;Desconectar&quot; esto desconectará al usuario. Atención, si está en un dispositivo registrado, esto también eliminará la grabación.
+
+### Dispositivo registrado
+
+Aquí encontrará la lista de todos los dispositivos registrados (que se conectan sin autenticación) a su Jeedom, así como la fecha del último uso.
+Aquí puede eliminar el registro de un dispositivo. Atención, no lo desconecta, solo impedirá su reconexión automática.

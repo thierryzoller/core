@@ -34,11 +34,11 @@ if (!isConnect()) {
 <script>
 	initTableSorter()
 	refreshScenarioSummary()
-	$tableScSummary = $('#table_scenarioSummary')
-	$tableScSummary[0].config.widgetOptions.resizable_widths = ['40px', '', '60px', '', '50px', '60px', '130px', '130px', '', '80px', '60px']
-	$tableScSummary.trigger('applyWidgets')
-	$tableScSummary.trigger('resizableReset')
-	$tableScSummary.trigger('sorton', [[[1,0]]])
+	var tableScSummary = $('#table_scenarioSummary')
+	tableScSummary[0].config.widgetOptions.resizable_widths = ['40px', '', '60px', '', '50px', '60px', '130px', '130px', '', '80px', '60px']
+	tableScSummary.trigger('applyWidgets')
+	tableScSummary.trigger('resizableReset')
+	tableScSummary.trigger('sorton', [[[1,0]]])
 
 	$('#bt_refreshSummaryScenario').off().on('click',function() {
 		refreshScenarioSummary()
@@ -93,7 +93,7 @@ if (!isConnect()) {
 					tr += '<center><input type="checkbox" class="scenarioAttr" data-l1key="configuration" data-l2key="syncmode"></center>'
 					tr += '</td>'
 					tr += '<td style="min-width:60px">'
-					tr += '<select class="scenarioAttr form-control" data-l1key="configuration" data-l2key="logmode">'
+					tr += '<select class="scenarioAttr form-control input-sm" data-l1key="configuration" data-l2key="logmode">'
 					tr += '<option value="default">{{Défaut}}</option>'
 					tr += '<option value="none">{{Aucun}}</option>'
 					tr += '<option value="realtime">{{Temps réel}}</option>'

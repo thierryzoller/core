@@ -1,149 +1,96 @@
-In der Ansicht können einfache persönliche Ansichten erstellt werden, sie sind nicht so fortgeschritten wie die im Design, aber es erlaubt in wenigen Minuten eine eigene Anzeige zu haben.
+# Vues
+**Home → Anzeigen**
 
-Die Ansichten sind über das Menü  Mein Haus → Ansicht erreichbar :
+Mit Ansichten können Sie eine benutzerdefinierte Ansicht erstellen.
+Es ist nicht so leistungsstark wie die Designs, ermöglicht jedoch in wenigen Minuten eine individuellere Anzeige.
 
-> **Tipp**
+> **Spitze**
 >
-> Es ist möglich, direkt zu einer Ansicht über das Untermenü wechseln.
+> Sie können die Standardansicht in Ihrem Profil auswählen, wenn Sie auf das Ansichtsmenü klicken.
 
-> **Tipp**
+## Principe
+
+Wir können auch Widgets, Diagramme (die aus mehreren Daten bestehen können) oder Tabellenzonen (die Widgets von Befehlen enthalten) einfügen).
+
+Auf dieser Seite befindet sich oben links eine Schaltfläche zum Ein- oder Ausblenden der Liste der Ansichten sowie die Schaltfläche zum Hinzufügen einer Ansicht (Jeedom fragt Sie nach dem Namen und sendet Sie zur Bearbeitungsseite) :
+
+> **Spitze**
 >
-> Sie können ein Profil in der Standardansicht wählen, wenn sie auf das
-> Menü Ansichten klicken. 
+> Sie können diese Option in Ihrem Profil so ändern, dass die Liste der Ansichten standardmäßig angezeigt wird.
 
-Die Ansichten 
-========
+## Hinzufügen / Bearbeiten einer Ansicht
 
-Sie können auch Bereiche für Widgets, Diagramme (die aus mehreren Daten bestehen können) oder Tabellen (die, die Befehle der Widgets enthalten) einfügen.
+Das Prinzip ist ganz einfach : Eine Ansicht besteht aus Zonen (Sie können so viele Zonen einfügen, wie Sie möchten). Jede Zone ist vom Typ Grafik, Widget oder Tabelle, je nachdem, welchen Typ Sie Geräte-, Steuerungs- oder Grafik-Widgets hinzufügen können.
 
-Auf dieser Seite finden Sie oben links eine Schaltfläche zum ein- oder
-ausblenden der Ansichten Liste, sowie die Schaltfläche zum hinzufügen
-(Jeedom wird Sie nach einen Namen fragen und Sie kommen anschließend auf die Bearbeitungsseite).
-
-> **Tipp**
+> **Spitze**
 >
-> Sie können in Ihrem Profil diese Option ändern, damit die Liste der
-> Ansichten standardmäßig sichtbar ist.
+> Sie können die Reihenfolge der Zonen durch Ziehen und Ablegen verschieben.
 
-Mit der Schaltfläche oben rechts können Sie die aktuelle Ansicht bearbeiten.
+- Links auf der Seite finden wir die Liste der Ansichten und eine Schaltfläche zum Hinzufügen.
+- Über eine Schaltfläche oben rechts können Sie die aktuelle Ansicht bearbeiten.
+- In der Mitte haben Sie eine Schaltfläche zum Umbenennen einer Ansicht, eine Schaltfläche zum Hinzufügen eines Bereichs, eine Schaltfläche zum Anzeigen des Ergebnisses, eine Schaltfläche zum Speichern und eine Schaltfläche zum Löschen der Ansicht.
 
-Hinzufügen/Bearbeiten einer Ansicht
-=======================
+Nach dem Klicken auf die Schaltfläche Zone hinzufügen fragt Jeedom nach Name und Typ.
+In jeder Zone haben Sie die folgenden allgemeinen Optionen :
 
-Das Prinzip ist ganz einfach : Eine Ansicht besteht aus Bereichen (Sie
-können so viele verwenden wie Sie wollen). Jeder Bereich kann vom Typ
-Grafik, Widget oder Tabelle sein, je nach dem Typ, sind Sie in der Lage von
-den Geräten, Widgets, Befehle oder Grafiken in diesem zu verwenden.
+- **Breite** : Definiert die Breite des Bereichs (nur im Desktop-Modus).
+- **Bearbeiten** : Ermöglicht das Ändern des Namens der Zone.
+- **Entfernen** : Ermöglicht das Löschen der Zone.
 
-> **Tipp**
+### Widget-Typ-Bereich
+
+In einem Widget-Typbereich können Sie Widgets hinzufügen :
+
+- **Widget hinzufügen** : Hinzufügen / Bearbeiten von Widgets zur Anzeige im Bereich.
+
+> **Spitze**
 >
-> Es ist möglich, die Reihenfolge der Bereiche durch Ziehen und Ablegen zu verschieben.
+> Sie können ein Widget direkt löschen, indem Sie auf den Papierkorb davor klicken.
 
-Auf der linken Seite befindet sich die Liste der Ansichten sowie eine
-Schaltfläche zum hinzufügen.
-
-Im Zentrum haben Sie eine Schaltfläche, zum umbenennen einer Ansicht,
-eine Schaltfläche Bereich hinzufügen, eine Schaltfläche zum Speichern und
-eine Schaltfläche zum löschen der Ansicht. 
-
-Nachdem die Schaltfläche "Bereich hinzufügen" geklickt wurde, bittet Sie
-Jeedom einen Namen und den Typ einzugeben.
-
-Für jeden Bereich haben Sie folgende allgemeine Optionen :
-
--   **Breite** : Definiert die Breite des Bereiches (nur im
-    Desktop-Modus verfügbar).
-
--   **Bearbeiten** : Erlaubt den Namen des Bereichs zu ändern.
-
--   **Löschen** : Ermöglicht den Bereich zu löschen.
-
-Bereich, Widget-Typ
--------------------
-
-In einem Bereich vom Typ Widget, können Sie Widgets hinzufügen :
-
--   **Widget hinzufügen** : Ermöglicht das Hinzufügen/Bearbeiten von Widgets 
-    zur Anzeige in dem Bereich
-
-> **Tipp**
+> **Spitze**
 >
-> Sie können ein Widget direkt löschen, indem Sie auf den Papierkorb davor
-> klicken.
+> Sie können die Reihenfolge der Widgets im Bereich durch Ziehen und Ablegen ändern.
 
-> **Tipp**
+Sobald die Schaltfläche Widget hinzufügen gedrückt wird, wird ein Fenster angezeigt, in dem Sie aufgefordert werden, das Widget hinzuzufügen
+
+### Grafiktypbereich
+
+In einem Grafikbereich können Sie Ihrer Ansicht Grafiken hinzufügen. Die folgenden Optionen stehen zur Verfügung :
+
+- **Zeit** : Hier können Sie den Anzeigezeitraum der Grafiken auswählen (30 Minuten, 1 Tag, 1 Woche, 1 Monat, 1 Jahr oder alle)).
+- **Kurve hinzufügen** : Ermöglicht das Hinzufügen / Ändern von Grafiken.
+
+Wenn Sie auf die Schaltfläche &quot;Kurve hinzufügen&quot; klicken, zeigt Jeedom die Liste der historischen Befehle an und Sie können die hinzuzufügenden Befehle auswählen. Sobald Sie fertig sind, haben Sie Zugriff auf die folgenden Optionen :
+
+- **Mülleimer** : Befehl aus Diagramm entfernen.
+- **Name** : Name des zu zeichnenden Befehls.
+- **Farbe** : Farbe der Kurve.
+- **Typ** : Kurventyp.
+- **Gruppe** : Ermöglicht die Gruppierung von Daten (maximaler Typ pro Tag).
+- **Maßstab** : Skala (rechts oder links) der Kurve.
+- **Treppe** : Zeigt die gestufte Kurve an.
+- **Stapel** : Stapeln Sie die Kurve mit den anderen Kurventypen.
+- **Veränderung** : Zeichnen Sie nur Variationen mit dem vorherigen Wert.
+
+> **Spitze**
 >
-> Es ist möglich, die Reihenfolge der Widgets in dem Bereich durch Ziehen
-> und Ablegen zu ändern.
+> Sie können die Reihenfolge der Grafiken im Bereich durch Ziehen und Ablegen ändern.
 
-Sobald die Schaltfläche zum Hinzufügen eines Widgets gedrückt wird, wird
-ein Fenster angezeigt, in dem Sie aufgefordert werden, das Widget hinzuzufügen.
+### Array-Typ-Bereich
 
-Bereich, Grafischer-Typ
-----------------------
+Hier haben Sie die Schaltflächen :
 
-Der Bereich vom Grafischen-Typ, erlaubt es Ihnen Diagramme zu Ihrer
-Ansicht hinzuzufügen, er besitzt die folgenden Optionen :
-
--   **Zeitraum** : Ermöglicht die Auswahl der Anzeigeperiode der
-    Grafiken (30 Minuten, 1 Tag, 1 Woche, 1 Monat, 1 Jahr oder alles).
-
--   **Ajouter courbe(Diagramm hinzufügen)** : Ermöglicht es Ihnen, Grafiken hinzuzufügen/bearbeiten.
-
-Wenn Sie auf die Schaltfläche "Diagramm hinzufügen" klicken, zeigt Jeedom
-die Liste der protokollierten Befehle an und Sie können auswählen, welche(s)
-hinzugefügt werden soll. Sobald dies erledigt ist, haben Sie Zugriff auf die
-folgenden Optionen :
-
--   **Papierkorb** : Entfernt den Diagramm Befehl.
-
--   **Name** : Name des Diagramm Befehls.
-
--   **Farbe** : Die Farbe des Diagramms.
-
--   **Type** : Diagramm Typ
-
--   **Gruppieren** : Ermöglicht das Gruppieren der Daten (maximaler Typ
-    pro Tag).
-
--   **Skala** : Die Skala (rechts oder links) des Diagramms.
-
--   **Treppe** : Zeigt das Diagramm als Treppe an.
-
--   **Stapel** : Staple das Diagramm mit anderen Diagrammen vom Typ
-    Stapel.
-
--   **Wertänderung** : Diagramm zeigt nur Wertänderungen vom vorherigen 
-    Wert an.
-
-> **Tipp**
->
-> Es ist möglich, die Reihenfolge der Grafiken in dem Bereich durch Ziehen
-> und Ablegen zu ändern.
-
-Bereich, Tabellen Typ
---------------------
-
-Sie haben hier die Schaltflächen :
-
--   **Spalte hinzufügen** : Sie können der Tabelle eine Spalte hinzuzufügen.
-
--   **Zeile hinzufügen** : Ermöglicht der Tabelle eine Zeile hinzuzufügen.
+- **Spalte hinzufügen** : Fügen Sie der Tabelle eine Spalte hinzu.
+- **Zeile hinzufügen** : Fügen Sie der Tabelle eine Zeile hinzu.
 
 > **Notiz**
 >
-> Es ist möglich, die Linien durch Ziehen und Ablegen zu ändern, aber nicht
-> die Spalten
+> Es ist möglich, die Zeilen durch Ziehen und Ablegen neu zu organisieren, nicht jedoch die Spalten.
 
-Sobald Sie Ihre Zeilen/Spalten hinzugefügt haben, können Sie Element in den Feldern hinzufügen :
+Nachdem Sie Ihre Zeilen / Spalten hinzugefügt haben, können Sie Informationen in die Felder einfügen :
 
--   **Text** : Nur Text zum Schreiben.
-
--   **html** : Beliebiger HTML-Code (Javascript ist möglich, wird 
-    aber abgeraten).
-
--   **Widget von Befehlen** : Über die Schaltfläche auf der rechten Seite können 
-    Sie den anzuzeigenden Befehl auswählen (Achtung, das Widget vom Befehl 
-    wird angezeigt).
+- **Text** : Nur Text zum Schreiben.
+- **HTML** : Jeder HTML-Code (Javascript möglich, aber dringend davon abgeraten).
+- **Befehls-Widget** : Über die Schaltfläche rechts können Sie den anzuzeigenden Befehl auswählen (beachten Sie, dass hier das Widget des Befehls angezeigt wird).
 
 

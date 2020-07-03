@@ -14,6 +14,32 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+//infos/actions tile signals:
+$('body')
+.on('mouseenter','div.eqLogic-widget .cmd-widget[data-type="action"][data-subtype!="select"]',function (event) {
+  $(this).closest('.eqLogic-widget').addClass('eqSignalAction')
+})
+.on('mouseleave','div.eqLogic-widget .cmd-widget[data-type="action"][data-subtype!="select"]',function (event) {
+  $(this).closest('.eqLogic-widget').removeClass('eqSignalAction')
+})
+.on('mouseenter','div.eqLogic-widget .cmd-widget.history[data-type="info"]',function (event) {
+  $(this).closest('.eqLogic-widget').addClass('eqSignalInfo')
+})
+.on('mouseleave','div.eqLogic-widget .cmd-widget.history[data-type="info"]',function (event) {
+  $(this).closest('.eqLogic-widget').removeClass('eqSignalInfo')
+})
+
+/* v4.1
+$('body')
+.on('mouseenter','div.eqLogic-widget .cmd-widget[data-type="action"] .timeCmd',function (event) {
+$(this).closest('.eqLogic-widget').removeClass('eqSignalAction').addClass('eqSignalInfo')
+})
+.on('mouseleave','div.eqLogic-widget .cmd-widget[data-type="action"] .timeCmd',function (event) {
+$(this).closest('.eqLogic-widget').removeClass('eqSignalInfo').addClass('eqSignalAction')
+})
+*/
+
+
 $(function(){
   setTimeout(function(){
     if(typeof rootObjectId != 'undefined'){
@@ -27,8 +53,10 @@ $(function(){
   },1);
 });
 
+var isEditing = false
 //searching
-$('#in_searchWidget').off('keyup').on('keyup',function(){
+$ ('#in_searchWidget').off('keyup').on('keyup',function() {
+  if (isEditing) return
   $('#bt_displaySummaries').attr('data-display', '0')
   var search = $(this).value()
   $('.div_object:not(.hideByObjectSel)').show()
@@ -38,13 +66,13 @@ $('#in_searchWidget').off('keyup').on('keyup',function(){
     $('.div_displayEquipement').packery()
     return
   }
-
+  
   search = normTextLower(search)
   $('.eqLogic-widget').each(function() {
     var match = false
     text = normTextLower($(this).find('.widget-name').text())
     if (text.indexOf(search) >= 0) match = true
-
+    
     if ($(this).attr('data-tags') != undefined) {
       text = normTextLower($(this).attr('data-tags'))
       if (text.indexOf(search) >= 0) match = true
@@ -61,7 +89,7 @@ $('#in_searchWidget').off('keyup').on('keyup',function(){
       text = normTextLower($(this).attr('data-translate-category'))
       if (text.indexOf(search) >= 0) match = true
     }
-
+    
     if (match) {
       $(this).show()
     } else {
@@ -88,21 +116,23 @@ $('#in_searchWidget').off('keyup').on('keyup',function(){
 })
 
 $('#bt_displaySummaries').on('click', function () {
+  if (isEditing) return
   $('.div_object').show()
   if ($(this).attr('data-display') == 0) {
     $('.eqLogic-widget').hide()
     $('.scenario-widget').hide()
     $('.div_displayEquipement').packery()
     $(this).attr('data-display', '1')
-} else {
-	$('.eqLogic-widget').show()
+  } else {
+    $('.eqLogic-widget').show()
     $('.scenario-widget').show()
     $('.div_displayEquipement').packery()
     $(this).attr('data-display', '0')
-}
+  }
 })
 
 $('#bt_resetDashboardSearch').on('click', function () {
+  if (isEditing) return
   $('#in_searchWidget').val('').keyup()
 })
 
@@ -111,6 +141,7 @@ $('#div_pageContainer').on( 'click','.eqLogic-widget .history', function () {
 });
 
 $('#bt_displayObject').on('click', function () {
+  if (isEditing) return
   if ($(this).attr('data-display') == 1) {
     $('#div_displayObjectList').hide();
     $('#div_displayObject').removeClass('col-lg-8 col-lg-10 col-lg-12 col-lg-8 col-lg-10 col-lg-12 col-md-8 col-md-9 col-md-10 col-md-12 col-sm-8 col-sm-10 col-sm-12').addClass('col-lg-12 col-md-12 col-sm-12');
@@ -127,16 +158,16 @@ $('#bt_displayObject').on('click', function () {
 });
 
 function editWidgetMode(_mode,_save){
-  if(!isset(_mode)){
+  if (!isset(_mode)) {
     if($('#bt_editDashboardWidgetOrder').attr('data-mode') != undefined && $('#bt_editDashboardWidgetOrder').attr('data-mode') == 1){
       editWidgetMode(0,false);
       editWidgetMode(1,false);
     }
     return;
   }
-  if(_mode == 0){
+  if (_mode == 0) {
     jeedom.cmd.disableExecute = false;
-    if(!isset(_save) || _save){
+    if (!isset(_save) || _save) {
       saveWidgetDisplay({dashboard : 1});
     }
     if( $('.div_displayEquipement .eqLogic-widget.ui-resizable').length > 0){
@@ -146,15 +177,21 @@ function editWidgetMode(_mode,_save){
       $('.div_displayEquipement .eqLogic-widget').draggable('disable');
     }
     $('.div_displayEquipement .eqLogic-widget').removeClass('editingMode','');
-
+    
     if( $('.div_displayEquipement .scenario-widget.ui-resizable').length > 0){
       $('.div_displayEquipement .scenario-widget.allowResize').resizable('destroy');
     }
     if( $('.div_displayEquipement .scenario-widget.ui-draggable').length > 0){
       $('.div_displayEquipement .scenario-widget').draggable('disable');
     }
-    $('.div_displayEquipement .scenario-widget').removeClass('editingMode','');
-  }else{
+    isEditing = false
+    $('.div_displayEquipement .scenario-widget').removeClass('editingMode','')
+    $('#div_displayObject .row').removeAttr('style')
+    $('#dashTopBar').removeAttr('style')
+    $('#in_searchWidget').removeAttr('style')
+    $('#in_searchWidget').val('')
+    $('#in_searchWidget').prop('readonly', false)
+  } else {
     jeedom.cmd.disableExecute = true;
     $('.div_displayEquipement .eqLogic-widget').addClass('editingMode').draggable('enable');
     $('.div_displayEquipement .eqLogic-widget.allowResize').resizable({
@@ -177,7 +214,14 @@ function editWidgetMode(_mode,_save){
         positionEqLogic(ui.element.attr('data-scenario_id'),false,true);
         ui.element.closest('.div_displayEquipement').packery();
       }
-    });
+    })
+    isEditing = true
+    $('#div_displayObject .row').css('margin-top', '27px')
+    $('#dashTopBar').css({"position":"fixed","top":"55px","z-index":"5000","width":"calc(100% - "+($('body').width() - $('#dashTopBar').width())+'px)'});
+    $('#in_searchWidget').style("background-color", "var(--al-info-color)", "important")
+    .style("color", "var(--linkHoverLight-color)", "important")
+    .val("{{Vous êtes en mode édition vous pouvez déplacer les widgets, les redimensionner et changer l'ordre des commandes dans les widgets. N'oubliez pas de quitter le mode édition pour sauvegarder}}")
+    .prop('readonly', true)
   }
   editWidgetCmdMode(_mode);
 }
@@ -198,14 +242,20 @@ function getObjectHtml(_object_id) {
       } catch(err) {
         console.log(err);
       }
-
-      positionEqLogic();
       var $divDisplayEq = $('#div_ob'+_object_id+'.div_displayEquipement')
+      if(SEL_SUMMARY != ''){
+        var count = $divDisplayEq.find('.scenario-widget:visible').length + $divDisplayEq.find('.eqLogic-widget:visible').length
+        if (count == 0) {
+          $('#div_ob'+_object_id).closest('.div_object').remove();
+          return;
+        }
+      }
+      positionEqLogic();
       $divDisplayEq.disableSelection();
       $("input").click(function() { $(this).focus(); });
       $("textarea").click(function() { $(this).focus(); });
       $("select").click(function() { $(this).focus(); });
-
+      
       var container = $divDisplayEq.packery();
       var packData = $divDisplayEq.data('packery');
       if (isset(packData) && packData.items.length == 1) {
@@ -241,43 +291,41 @@ function getObjectHtml(_object_id) {
   });
 }
 
-$('#bt_editDashboardWidgetOrder').on('click',function(){
-  if($(this).attr('data-mode') == 1){
+$('#bt_editDashboardWidgetOrder').on('click',function() {
+  if ($(this).attr('data-mode') == 1) {
     $('.tooltipstered').tooltipster('enable')
-    $.hideAlert();
-    $(this).attr('data-mode',0);
-    editWidgetMode(0);
-    $(this).css('color','black');
-    $('.bt_editDashboardWidgetAutoResize').hide();
-    $('.counterReorderJeedom').remove();
-    $('.div_displayEquipement').packery();
-  }else{
+    $.hideAlert()
+    $(this).attr('data-mode',0)
+    editWidgetMode(0)
+    $(this).css('color','black')
+    $('.bt_editDashboardWidgetAutoResize').hide()
+    $('.counterReorderJeedom').remove()
+    $('.div_displayEquipement').packery()
+  } else {
     $('.tooltipstered').tooltipster('disable')
-    $('#div_alert').showAlert({message: "{{Vous êtes en mode édition vous pouvez déplacer les widgets, les redimensionner et changer l'ordre des commandes dans les widgets. N'oubliez pas de quitter le mode édition pour sauvegarder}}", level: 'info'});
-    $(this).attr('data-mode',1);
-    $('.bt_editDashboardWidgetAutoResize').show();
-    $('.bt_editDashboardWidgetAutoResize').off('click').on('click', function(){
-      var id_object = $(this).attr('id');
-      id_object = id_object.replace('edit_object_','');
-      var heightObjectex = 0;
-      $('#div_ob'+id_object+'.div_displayEquipement .eqLogic-widget,.scenario-widget').each(function(index, element){
-        var heightObject = this.style.height;
-        heightObject = eval(heightObject.replace('px',''));
-        var valueAdd = eval(heightObject * 0.20);
-        var valueRemove = eval(heightObject * 0.05);
-        var heightObjectadd = eval(heightObject + valueAdd);
-        var heightObjectremove = eval(heightObject - valueRemove);
-        if(heightObjectadd >= heightObjectex && (heightObjectex > heightObject || heightObjectremove < heightObjectex)){
-          if($(element).hasClass('allowResize')){
-            $( element ).height(heightObjectex);
-            heightObject = heightObjectex;
-          }
-        }
-        heightObjectex = heightObject;
-      });
+    $(this).attr('data-mode',1)
+    $('.bt_editDashboardWidgetAutoResize').show()
+    $('.bt_editDashboardWidgetAutoResize').off('click').on('click', function() {
+      var doesMin = false
+      if (event.ctrlKey) doesMin = true
+      var id_object = $(this).attr('id').replace('edit_object_','')
+      var objectContainer = $('#div_ob'+id_object+'.div_displayEquipement')
+      var arHeights = new Array()
+      objectContainer.find('.eqLogic-widget,.scenario-widget').each(function(index, element) {
+        var h = $(this).height()
+        arHeights.push(h)
+      })
+      if (doesMin) {
+        var maxHeight = Math.min(...arHeights)
+      } else {
+        var maxHeight = Math.max(...arHeights)
+      }
+      objectContainer.find('.eqLogic-widget,.scenario-widget').each(function(index, element) {
+        $(this).height(maxHeight)
+      })
+      objectContainer.packery()
     });
-    editWidgetMode(1);
-    $(this).css('color','rgb(46, 176, 75)');
+    editWidgetMode(1)
   }
 });
 

@@ -357,7 +357,8 @@ class scenario {
 				
 				public static function consystencyCheck($_needsReturn = false) {
 					$return = array();
-					foreach (self::all() as $scenario) {
+					$scenarios = self::all();
+					foreach ($scenarios as $scenario) {
 						if ($scenario->getGroup() == '') {
 							$group = 'aucun';
 						} else {
@@ -373,7 +374,8 @@ class scenario {
 							foreach ($scenario->getTrigger() as $trigger) {
 								$trigger_list .= cmd::cmdToHumanReadable($trigger) . '_';
 							}
-							preg_match_all("/#([0-9]*)#/", $trigger_list, $matches);foreach ($matches[1] as $cmd_id) {
+							preg_match_all("/#([0-9]*)#/", $trigger_list, $matches);
+							foreach ($matches[1] as $cmd_id) {
 								if (is_numeric($cmd_id)) {
 									if ($_needsReturn) {
 										$return[] = array('detail' => 'Scénario ' . $scenario->getName() . ' du groupe ' . $group, 'help' => 'Déclencheur du scénario', 'who' => '#' . $cmd_id . '#');
@@ -384,7 +386,8 @@ class scenario {
 							}
 						}
 						$expression_list = '';
-						foreach ($scenario->getElement() as $element) {
+						$elements = $scenario->getElement();
+						foreach ($elements as $element) {
 							$expression_list .= cmd::cmdToHumanReadable(json_encode($element->getAjaxElement()));
 						}
 						preg_match_all("/#([0-9]*)#/", $expression_list, $matches);
@@ -594,7 +597,7 @@ class scenario {
 				* @return type
 				*/
 				public static function getTemplate() {
-					$path = __DIR__ . '/../config/scenario';
+					$path = __DIR__ . '/../../data/scenario';
 					return ls($path, '*.json', false, array('files', 'quiet'));
 				}
 				
@@ -609,8 +612,12 @@ class scenario {
 					}
 					$object = $scenario->getObject();
 					$return['object'] = is_object($object) ? $object->getId() : 'aucun';
-					$return['html'] = '<div class="scenario" data-id="' . $_event['id'] . '">';
-					$return['html'] .= '<div>' . $_event['name'];
+					
+					$name = str_replace('<br/><strong>', '',  $_event['name']);
+					$name = str_replace('</strong>', '',  $name);
+					$name = str_replace('<span class="label"', '<span class="label-sm"',  $name);
+					$return['html'] = '<div class="tml-scenario" data-id="' . $_event['id'] . '">';
+					$return['html'] .= '<div>' . $name;
 					$return['html'] .= ' <span class="label-sm label-info" title="'.__('Scénario déclenché par',__FILE__).'">' . $_event['trigger'] . '</span>';
 					$return['html'] .= ' <i class="fas fa-file-alt pull-right cursor bt_scenarioLog" title="'.__('Log du scénario',__FILE__).'"></i> ';
 					$return['html'] .= ' <i class="fas fa-share pull-right cursor bt_gotoScenario" title="'.__('Aller au scénario',__FILE__).'"></i> ';
@@ -618,6 +625,7 @@ class scenario {
 					$return['html'] .= '</div>';
 					return $return;
 				}
+				
 				
 				/*     * *********************Méthodes d'instance************************* */
 				/**
@@ -725,12 +733,12 @@ class scenario {
 					if (is_object($cmd)) {
 						log::add('event', 'info', __('Exécution du scénario ', __FILE__) . $this->getHumanName() . __(' déclenché par : ', __FILE__) . $cmd->getHumanName());
 						if ($this->getConfiguration('timeline::enable')) {
-							jeedom::addTimelineEvent(array('type' => 'scenario', 'id' => $this->getId(), 'name' => $this->getHumanName(true), 'datetime' => date('Y-m-d H:i:s'), 'trigger' => $cmd->getHumanName(true)));
+							jeedom::addTimelineEvent(array('type' => 'scenario', 'id' => $this->getId(), 'name' => $this->getHumanName(true, true, true, true), 'datetime' => date('Y-m-d H:i:s'), 'trigger' => $cmd->getHumanName(true)));
 						}
 					} else {
 						log::add('event', 'info', __('Exécution du scénario ', __FILE__) . $this->getHumanName() . __(' déclenché par : ', __FILE__) . $_trigger);
 						if ($this->getConfiguration('timeline::enable')) {
-							jeedom::addTimelineEvent(array('type' => 'scenario', 'id' => $this->getId(), 'name' => $this->getHumanName(true), 'datetime' => date('Y-m-d H:i:s'), 'trigger' => ($_trigger == 'schedule') ? 'programmation' : $_trigger));
+							jeedom::addTimelineEvent(array('type' => 'scenario', 'id' => $this->getId(), 'name' => $this->getHumanName(true, true, true, true), 'datetime' => date('Y-m-d H:i:s'), 'trigger' => ($_trigger == 'schedule') ? 'programmation' : $_trigger));
 						}
 					}
 					if ($this->getState() == 'in progress' && $this->getConfiguration('allowMultiInstance', 0) == 0) {
@@ -799,7 +807,7 @@ class scenario {
 						'#id#' => $this->getId(),
 						'#state#' => $this->getState(),
 						'#isActive#' => $this->getIsActive(),
-						'#name#' => (strlen($name) <25) ?$name : substr($name,0,25)."...",
+						'#name#' => $name,
 						'#icon#' => $this->getIcon(),
 						'#lastLaunch#' => $this->getLastLaunch(),
 						'#scenarioLink#' => $this->getLinkToConfiguration(),
@@ -820,7 +828,7 @@ class scenario {
 					if(config::byKey('widget::disableCache','core',0) == 0){
 						cache::set('scenarioHtml' . $version . $this->getId(), $html);
 					}
-					return $html;
+					return translate::exec($html, 'core/template/widgets.html');
 				}
 				/**
 				*
@@ -1132,7 +1140,7 @@ class scenario {
 									$cron->halt();
 									$cron->remove();
 								} catch (Exception $e) {
-									log::add('scenario', 'info', __('Can not stop subtask : ') . print_r($cron->getOption(), true));
+									log::add('scenario', 'info', __('Can not stop subtask : ',__FILE__) . json_encode($cron->getOption()));
 								}
 							}
 						}
@@ -1474,7 +1482,7 @@ class scenario {
 					$return['eqLogic'] = eqLogic::searchConfiguration(array('#scenario' . $this->getId() . '#', '"scenario_id":"' . $this->getId()));
 					$return['interactDef'] = interactDef::searchByUse(array('#scenario' . $this->getId() . '#', '"scenario_id":"' . $this->getId()));
 					$return['scenario'] = scenario::searchByUse(array(
-						array('action' => 'scenario', 'option' => $this->getId(), 'and' => true),
+						array('action' => 'scenario', 'option' => 'scenario_id":"'.$this->getId().'"', 'and' => true),
 						array('action' => '#scenario' . $this->getId() . '#'),
 					));
 					$return['view'] = view::searchByUse('scenario', $this->getId());

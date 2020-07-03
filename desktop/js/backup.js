@@ -19,8 +19,6 @@ jwerty.key('ctrl+s/⌘+s', function (e) {
   $("#bt_saveBackup").click();
 });
 
-$('#pre_backupInfo').height($(window).height() - $('header').height() - $('footer').height() - 150);
-
 $("#bt_saveBackup").on('click', function (event) {
   $.hideAlert();
   jeedom.config.save({
@@ -138,7 +136,7 @@ $(".bt_uploadCloudBackup").on('click', function (event) {
 
 $(".bt_restoreRepoBackup").on('click', function (event) {
   var el = $(this);
-  bootbox.confirm('{{Êtes-vous sûr de vouloir restaurer}} '+JEEDOM_PRODUCT_NAME+' {{avec la sauvegarde Cloud}} <b>' + $('#sel_restoreCloudBackup option:selected').text() + '</b> ? {{Une fois lancée cette opération ne peut être annulée}}', function (result) {
+  bootbox.confirm('{{Êtes-vous sûr de vouloir rapatrier la sauvegarde cloud}} <b>' + $('#sel_restoreCloudBackup option:selected').text() + '</b> ?', function (result) {
     if (result) {
       el.find('.fa-refresh').show();
       jeedom.backup.restoreCloud({
@@ -148,7 +146,8 @@ $(".bt_restoreRepoBackup").on('click', function (event) {
           $('#div_alert').showAlert({message: error.message, level: 'danger'});
         },
         success: function () {
-          getJeedomLog(1, 'restore');
+          updateListBackup();
+          $('#div_alert').showAlert({message: '{{Sauvegarde rapatrier avec succès}}', level: 'success'});
         }
       });
     }
@@ -171,6 +170,14 @@ updateListBackup();
 $('#div_pageContainer').off('change','.configKey').on('change','.configKey:visible',  function () {
   modifyWithoutSave = true;
 });
+
+$(".btn_closeInfo").on('click', function () {
+  $('.panel-backupinfo').addClass('hidden')
+  $('#pre_backupInfo').text('');
+});
+
+
+
 
 /********************Log************************/
 

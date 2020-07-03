@@ -40,39 +40,45 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 				<form class="form-horizontal">
 					<fieldset>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID}}</label>
+							<label class="col-sm-6 control-label">{{ID}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="id"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Nom}}</label>
+							<label class="col-sm-6 control-label">{{Nom}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="name"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID logique}}</label>
+							<label class="col-sm-6 control-label">{{ID logique}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="logicalId"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{ID de l'objet}}</label>
+							<label class="col-sm-6 control-label">{{ID de l'objet}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="object_id"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Création}}</label>
+							<label class="col-sm-6 control-label">{{Création}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="configuration" data-l2key="createtime"></span>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-7 control-label">{{Changement de pile}}</label>
+							<label class="col-sm-6 control-label">{{Changement de pile}}</label>
 							<div class="col-sm-4">
 								<span class="eqLogicAttr label label-primary" data-l1key="configuration" data-l2key="batterytime"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-6 control-label">{{Tag(s)}}</label>
+							<div class="col-sm-6">
+								<input class="eqLogicAttr form-control" data-l1key="tags" />
 							</div>
 						</div>
 					</fieldset>
@@ -119,14 +125,6 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 				</form>
 			</div>
 			<div class="col-sm-12" >
-				<div class="form-group">
-					<label class="col-sm-1 control-label">{{Tag(s)}}</label>
-					<div class="col-sm-11">
-						<input class="eqLogicAttr form-control" data-l1key="tags" />
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-12" >
 				<legend>{{Commandes}}</legend>
 				<table class="table table-bordered table-condensed">
 					<thead>
@@ -137,14 +135,16 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 					</thead>
 					<tbody>
 						<?php
+						$display = '';
 						foreach ($eqLogic->getCmd() as $cmd) {
-							echo '<tr class="advanceCmdConfigurationCmdConfigure" data-id="' . $cmd->getId() . '">';
-							echo '<td>' . $cmd->getHumanName() . '</td>';
-							echo '<td>';
-							echo '<a class="btn btn-default btn-xs pull-right cursor bt_advanceCmdConfigurationOnEqLogicConfiguration" data-id="' . $cmd->getId() . '"><i class="fas fa-cogs"></i></a>';
-							echo '</td>';
-							echo '</tr>';
+							$display .= '<tr class="advanceCmdConfigurationCmdConfigure" data-id="' . $cmd->getId() . '">';
+							$display .= '<td>' . $cmd->getHumanName() . '</td>';
+							$display .= '<td>';
+							$display .= '<a class="btn btn-default btn-xs pull-right cursor bt_advanceCmdConfigurationOnEqLogicConfiguration" data-id="' . $cmd->getId() . '"><i class="fas fa-cogs"></i></a>';
+							$display .= '</td>';
+							$display .= '</tr>';
 						}
+						echo $display;
 						?>
 					</tbody>
 				</table>
@@ -162,23 +162,26 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 						<tr>
 							<th></th>
 							<?php
+							$display = '';
 							foreach (jeedom::getConfiguration('eqLogic:displayType') as $key => $value) {
-								echo '<th style="width:20%">{{' . $value['name'] . '}}';
-								echo '</th>';
+								$display .= '<th style="width:20%">{{' . $value['name'] . '}}';
+								$display .= '</th>';
 							}
+							echo $display;
 							?>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
 						if (is_array($eqLogic->widgetPossibility('parameters'))) {
+							$echo = '';
 							foreach ($eqLogic->widgetPossibility('parameters') as $pKey => $parameter) {
-								echo '<tr>';
-								echo '<td>';
-								echo $parameter['name'];
-								echo '</td>';
+								$echo .= '<tr>';
+								$echo .= '<td>';
+								$echo .= $parameter['name'];
+								$echo .= '</td>';
 								foreach (jeedom::getConfiguration('eqLogic:displayType') as $key => $value) {
-									echo '<td>';
+									$echo .= '<td>';
 									if (!isset($parameter['allow_displayType'])) {
 										continue;
 									}
@@ -196,30 +199,31 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 									if (isset($parameter['default'])) {
 										$display = 'display:none;';
 										$default = $parameter['default'];
-										echo '<label>{{Defaut}} <input type="checkbox" class="eqLogicAttr advanceWidgetParameterDefault" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '-default" checked /></label>';
+										$echo .= '<label>{{Defaut}} <input type="checkbox" class="eqLogicAttr advanceWidgetParameterDefault" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '-default" checked /></label>';
 									}
 									switch ($parameter['type']) {
 										case 'color':
 										if ($parameter['allow_transparent']) {
-											echo '<span class="advanceWidgetParameter" style="' . $display . '">';
-											echo ' <label>{{Transparent}} <input type="checkbox" class="eqLogicAttr advanceWidgetParameterColorTransparent" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '-transparent" /></label>';
-											echo '<input type="color" class="eqLogicAttr pull-right inline-block advanceWidgetParameterColor" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" value="' . $default . '" />';
-											echo '</span>';
+											$echo .= '<span class="advanceWidgetParameter" style="' . $display . '">';
+											$echo .= ' <label>{{Transparent}} <input type="checkbox" class="eqLogicAttr advanceWidgetParameterColorTransparent" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '-transparent" /></label>';
+											$echo .= '<input type="color" class="eqLogicAttr pull-right inline-block advanceWidgetParameterColor" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" value="' . $default . '" />';
+											$echo .= '</span>';
 										} else {
-											echo '<input type="color" class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
+											$echo .= '<input type="color" class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
 										}
 										break;
 										case 'input':
-										echo '<input class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
+										$echo .= '<input class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
 										break;
 										case 'number':
-										echo '<input type="number" class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
+										$echo .= '<input type="number" class="eqLogicAttr pull-right advanceWidgetParameter form-control inline-block input-sm" data-l1key="display" data-l2key="advanceWidgetParameter' . $pKey . $key . '" style="width:50%;' . $display . '" value="' . $default . '" />';
 										break;
 									}
-									echo '</td>';
+									$echo .= '</td>';
 								}
-								echo '</tr>';
+								$echo .= '</tr>';
 							}
+							echo $echo;
 						}
 						?>
 					</tbody>
@@ -240,19 +244,21 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 					<tbody>
 						<?php
 						if ($eqLogic->getDisplay('parameters') != '') {
+							$echo = '';
 							foreach ($eqLogic->getDisplay('parameters') as $key => $value) {
-								echo '<tr>';
-								echo '<td>';
-								echo '<input class="form-control key" value="' . $key . '" />';
-								echo '</td>';
-								echo '<td>';
-								echo '<input class="form-control value" value="' . $value . '" />';
-								echo '</td>';
-								echo '<td>';
-								echo '<a class="btn btn-danger btn-xs removeWidgetParameter"><i class="fas fa-times"></i> Supprimer</a>';
-								echo '</td>';
-								echo '</tr>';
+								$echo .= '<tr>';
+								$echo .= '<td>';
+								$echo .= '<input class="form-control key" value="' . $key . '" />';
+								$echo .= '</td>';
+								$echo .= '<td>';
+								$echo .= '<input class="form-control value" value="' . $value . '" />';
+								$echo .= '</td>';
+								$echo .= '<td>';
+								$echo .= '<a class="btn btn-danger btn-xs removeWidgetParameter"><i class="fas fa-times"></i> Supprimer</a>';
+								$echo .= '</td>';
+								$echo .= '</tr>';
 							}
+							echo $echo;
 						}
 						?>
 					</tbody>
@@ -408,8 +414,13 @@ sendVarToJS('eqLogicInfoSearchString', urlencode(str_replace('#', '', $eqLogic->
 	</div>
 </div>
 </div>
-<script>
 
+<script>
+$(function() {
+	if ($('body').attr('data-page')=="eqAnalyse") {
+		$('a[href="#eqLogic_alert"]').click()
+	}
+})
 
 $('#tableCmdLayoutConfiguration tbody td .cmdLayoutContainer').sortable({
 	connectWith: '#tableCmdLayoutConfiguration tbody td .cmdLayoutContainer',
@@ -512,8 +523,7 @@ $('.bt_displayWidget').off('click').on('click',function(){
 	$('#md_modal2').load('index.php?v=d&modal=eqLogic.displayWidget&eqLogic_id=' + eqLogic.id+'&version='+$(this).attr('data-version')).dialog('open');
 });
 
-$('#bt_eqLogicConfigureSave').on('click', function () {
-	
+$('#bt_eqLogicConfigureSave').on('click', function (event) {
 	var eqLogic = $('#div_displayEqLogicConfigure').getValues('.eqLogicAttr')[0];
 	if (!isset(eqLogic.display)) {
 		eqLogic.display = {};
@@ -550,6 +560,14 @@ $('#bt_eqLogicConfigureSave').on('click', function () {
 				},
 				success : function(){
 					$('#md_displayEqLogicConfigure').showAlert({message: '{{Enregistrement réussi}}', level: 'success'});
+					if (event.ctrlKey) {
+						setTimeout(function() { $('#md_modal').dialog('close') }, 500);
+					}else{
+						var tab = $('#md_modal > ul.nav li.active a').attr('href')
+						$('#md_modal').load('index.php?v=d&modal=eqLogic.configure&eqLogic_id=' + eqLogic.id,function(){
+							$('#md_modal > ul.nav a[href="' + tab + '"]').click();
+						});
+					}
 				}
 			});
 		}

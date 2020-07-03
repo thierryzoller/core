@@ -116,7 +116,7 @@ class scenarioExpression {
 				$replace[$value] = '';
 			}
 		}
-		$return['html'] = translate::exec(template_replace($replace, $return['html']), 'core/template/scenario/' . $_expression . '.default');
+		$return['html'] = translate::exec(template_replace($replace, $return['html']), 'core/template/scenario/' . $_expression . '.default.html');
 		return $return;
 	}
 	
@@ -470,6 +470,36 @@ class scenarioExpression {
 		return $values[round(count($values) / 2) - 1];
 	}
 	
+	public static function avg() {
+		$args = func_get_args();
+		$values = array();
+		foreach ($args as $arg) {
+			if (is_numeric($arg)) {
+				$values[] = $arg;
+			} else {
+				$value = cmd::cmdToValue($arg);
+				if (is_numeric($value)) {
+					$values[] = $value;
+				} else {
+					try {
+						$values[] = evaluate($value);
+					} catch (Exception $ex) {
+						
+					} catch (Error $ex) {
+						
+					}
+				}
+			}
+		}
+		if (count($values) < 1) {
+			return 0;
+		}
+		if (count($values) == 1) {
+			return $values[0];
+		}
+		return array_sum($values)/count($values);
+	}
+	
 	public static function tendance($_cmd_id, $_period = '1 hour', $_threshold = '') {
 		$cmd = cmd::byId(trim(str_replace('#', '', $_cmd_id)));
 		if (!is_object($cmd)) {
@@ -657,6 +687,9 @@ class scenarioExpression {
 		$_startDate = date('Y-m-d H:i:s', strtotime(self::setTags($_startDate)));
 		$_endDate = date('Y-m-d H:i:s', strtotime(self::setTags($_endDate)));
 		$historyStatistique = $cmd->getStatistique($_startDate, $_endDate);
+		if(!isset($historyStatistique['last']) || $historyStatistique['last'] === ''){
+			return '';
+		}
 		return round($historyStatistique['last'], 1);
 	}
 	
@@ -675,7 +708,7 @@ class scenarioExpression {
 		}
 		$_calc = str_replace(' ', '', $_calc);
 		$historyStatistique = $cmd->getStatistique($startHist, date('Y-m-d H:i:s'));
-		if ($historyStatistique['min'] == '') {
+		if (!isset($historyStatistique['min']) || $historyStatistique['min'] == '') {
 			return $cmd->execCmd();
 		}
 		return $historyStatistique[$_calc];
@@ -937,35 +970,43 @@ class scenarioExpression {
 		return __('Type inconnu', __FILE__);
 	}
 	
-	public static function getRequestTags($_expression) {
+		public static function getRequestTags($_expression) {
 		$return = array();
 		preg_match_all("/#([a-zA-Z0-9]*)#/", $_expression, $matches);
 		if (count($matches) == 0) {
 			return $return;
 		}
 		$matches = array_unique($matches[0]);
-		foreach ($matches as $tag) {
+		$replace = array(
+			'heure' => 'hour',
+			'jour' => 'day',
+			'mois' => 'month',
+			'annee' => 'year',
+			'semaine' => 'week'
+		);
+		foreach($matches as &$tag) {
+			$tag = str_replace(array_keys($replace),$replace,$tag);
 			switch ($tag) {
 				case '#seconde#':
 				$return['#seconde#'] = (int) date('s');
 				break;
-				case '#heure#':
-				$return['#heure#'] = (int) date('G');
+				case '#hour#':
+				$return['#hour#'] = (int) date('G');
 				break;
-				case '#heure12#':
-				$return['#heure12#'] = (int) date('g');
+				case '#hour12#':
+				$return['#hour12#'] = (int) date('g');
 				break;
 				case '#minute#':
 				$return['#minute#'] = (int) date('i');
 				break;
-				case '#jour#':
-				$return['#jour#'] = (int) date('d');
+				case '#day#':
+				$return['#day#'] = (int) date('d');
 				break;
-				case '#mois#':
-				$return['#mois#'] = (int) date('m');
+				case '#month#':
+				$return['#month#'] = (int) date('m');
 				break;
-				case '#annee#':
-				$return['#annee#'] = (int) date('Y');
+				case '#year#':
+				$return['#year#'] = (int) date('Y');
 				break;
 				case '#time#':
 				$return['#time#'] = date('Gi');
@@ -979,26 +1020,26 @@ class scenarioExpression {
 				case '#date#':
 				$return['#date#'] = date('md');
 				break;
-				case '#semaine#':
-				$return['#semaine#'] = date('W');
+				case '#week#':
+				$return['#week#'] = date('W');
 				break;
-				case '#sjour#':
-				$return['#sjour#'] = '"' . date_fr(date('l')) . '"';
+				case '#sday#':
+				$return['#sday#'] = date_fr(date('l'));
 				break;
-				case '#smois#':
-				$return['#smois#'] = '"' . date_fr(date('F')) . '"';
+				case '#smonth#':
+				$return['#smonth#'] = date_fr(date('F'));
 				break;
-				case '#njour#':
-				$return['#njour#'] = (int) date('w');
+				case '#nday#':
+				$return['#nday#'] = (int) date('w');
 				break;
-				case '#name#':
-				$return['#jeedom_name#'] = '"' . config::byKey('name') . '"';
+				case '#jeedom_name#':
+				$return['#jeedom_name#'] = config::byKey('name');
 				break;
 				case '#hostname#':
-				$return['#hostname#'] = '"' . gethostname() . '"';
+				$return['#hostname#'] = gethostname();
 				break;
 				case '#IP#':
-				$return['#IP#'] = '"' . network::getNetworkAccess('internal', 'ip', '', false) . '"';
+				$return['#IP#'] = network::getNetworkAccess('internal', 'ip', '', false);
 				break;
 				case '#trigger#':
 				$return['#trigger#'] = '';
@@ -1008,18 +1049,22 @@ class scenarioExpression {
 				break;
 			}
 		}
-		return $return;
+		$new = array();
+		foreach ($return as $key => $value) {
+			$new[str_replace($replace,array_keys($replace),$key)] = $value;
+		}
+		return array_merge($return,$new);
 	}
 	
 	public static function tag(&$_scenario = null, $_name, $_default = '') {
 		if ($_scenario == null) {
-			return '"' . $_default . '"';
+			return $_default;
 		}
 		$tags = $_scenario->getTags();
 		if (isset($tags['#' . $_name . '#'])) {
 			return $tags['#' . $_name . '#'];
 		}
-		return '"' . $_default . '"';
+		return $_default;
 	}
 	
 	public static function setTags($_expression, &$_scenario = null, $_quote = false, $_nbCall = 0) {
@@ -1183,7 +1228,7 @@ class scenarioExpression {
 						continue;
 					}
 					if (is_string($value)) {
-						$options[$key] = str_replace('"', '', self::setTags($value, $scenario));
+						$options[$key] = self::setTags($value, $scenario);
 					}
 				}
 			}
@@ -1321,7 +1366,7 @@ class scenarioExpression {
 							$tags = array();
 							$args = arg2array($this->getOptions('tags'));
 							foreach ($args as $key => $value) {
-								$tags['#' . trim(trim($key), '#') . '#'] = self::setTags(trim($value), $scenario);
+								$tags['#' . trim(trim($key), '#') . '#'] = trim(self::setTags(trim($value), $scenario),'"');
 							}
 							$actionScenario->setTags($tags);
 						}
@@ -1340,7 +1385,7 @@ class scenarioExpression {
 							$tags = array();
 							$args = arg2array($this->getOptions('tags'));
 							foreach ($args as $key => $value) {
-								$tags['#' . trim(trim($key), '#') . '#'] = self::setTags(trim($value), $scenario);
+								$tags['#' . trim(trim($key), '#') . '#'] = trim(self::setTags(trim($value), $scenario),'"');
 							}
 							$actionScenario->setTags($tags);
 						}
@@ -1365,6 +1410,7 @@ class scenarioExpression {
 						break;
 						case 'activate':
 						$this->setLog($scenario, __('Activation du scénario : ', __FILE__) . $actionScenario->getName());
+						$actionScenario->setLastLaunch(date('Y-m-d H:i:s'));
 						$actionScenario->setIsActive(1);
 						$actionScenario->save();
 						break;
@@ -1375,7 +1421,6 @@ class scenarioExpression {
 					}
 					return;
 				} elseif ($this->getExpression() == 'variable') {
-					$options['value'] = self::setTags($options['value'], $scenario);
 					try {
 						$result = evaluate($options['value']);
 						if (!is_numeric($result)) {
@@ -1530,12 +1575,15 @@ class scenarioExpression {
 						throw new Exception(__('Erreur : Aucun rapport généré', __FILE__));
 					}
 					if ($this->getOptions('cmd') != '') {
-						$cmd = cmd::byId(str_replace('#', '', $this->getOptions('cmd')));
-						if (!is_object($cmd)) {
-							throw new Exception(__('Commande introuvable veuillez vérifiez l\'id : ', __FILE__) . $this->getOptions('cmd'));
+						$cmdArray = explode('&&',$this->getOptions('cmd'));
+						foreach ($cmdArray as $cmdname){
+							$cmd = cmd::byId(str_replace('#', '', $cmdname));
+							if (!is_object($cmd)) {
+								throw new Exception(__('Commande introuvable veuillez vérifiez l\'id : ', __FILE__) . $this->getOptions('cmd'));
+							}
+							$this->setLog($scenario, __('Envoi du rapport généré sur ', __FILE__) . $cmd->getHumanName());
+							$cmd->execCmd($cmd_parameters);
 						}
-						$this->setLog($scenario, __('Envoi du rapport généré sur ', __FILE__) . $cmd->getHumanName());
-						$cmd->execCmd($cmd_parameters);
 					}
 				} elseif ($this->getExpression() == 'tag') {
 					$tags = $scenario->getTags();
@@ -1554,6 +1602,25 @@ class scenarioExpression {
 					$this->setLog($scenario, __('Mise à jour du tag ', __FILE__) . '#' . $options['name'] . '#' . ' => ' . $result);
 					$scenario->setTags($tags);
 				} else {
+					//check user function:
+					if (file_exists(__DIR__ . '/../../data/php/user.function.class.php')) {
+						require_once __DIR__ . '/../../data/php/user.function.class.php';
+						$stringFunction = strval($this->getExpression());
+						$functionName = explode('(', $stringFunction)[0];
+						if (class_exists('userFunction') && method_exists('userFunction', $functionName)) {
+							$arguments = str_replace([$functionName, '(', ')'], '', $stringFunction);
+							if ($arguments != '') {
+								$arguments = explode(',', $arguments);
+							} else {
+								$arguments = [];
+							}
+							$result = call_user_func_array('userFunction::' . $functionName, $arguments);
+							$this->setLog($scenario, 'userFunction: ' . $stringFunction . ' : ' . json_encode($result));
+							$scenario->persistLog();
+							return;
+						}
+					}
+					
 					$cmd = cmd::byId(str_replace('#', '', $this->getExpression()));
 					if (is_object($cmd)) {
 						if ($cmd->getSubtype() == 'slider' && isset($options['slider'])) {
@@ -1607,14 +1674,14 @@ class scenarioExpression {
 	
 	public function getAllId() {
 		$return = array(
-			'element' => array(),
-			'subelement' => array(),
-			'expression' => array($this->getId()),
+		'element' => array(),
+		'subelement' => array(),
+		'expression' => array($this->getId()),
 		);
 		$result = array(
-			'element' => array(),
-			'subelement' => array(),
-			'expression' => array(),
+		'element' => array(),
+		'subelement' => array(),
+		'expression' => array(),
 		);
 		if ($this->getType() == 'element') {
 			$element = scenarioElement::byId($this->getExpression());

@@ -25,14 +25,35 @@ if (!isset(jeedom.cmd.cache.byHumanName)) {
 if (!isset(jeedom.cmd.update)) {
   jeedom.cmd.update = Array();
 }
+
+jeedom.cmd.notifyEq = function(_eqlogic,_hide) {
+  if (!_eqlogic){
+    return;
+  }
+  if (_eqlogic.find('.cmd.refresh').length) {
+    _eqlogic.find('.cmd.refresh').addClass('spinning')
+  } else {
+    _eqlogic.find('.widget-name').prepend('<span class="cmd refresh pull-right remove"><i class="fas fa-sync"></i></span>')
+  }
+  if (_hide) {
+    setTimeout(function() {
+      if (_eqlogic.find('.cmd.refresh').hasClass('remove')) {
+        _eqlogic.find('.cmd.refresh').remove()
+      } else {
+        _eqlogic.find('.cmd.refresh').removeClass('spinning')
+      }
+    }, 1000);
+  }
+}
+
 jeedom.cmd.execute = function(_params) {
   if(jeedom.cmd.disableExecute){
     return;
   }
   var notify = _params.notify || true;
   if (notify) {
-    var eqLogic = $('.cmd[data-cmd_id=' + _params.id + ']').closest('.eqLogic');
-    eqLogic.find('.statusCmd').empty().append('<i class="fa fa-spinner fa-spin"></i>');
+    var eqLogic = $('.cmd[data-cmd_id=' + _params.id + ']').closest('.eqLogic-widget');
+    jeedom.cmd.notifyEq(eqLogic, false)
   }
   if (_params.value != 'undefined' && (is_array(_params.value) || is_object(_params.value))) {
     _params.value = json_encode(_params.value);
@@ -57,10 +78,7 @@ jeedom.cmd.execute = function(_params) {
                 });
               }
               if (notify) {
-                eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
-                setTimeout(function() {
-                  eqLogic.find('.statusCmd').empty();
-                }, 3000);
+                jeedom.cmd.notifyEq(eqLogic, true)
               }
               return data;
             }
@@ -78,10 +96,7 @@ jeedom.cmd.execute = function(_params) {
                   });
                 }
                 if (notify) {
-                  eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
-                  setTimeout(function() {
-                    eqLogic.find('.statusCmd').empty();
-                  }, 3000);
+                  jeedom.cmd.notifyEq(eqLogic, true)
                 }
                 return data;
               }
@@ -103,10 +118,7 @@ jeedom.cmd.execute = function(_params) {
                 });
               }
               if (notify) {
-                eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
-                setTimeout(function() {
-                  eqLogic.find('.statusCmd').empty();
-                }, 3000);
+                jeedom.cmd.notifyEq(eqLogic, true)
               }
               return data;
             }
@@ -124,10 +136,7 @@ jeedom.cmd.execute = function(_params) {
                   });
                 }
                 if (notify) {
-                  eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
-                  setTimeout(function() {
-                    eqLogic.find('.statusCmd').empty();
-                  }, 3000);
+                  jeedom.cmd.notifyEq(eqLogic, true)
                 }
                 return data;
               }
@@ -142,19 +151,13 @@ jeedom.cmd.execute = function(_params) {
             });
           }
           if (notify) {
-            eqLogic.find('.statusCmd').empty().append('<i class="fas fa-times"></i>');
-            setTimeout(function() {
-              eqLogic.find('.statusCmd').empty();
-            }, 3000);
+            jeedom.cmd.notifyEq(eqLogic, true)
           }
           return data;
         }
       }
       if (notify) {
-        eqLogic.find('.statusCmd').empty().append('<i class="fa fa-rss"></i>');
-        setTimeout(function() {
-          eqLogic.find('.statusCmd').empty();
-        }, 3000);
+        jeedom.cmd.notifyEq(eqLogic, true)
       }
       return data;
     }
@@ -814,7 +817,6 @@ jeedom.cmd.normalizeName = function(_tagname) {
   return _tagname;
 }
 
-
 jeedom.cmd.setOrder = function(_params) {
   var paramsRequired = ['cmds'];
   var paramsSpecifics = {};
@@ -834,16 +836,35 @@ jeedom.cmd.setOrder = function(_params) {
   $.ajax(paramsAJAX);
 };
 
+jeedom.cmd.getDeadCmd = function(_params) {
+  var paramsRequired = [];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/cmd.ajax.php';
+  paramsAJAX.data = {
+    action: 'getDeadCmd'
+  };
+  $.ajax(paramsAJAX);
+};
+
 
 jeedom.cmd.displayDuration = function(_date,_el){
+  var deltaDiff = ((new Date).getTimezoneOffset() + serverTZoffsetMin)*60000 + clientServerDiffDatetime
   var arrDate = _date.split(/-|\s|:/);
   var timeInMillis = new Date(arrDate[0], arrDate[1] -1, arrDate[2], arrDate[3], arrDate[4], arrDate[5]).getTime();
   _el.attr('data-time',timeInMillis);
   if(_el.attr('data-interval') != undefined){
     clearInterval(_el.attr('data-interval'));
   }
-  if(_el.attr('data-time') < (Date.now()+ clientServerDiffDatetime)){
-    var d = ((Date.now() + clientServerDiffDatetime) - _el.attr('data-time')) / 1000;
+  if(_el.attr('data-time') < (Date.now()+ deltaDiff)){
+    var d = ((Date.now() + deltaDiff) - _el.attr('data-time')) / 1000;
     var j = Math.floor(d / 86400);
     var h = Math.floor(d % 86400 / 3600);
     var m = Math.floor(d % 3600 / 60);
@@ -859,7 +880,7 @@ jeedom.cmd.displayDuration = function(_date,_el){
       _el.empty().append(((m > 0 ? m + " m " : "") + (s > 0 ? (m > 0 && s < 10 ? "0" : "") + s + " s " : "0 s")));
     }
     var myinterval = setInterval(function(){
-      var d = ((Date.now() + clientServerDiffDatetime) - _el.attr('data-time')) / 1000;
+      var d = ((Date.now() + deltaDiff) - _el.attr('data-time')) / 1000;
       var j = Math.floor(d / 86400);
       var h = Math.floor(d % 86400 / 3600);
       var m = Math.floor(d % 3600 / 60);
@@ -880,8 +901,8 @@ jeedom.cmd.displayDuration = function(_date,_el){
     _el.empty().append("0 s");
     var interval = 10000;
     var myinterval = setInterval(function(){
-      if(_el.attr('data-time') < (Date.now()+ clientServerDiffDatetime)){
-        var d = ((Date.now() + clientServerDiffDatetime) - _el.attr('data-time')) / 1000;
+      if(_el.attr('data-time') < (Date.now()+ deltaDiff)){
+        var d = ((Date.now() + deltaDiff) - _el.attr('data-time')) / 1000;
         var j = Math.floor(d / 86400);
         var h = Math.floor(d % 86400 / 3600);
         var m = Math.floor(d % 3600 / 60);

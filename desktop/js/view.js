@@ -71,11 +71,6 @@ if (view_id != '') {
       }catch(err) {
         console.log(err);
       }
-      if(isset(html.raw) && isset(html.raw.configuration) && isset(html.raw.configuration.displayObjectName)){
-        jeedom.eqLogic.changeDisplayObjectName(html.raw.configuration.displayObjectName);
-      }else{
-        jeedom.eqLogic.changeDisplayObjectName(false);
-      }
       setTimeout(function () {
         initReportMode();
         positionEqLogic();
@@ -83,16 +78,17 @@ if (view_id != '') {
         $( "input").click(function() { $(this).focus(); });
         $( "textarea").click(function() { $(this).focus(); });
         $('.eqLogicZone').each(function () {
-          var container = $(this).packery({
-            gutter : 2
-          });
+          var container = $(this).packery();
           var itemElems =  container.find('.eqLogic-widget');
           itemElems.draggable();
           container.packery( 'bindUIDraggableEvents', itemElems );
           container.packery( 'on', 'dragItemPositioned',function(){
-            $('.div_displayEquipement').packery();
+            $('.eqLogicZone').packery();
           });
           function orderItems() {
+            setTimeout(function(){
+              $('.eqLogicZone').packery();
+            },1);
             var itemElems = container.packery('getItemElements');
             $( itemElems ).each( function( i, itemElem ) {
               $( itemElem ).attr('data-order', i + 1 );
@@ -116,6 +112,9 @@ if (view_id != '') {
             $(this).css('color','rgb(46, 176, 75)');
           }
         });
+        if(isset(html.raw) && isset(html.raw.configuration) && isset(html.raw.configuration.displayObjectName) && html.raw.configuration.displayObjectName == 1){
+          $('.eqLogic-widget').addClass('displayObjectName');
+        }
         if (getUrlVars('fullscreen') == 1) {
           fullScreen(true);
         }
@@ -154,6 +153,8 @@ function editWidgetMode(_mode,_save){
     return;
   }
   if(_mode == 0 || _mode == '0'){
+    $('.eqLogic-widget').removeClass('editingMode')
+    $('.scenario-widget').removeClass('editingMode')
     jeedom.cmd.disableExecute = false;
     if(!isset(_save) || _save){
       saveWidgetDisplay({view : 1});
@@ -163,6 +164,8 @@ function editWidgetMode(_mode,_save){
       $('.eqLogicZone .eqLogic-widget.allowResize').resizable('destroy');
     }
   }else{
+    $('.eqLogic-widget').addClass('editingMode')
+    $('.scenario-widget').addClass('editingMode')
     jeedom.cmd.disableExecute = true;
     $('.eqLogicZone .eqLogic-widget').draggable('enable');
     $( ".eqLogicZone .eqLogic-widget.allowResize").resizable({

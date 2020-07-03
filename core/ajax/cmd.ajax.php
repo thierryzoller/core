@@ -271,9 +271,10 @@ try {
 					}
 				} else {
 					$dateEnd = date('Y-m-d H:i:s');
-					$dateStart = date('Y-m-d 00:00:00', strtotime('- ' . init('dateRange') . ' ' . $dateEnd));
+					$dateStart = date('Y-m-d H:i:s', strtotime('- ' . init('dateRange') . ' ' . $dateEnd));
 				}
 			}
+			
 			if (init('dateStart') != '') {
 				$dateStart = init('dateStart');
 			}
@@ -286,6 +287,11 @@ try {
 			if (strtotime($dateEnd) > strtotime('now')) {
 				$dateEnd = date('Y-m-d H:i:s');
 			}
+			
+			if ($dateStart == '') {
+				$dateStart =  init('startDate', date('Y-m-d', strtotime(config::byKey('history::defautShowPeriod') . ' ' . date('Y-m-d'))));
+			}
+			
 			$return['maxValue'] = '';
 			$return['minValue'] = '';
 			if ($dateStart === null) {
@@ -308,18 +314,26 @@ try {
 				if (!$eqLogic->hasRight('r')) {
 					throw new Exception(__('Vous n\'êtes pas autorisé à faire cette action', __FILE__));
 				}
-				$histories = $cmd->getHistory($dateStart, $dateEnd);
+				$groupingType=init('groupingType');
+				if($groupingType == ''){
+					$groupingType = $cmd->getDisplay('groupingType');
+				}
+				$derive = init('derive', $cmd->getDisplay('graphDerive'));
+				if (trim($derive) == '') {
+					$derive = $cmd->getDisplay('graphDerive');
+				}
+				if($derive){
+					$groupingType = '';
+				}
+				$histories = $cmd->getHistory($dateStart, $dateEnd,$groupingType);
 				$return['cmd_name'] = $cmd->getName();
 				$return['history_name'] = $cmd->getHumanName();
 				$return['unite'] = $cmd->getUnite();
 				$return['cmd'] = utils::o2a($cmd);
 				$return['eqLogic'] = utils::o2a($cmd->getEqLogic());
 				$return['timelineOnly'] = $JEEDOM_INTERNAL_CONFIG['cmd']['type']['info']['subtype'][$cmd->getSubType()]['isHistorized']['timelineOnly'];
-				$previsousValue = null;
-				$derive = init('derive', $cmd->getDisplay('graphDerive'));
-				if (trim($derive) == '') {
-					$derive = $cmd->getDisplay('graphDerive');
-				}
+				$previousValue = null;
+				$return['derive'] = $derive;
 				foreach ($histories as $history) {
 					$info_history = array();
 					if($cmd->getDisplay('groupingType') != ''){
@@ -332,12 +346,12 @@ try {
 					} else {
 						$value = ($history->getValue() === null) ? null : floatval($history->getValue());
 						if ($derive == 1 || $derive == '1') {
-							if ($value !== null && $previsousValue !== null) {
-								$value = $value - $previsousValue;
+							if ($value !== null && $previousValue !== null) {
+								$value = $value - $previousValue;
 							} else {
 								$value = null;
 							}
-							$previsousValue = ($history->getValue() === null) ? null : floatval($history->getValue());
+							$previousValue = ($history->getValue() === null) ? null : floatval($history->getValue());
 						}
 					}
 					$info_history[] = $value;
@@ -352,7 +366,7 @@ try {
 					$data[] = $info_history;
 				}
 			} else {
-				$histories = history::getHistoryFromCalcul(jeedom::fromHumanReadable(init('id')), $dateStart, $dateEnd, init('allowZero', false));
+				$histories = history::getHistoryFromCalcul(jeedom::fromHumanReadable(init('id')), $dateStart, $dateEnd, init('allowZero', false),init('groupingType'));
 				if (is_array($histories)) {
 					foreach ($histories as $datetime => $value) {
 						$info_history = array();
@@ -371,9 +385,11 @@ try {
 				$return['history_name'] = init('id');
 				$return['unite'] = init('unite');
 			}
-			$last = end($data);
-			if ($last[0] < (strtotime($dateEnd . " UTC") * 1000)) {
-				$data[] = array((strtotime($dateEnd . " UTC") * 1000), $last[1]);
+			if(init('lastPointToEnd') == 1){
+				$last = end($data);
+				if ($last[0] < (strtotime($dateEnd . " UTC") * 1000)) {
+					$data[] = array((strtotime($dateEnd . " UTC") * 1000), $last[1]);
+				}
 			}
 			$return['data'] = $data;
 			ajax::success($return);
@@ -426,6 +442,27 @@ try {
 				$eqLogic['eqLogic']->save(true);
 			}
 			ajax::success();
+		}
+		
+		if (init('action') == 'getDeadCmd') {
+			$return = array(
+				'core' => array('cmd' => jeedom::deadCmd(),'name' => __('Jeedom',__FILE__)),
+				'cmd' => array('cmd' => cmd::deadCmd(),'name' => __('Commande',__FILE__)),
+				'jeeObject' => array('cmd' => jeeObject::deadCmd(),'name' => __('Objet',__FILE__)),
+				'scenario' => array('cmd' => scenario::consystencyCheck(true),'name' => __('Scénario',__FILE__)),
+				'interactDef' => array('cmd' => interactDef::deadCmd(),'name' => __('Intéraction',__FILE__)),
+				'user' => array('cmd' => user::deadCmd(),'name' => __('Utilisateur',__FILE__)),
+			);
+			foreach (plugin::listPlugin(true) as $plugin) {
+				$plugin_id = $plugin->getId();
+				$return[$plugin_id] =  array('cmd' => array(),'name' => 'Plugin '.$plugin->getName());
+				if (method_exists($plugin_id, 'deadCmd')) {
+					$return[$plugin_id]['cmd'] = $plugin_id::deadCmd();
+				}else{
+					$return[$plugin_id]['cmd'] = eqLogic::deadCmdGeneric($plugin_id);
+				}
+			}
+			ajax::success($return);
 		}
 		
 		throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

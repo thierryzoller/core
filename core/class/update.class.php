@@ -309,9 +309,13 @@ class update {
 					if (!file_exists($tmp)) {
 						throw new Exception(__('Impossible de trouver le fichier zip : ', __FILE__) . $this->getConfiguration('path'));
 					}
-					if (filesize($tmp) < 100) {
+				if (filesize($tmp) < 100) {
+					if(jeedom::getHardwareName() == 'smart' && stristr(config::byKey('product_name'), 'Jeedom') == true){
 						throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets). Cela peut être dû à une absence de connexion au market (vérifiez dans la configuration de jeedom qu\'un test de connexion au market marche) ou lié à un manque de place, une version minimale requise non consistante avec votre version de Jeedom, un souci du plugin sur le market, etc.', __FILE__));
+					} else {
+						throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets). Cela peut être dû à une absence de connexion au market (vérifiez dans la configuration de' . jeedom::getHardwareName() . 'qu\'un test de connexion au market marche) ou lié à un manque de place, une version minimale requise non consistante avec votre version de' . jeedom::getHardwareName() . 'un souci du plugin sur le market, etc.', __FILE__));
 					}
+				}
 					$extension = strtolower(strrchr($tmp, '.'));
 					if (!in_array($extension, array('.zip'))) {
 						throw new Exception('Extension du fichier non valide (autorisé .zip) : ' . $extension);
@@ -417,14 +421,14 @@ class update {
 	public function preInstallUpdate() {
 		if (!file_exists(__DIR__ . '/../../plugins')) {
 			mkdir(__DIR__ . '/../../plugins');
-			@chown(__DIR__ . '/../../plugins', system::getWWWUid());
-			@chgrp(__DIR__ . '/../../plugins', system::getWWWGid());
+			@chown(__DIR__ . '/../../plugins', system::get('www-uid'));
+			@chgrp(__DIR__ . '/../../plugins', system::get('www-gid'));
 			@chmod(__DIR__ . '/../../plugins', 0775);
 		}
+		$cibDir = __DIR__ . '/../../plugins/' . $this->getLogicalId();
 		log::add('update', 'alert', __('Début de la mise à jour de : ', __FILE__) . $this->getLogicalId() . "\n");
 		switch ($this->getType()) {
 			case 'plugin':
-			$cibDir = __DIR__ . '/../../plugins/' . $this->getLogicalId();
 			if (!file_exists($cibDir) && !mkdir($cibDir, 0775, true)) {
 				throw new Exception(__('Impossible de créer le dossier  : ' . $cibDir . '. Problème de droits ?', __FILE__));
 			}
@@ -449,6 +453,14 @@ class update {
 			case 'plugin':
 			try {
 				$plugin = plugin::byId($this->getLogicalId());
+				$cibDir = __DIR__ . '/../../plugins/' . $this->getLogicalId();
+				log::add('update', 'alert',  __('Supression des fichiers inutiles...', __FILE__));
+				foreach (array('3rdparty','3rparty','desktop','mobile','core','docs','install','script','vendor','plugin_info') as $folder) {
+					if(!file_exists($cibDir. '/'.$folder)){
+						continue;
+					}
+					shell_exec('find '.$cibDir. '/'.$folder.'/* -mtime +7 -type f ! -iname "custom.*" ! -iname "common.config.php" -delete 2>/dev/null');
+				}
 			} catch (Exception $e) {
 				$this->remove();
 				throw new Exception(__('Impossible d\'installer le plugin. Le nom du plugin est différent de l\'ID ou le plugin n\'est pas correctement formé. Veuillez contacter l\'auteur.', __FILE__));

@@ -36,12 +36,6 @@ sendVarToJS('planHeader', utils::o2a($planHeader));
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-4 control-label">{{Afficher le nom des objets sur les widgets}}</label>
-						<div class="col-lg-2">
-							<input type="checkbox" class="planHeaderAttr form-control" data-l1key="configuration" data-l2key="displayObjectName" />
-						</div>
-					</div>
-					<div class="form-group">
 						<label class="col-lg-4 control-label">{{Fond transparent}}</label>
 						<div class="col-lg-2">
 							<input type="checkbox" class="planHeaderAttr" data-l1key="configuration" data-l2key="backgroundTransparent" />
@@ -56,7 +50,7 @@ sendVarToJS('planHeader', utils::o2a($planHeader));
 					<div class="form-group">
 						<label class="col-lg-4 control-label">{{Code d'accès}}</label>
 						<div class="col-lg-2">
-							<input type="password" autocomplete="new-password"  class="planHeaderAttr form-control" data-l1key="configuration" data-l2key="accessCode" />
+							<input class="planHeaderAttr form-control inputPassword" data-l1key="configuration" data-l2key="accessCode" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -121,11 +115,15 @@ sendVarToJS('planHeader', utils::o2a($planHeader));
 							echo $plan->getLink_id();
 							echo '</td>';
 							echo '<td>';
-							$link = $plan->	getLink();
-							if(is_object($link)){
-								echo $link->getHumanName();
+							if(in_array($plan->getLink_type(),array('text','summary','graph','plan','view'))){
+								echo '<span class="label label-default">N/A</span>';
 							}else{
-								echo '<span class="label label-danger">{{Lien mort ou absent}}</span>';
+								$link = $plan->	getLink();
+								if(is_object($link)){
+									echo $link->getHumanName();
+								}else{
+									echo '<span class="label label-danger">{{Lien mort ou absent}}</span>';
+								}
 							}
 							echo '</td>';
 							echo '<td>';
@@ -208,6 +206,7 @@ $('#bt_saveConfigurePlanHeader').on('click', function () {
 		},
 		success: function () {
 			$('#div_alertPlanHeaderConfigure').showAlert({message: '{{Design sauvegardé}}', level: 'success'});
+			$('#div_pageContainer').data('editOption.state', false);
 			loadPage('index.php?v=d&p=plan&plan_id='+planHeader_id);
 		},
 	});

@@ -1,232 +1,131 @@
-Le sous-menu Gestion des plugins permet de manipuler les plugins, à
-savoir : les télécharger, les mettre à jour et les activer,…​
+# Gestión de complementos
+Complementos → Gestión de complementos
 
-Plugin de gestión
-===================
+Esta página proporciona acceso a configuraciones de complementos.
+También puede manipular los complementos, a saber : descárguelos, actualícelos y actívelos,
 
-Puede acceder a la página de complementos de gestión de plugins →
-plugins. Una vez que se hace clic, la lista de encontrar
-plugins en orden alfabético y un enlace para el mercado. plugins
-personas con discapacidad se atenúan.
+Por lo tanto, hay una lista de complementos en orden alfabético y un enlace al mercado.
+- Los complementos deshabilitados están atenuados.
+- Complementos que no están en la versión *Estable* tenemos un punto naranja delante de su nombre.
 
-> **Tip**
+Al hacer clic en un complemento, accede a su configuración. En la parte superior, encontrará el nombre del complemento, luego entre paréntesis, su nombre en Jeedom (ID) y, finalmente, el tipo de versión instalada (estable, beta).
+
+> **Importante**
 >
-> Al igual que en muchos lugares en Jeedom, poner el ratón mientras la izquierda
-> Para que aparezca un menú de acceso rápido (se puede
-> Su perfil en dejar la siempre visible). A continuación, el menú
-> Para obtener la lista de plugins ordenados por categorías.
+> Al descargar un complemento, está deshabilitado de forma predeterminada. Entonces tienes que activarlo tú mismo.
 
-En cliquant sur un plugin, vous accédez à sa configuration. En haut, vous
-retrouvez le nom du plugin, puis entre parenthèses, son nom dans Jeedom
-(ID) et enfin, le type de version installée (stable, beta).
-
-> **Important**
+> **Punta**
 >
-> Lors du téléchargement d’un plugin, celui-ci est désactivé par défaut.
-> Il faut donc que vous l’activiez par vous-même.
+> Puede hacer Ctrl-clic o hacer clic en Centro para abrir su configuración en una nueva pestaña del navegador.
 
-Arriba a la derecha, un par de botones:
+## Configuración del complemento
 
--   ** ** Documentación: Permite el acceso directo a la página
-    documentación para plugins
+### Arriba a la derecha, algunos botones :
 
--   ** ** Cambios: Para ver el plugin si hay cambios
+- **Documentación** : Permite el acceso directo a la página de documentación del complemento.
+- **Cambios** : Permite ver el registro de cambios del complemento si existe.
+- **Detalles** : Permite encontrar la página de complementos en el mercado.
+- **Remove** : Elimina el complemento de tu Jeedom. Tenga en cuenta que esto también elimina permanentemente todo el equipo de este complemento.
 
--   ** ** Enviar en el mercado: enviar el plugin en el mercado
-    (Sólo está disponible si usted es el autor)
+### Abajo a la izquierda, hay un área **Estado** con :
 
--   ** ** Detalles: recupera la página del plugin en el mercado
+- **Estatus** : Le permite ver el estado del complemento (activo / inactivo).
+- **Versión** : La versión del complemento instalado.
+- **Autor** : Autor del complemento.
+- **Acción** : Le permite habilitar o deshabilitar el complemento.
+- **Versión Jeedom** : Indica la versión mínima de Jeedom requerida para el complemento.
+- **Licencia** : Indica la licencia del complemento que generalmente será AGPL.
 
--   **Supprimer** : Supprime le plugin de votre Jeedom. Attention, cela
-    También elimina de forma permanente todas las instalaciones de este plugin
+### A la derecha, encontramos el área **Registro y monitoreo** que permite definir :
 
-Abajo a la izquierda, hay una zona estado con :
+- El nivel de registros específicos del complemento (encontramos esta misma posibilidad en Administración → Configuración en la pestaña de registros, en la parte inferior de la página).
+- Ver registros de complementos.
+- Latido del corazón : Cada 5 minutos, Jeedom comprueba si al menos un dispositivo de complemento se ha comunicado en los últimos X minutos (si desea desactivar la funcionalidad, simplemente ponga 0).
+- Reiniciar demonio : Si el latido sale mal, entonces Jeedom reiniciará el demonio.
 
--   ** ** Estado: muestra el estado del plugin (activo / inactivo)
+Si el complemento tiene dependencias y / o un demonio, estas áreas adicionales se muestran debajo de las áreas mencionadas anteriormente.
 
--   ** ** Versión: la versión del plug-in instalado
+### Dependencias :
 
--   **Auteur** : l’auteur du plugin
+- **Apellido** : Generalmente será local.
+- **Estatus** : Estado de dependencia, OK o NOK.
+- **Instalación** : Permite instalar o reinstalar dependencias (si no lo hace manualmente y son NOK, Jeedom se encargará de sí mismo después de un tiempo).
+- **Última instalación** : Fecha de la última instalación de dependencia.
 
--   **Action** : Permet d’activer ou désactiver le plugin
+### Demonio :
 
--   **Version jeedom** : Indique la version de Jeedom minimum requise
-    pour le plugin
+- **Apellido** : Generalmente será local.
+- **Estatus** : Estado del demonio, OK o NOK.
+- **Configuración** : OK si se cumplen todos los criterios para que el demonio corra, o si da la causa del bloqueo.
+- **(Para reiniciar** : Permite lanzar o relanzar al demonio.
+- **Parar** : Se usa para detener el demonio (solo en el caso en que la administración automática esté deshabilitada).
+- **Gestión automática** : Activa o desactiva la administración automática (que permite a Jeedom administrar el demonio y reiniciarlo si es necesario. A menos que se indique lo contrario, es aconsejable dejar activa la gestión automática).
+- **Último lanzamiento** : Fecha del último lanzamiento del demonio.
 
--   **Licence** : Indique la licence du plugin qui sera généralement
-    AGPL
-
-A droite, on retrouve la zone Log qui permet de définir 
-
--   le niveau de logs spécifique au plugin (on retrouve cette même possibilité dans
-Administation → Configuration sur l’onglet logs, en bas de page)
-
--   de voir les logs du plugin
-
--   Heartbeat : toute les 5 mins, Jeedom regarde si au moins un équipement du plugin a communiqué dans les X dernières minutes (si vous voulez désactiver la fonctionnalité, il suffit de mettre 0)
-
--   Redemarrer démon : si le hertbeat tombe en erreur alors Jeedom va redémarrer le démon
-
-Si le plugin possède des dépendances et/ou un démon, ces zones
-supplémentaires s’affichent sous les zones citées ci-dessus.
-
-Dépendances :
-
--   **Nom** : généralement sera local
-
--   **Statut** : vous dira si les dépendances sont OK ou KO
-
--   **Installation** : permettra d’installer ou réinstaller les
-    dépendances (si vous ne le faites pas manuellement et qu’elles sont
-    KO, Jeedom s’en chargera de lui-même au bout d’un moment)
-
--   **Dernière installation** : date de la dernière installation des
-    dépendances
-
-Deamon : 
-
--   **Nom** : généralement sera local
-
--   **Statut** : vous dira si le démon est OK ou KO
-
--   **Configuration** : sera OK si tous les critères pour que le démon
-    tourne sont réunis ou donnera la cause du blocage
-
--   **(Re)Démarrer** : permet de lancer ou relancer le démon
-
--   **Arrêter** : permet d’arrêter le démon (Uniquement dans le cas où
-    la gestion automatique est désactivée)
-
--   **Gestion automatique** : permet d’activer ou désactiver la gestion
-    automatique (ce qui permet à Jeedom de gérer lui même le démon et le
-    relancer si besoin. Sauf contre indication, il est conseillé de
-    laisser la gestion automatique active)
-
--   **Dernier lancement** : date du dernier lancement du démon
-
-> **Tip**
+> **Punta**
 >
-> Certains plugins ont une partie configuration. Si tel est le cas, elle
-> apparaîtra sous les zones dépendances et démon décrites ci-dessus.
-> Dans ce cas, il faut se référer à la documentation du plugin en
-> question pour savoir comment le configurer.
+> Algunos complementos tienen una parte de configuración. Si este es el caso, aparecerá bajo las zonas de dependencia y demonio descritas anteriormente.
+> En este caso, consulte la documentación del complemento en cuestión para saber cómo configurarlo.
 
-En dessous, on retrouve une zone fonctionnalités. Celle-ci permet de voir
-si le plugin utilise une des fonctions core Jeedom tel que :
+### A continuación, hay un área de funcionalidad. Esto le permite ver si el complemento utiliza una de las funciones principales de Jeedom, como :
 
--   **Interact** : des interactions spécifiques
+- **Interact** : Interacciones específicas.
+- **Cron** : Un cron por minuto.
+- **Cron5** : Un cron cada 5 minutos.
+- **Cron10** : Un cron cada 10 minutos.
+- **Cron15** : Un cron cada 15 minutos.
+- **Cron30** : Un cron cada 30 minutos.
+- **CronHourly** : Un cron cada hora.
+- **CronDaily** : Un cron diario.
+- **deadcmd** : Un cron para comandantes muertos.
+- **salud** : Una salud cron.
 
--   **Cron** : un cron à la minute
-
--   **Cron5** : un cron toutes les 5 minutes
-
--   **Cron15** : un cron toutes les 15 minutes
-
--   **Cron30** : un cron toutes les 30 minutes
-
--   **CronHourly** : un cron toutes les heures
-
--   **CronDaily** : un cron journalier
-
-> **Tip**
+> **Punta**
 >
-> Si le plugin utilise une de ces fonctions, vous pourrez spécifiquement
-> lui interdire de le faire en décochant la case "activer" qui sera
-> présente à côté.
+> Si el complemento utiliza una de estas funciones, puede prohibirlo específicamente desmarcando la casilla &quot;activar&quot; que estará presente al lado.
 
-Enfin, on peut retrouver une section Panel qui permettra d’activer ou
-désactiver l’affichage du panel sur le dashboard ou en mobile si le
-plugin en propose un.
+### Panel
 
-Installation d’un plugin 
-========================
+Podemos encontrar una sección de Panel que habilitará o deshabilitará la visualización del panel en el tablero o en el dispositivo móvil si el complemento ofrece uno.
 
-Pour installer un nouveau plugin, il suffit de cliquer sur le bouton
-"Market" (et que Jeedom soit relié à Internet). Après un petit temps de
-chargement, vous obtiendrez la page.
+## Instalación de complementos
 
-> **Tip**
+Para instalar un nuevo complemento, simplemente haga clic en el botón "Market" (y Jeedom está conectado a Internet). Después de un breve tiempo de carga, obtendrá la página.
+
+> **Punta**
 >
-> Vous devez avoir saisi les informations de votre compte du Market dans
-> l’administration (Configuration→Mises à jour→Onglet market) afin de
-> retrouver les plugins que vous avez déjà achetés par exemple.
+> Debe haber ingresado la información de su cuenta Market en la administración (Configuración → Actualizaciones → pestaña Market) para encontrar los complementos que ya compró, por ejemplo.
 
-En haut de la fenêtre, vous avez des filtres :
+En la parte superior de la ventana tienes filtros :
+- **Abierto / De pago** : muestra solo gratis o de pago.
+- **Oficial / Recomendado** : muestra solo complementos oficiales o recomendados.
+- **Menú desplegable de categoría** : muestra solo ciertas categorías de complementos.
+- **Buscar** : le permite buscar un complemento (en el nombre o la descripción del mismo).
+- **Nombre del usuario** : muestra el nombre de usuario utilizado para conectarse a Market, así como el estado de la conexión.
 
--   **Gratuit/Payant** : permet d’afficher uniquement les gratuits ou
-    les payants.
-
--   **Officiel/Conseillé** : permet d’afficher uniquement les plugins
-    officiels ou les conseillés
-
--   **Installé/Non installé** : permet d’afficher uniquement les plugins
-    installés ou non installés
-
--   **Menu déroulant Catégorie** : permet d’afficher uniquement
-    certaines catégories de plugins
-
--   **Rechercher** : permet de rechercher un plugin (dans le nom ou la
-    description de celui-ci)
-
--   **Nom d’utilisateur** : affiche le nom d’utilisateur utilisé pour la
-    connexion au Market ainsi que le statut de la connexion
-
-> **Tip**
+> **Punta**
 >
-> La petite croix permet de réinitialiser le filtre concerné
+> La pequeña cruz restablece el filtro en cuestión
 
-Une fois que vous avez trouvé le plugin voulu, il suffit de cliquer sur
-celui-ci pour faire apparaître sa fiche. Cette fiche vous donne beaucoup
-d’informations sur le plugin, notamment :
+Una vez que haya encontrado el complemento que desea, simplemente haga clic en él para que aparezca su archivo. Esta hoja le brinda mucha información sobre el complemento, en particular :
 
--   S’il est officiel/recommandé ou s’il est obsolète (il faut vraiment
-    éviter d’installer des plugins obsolètes)
+- Si es oficial / recomendado o si está obsoleto (definitivamente debe evitar instalar complementos obsoletos).
+- 4 acciones :
+    - **Instalar estable** : permite instalar el complemento en su versión estable.
+    - **Instalar beta** : permite instalar el complemento en su versión beta (solo para betatesters).
+    - **Instalar pro** : permite instalar la versión pro (muy poco utilizada).
+    - **Remove** : Si el complemento está instalado actualmente, este botón le permite eliminarlo.
 
--   4 actions :
+A continuación, encontrará la descripción del complemento, la compatibilidad (si Jeedom detecta una incompatibilidad, se lo notificará), las opiniones sobre el complemento (puede anotarlo aquí) e información adicional (el autor, la persona que realizó la última actualización, un enlace al documento, la cantidad de descargas). A la derecha encontrará un botón &quot;Registro de cambios&quot; que le permite tener todo el historial de modificaciones, un botón &quot;Documentación&quot; que se refiere a la documentación del complemento. Luego tiene el idioma disponible y la información variada sobre la fecha de la última versión estable.
 
-    -   **Installer stable** : permet d’installer le plugin dans sa
-        version stable
-
-    -   **Installer beta** : permet d’installer le plugin dans sa
-        version beta (seulement pour les betatesteurs)
-
-    -   **Installer pro** : permet d’installer la version pro (très
-        peu utilisé)
-
-    -   **Supprimer** : si le plugin est actuellement installé, ce
-        bouton permet de le supprimer
-
-En dessous, vous retrouvez la description du plugin, la compatibilité
-(si Jeedom détecte une incompatibilité, il vous le signalera), les avis
-sur le plugin (vous pouvez ici le noter) et des informations
-complémentaires (l’auteur, la personne ayant fait la dernière mise à
-jour, un lien vers la doc, le nombre de téléchargements). Sur la droite
-vous retrouvez un bouton "Changelog" qui vous permet d’avoir tout
-l’historique des modifications, un bouton "Documentation" qui renvoie
-vers la documentation du plugin. Ensuite vous avez la langue disponible
-et les diverses informations sur la date de la dernière version stable.
-
-> **Important**
+> **Importante**
 >
-> Il n’est vraiment pas recommandé de mettre un plugin beta sur un
-> Jeedom non beta, beaucoup de soucis de fonctionnement peuvent en
-> résulter.
+> Realmente no se recomienda poner un complemento beta en un Jeedom no beta, pueden resultar muchos problemas operativos.
 
-> **Important**
+> **Importante**
 >
-> Certains plugins sont payants, dans ce cas la fiche du plugin vous
-> proposera de l’acheter. Une fois cela fait, il faut attendre une
-> dizaine de minutes (temps de validation du paiement), puis retourner
-> sur la fiche du plugin pour l’installer normalement.
+> Algunos complementos son de pago, en este caso el complemento le ofrecerá comprarlo. Una vez hecho esto, debe esperar unos diez minutos (tiempo de validación del pago), luego regresar al archivo del complemento para instalarlo normalmente.
 
-> **Tip**
+> **Punta**
 >
-> Vous pouvez aussi ajouter un plugin à Jeedom à partir d’un fichier ou
-> depuis un dépôt Github. Pour cela, il faut, dans la configuration de
-> Jeedom, activer la fonction adéquate dans la partie "Mises à jour et
-> fichiers". Il sera ensuite possible, en mettant la souris tout à
-> gauche, et en faisant apparaître le menu de la page plugin, de cliquer
-> sur "Ajout depuis une autre source". Vous pourrez ensuite choisir la
-> source "Fichier". Attention, dans le cas de l’ajout par un fichier
-> zip, le nom du zip doit être le même que l’ID du plugin et dès
-> l’ouverture du ZIP un dossier plugin\_info doit être présent.
+> También puede agregar un complemento a Jeedom desde un archivo o desde un repositorio de Github. Para hacer esto, en la configuración de Jeedom, active la función apropiada en la sección "Actualizaciones y archivos"". Entonces será posible, colocando el mouse en el extremo izquierdo y haciendo que aparezca el menú de la página del complemento, hacer clic en "Agregar desde otra fuente". Luego puede elegir la fuente "Archivo". Atención, en el caso de agregar por un archivo zip, el nombre del zip debe ser el mismo que el ID del complemento y al abrir el ZIP debe estar presente una carpeta plugin\_info.

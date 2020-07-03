@@ -20,14 +20,12 @@ jeedom.eqLogic = function () {
 };
 
 jeedom.eqLogic.cache = Array();
-jeedom.eqLogic.displayObjectName = false;
 
 jeedom.eqLogic.changeDisplayObjectName = function(_display){
-  jeedom.eqLogic.displayObjectName = _display;
   if(_display){
-    $('.object_name').show();
+    $('.eqLogic-widget').addClass('displayObjectName');
   }else{
-    $('.object_name').hide();
+    $('.eqLogic-widget').removeClass('displayObjectName');
   }
 }
 
@@ -154,8 +152,8 @@ jeedom.eqLogic.remove = function (_params) {
   var paramsRequired = ['id', 'type'];
   var paramsSpecifics = {
     pre_success: function (data) {
-      if (isset(jeedom.eqLogic.cache.byId[_params.eqLogic_Id])) {
-        delete jeedom.eqLogic.cache.byId[_params.eqLogic_Id];
+      if (isset(jeedom.eqLogic.cache.byId[_params.id])) {
+        delete jeedom.eqLogic.cache.byId[_params.id];
       }
       return data;
     }
@@ -181,8 +179,8 @@ jeedom.eqLogic.copy = function (_params) {
   var paramsRequired = ['id', 'name'];
   var paramsSpecifics = {
     pre_success: function (data) {
-      if (isset(jeedom.eqLogic.cache.byId[_params.eqLogic_Id])) {
-        delete jeedom.eqLogic.cache.byId[_params.eqLogic_Id];
+      if (isset(jeedom.eqLogic.cache.byId[_params.id])) {
+        delete jeedom.eqLogic.cache.byId[_params.id];
       }
       return data;
     }
@@ -296,7 +294,7 @@ jeedom.eqLogic.byId = function (_params) {
     return;
   }
   if (init(_params.noCache, false) == false && isset(jeedom.eqLogic.cache.byId[_params.id]) && 'function' == typeof (_params.success)) {
-    _params.success(jeedom.eqLogic.cache.byId[_params.eqLogic_id]);
+    _params.success(jeedom.eqLogic.cache.byId[_params.id]);
     return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
@@ -396,9 +394,14 @@ jeedom.eqLogic.refreshValue = function (_params) {
         if(uid != 'undefined'){
           eqLogic.attr('data-eqLogic_uid',uid);
         }
-        eqLogic.empty().html(html.children());
-        eqLogic.attr("class", html.attr("class"))
-        .trigger('change');
+        eqLogic.addClass(html.attr('class'));
+        if(!html.hasClass('eqLogic_layout_table')){
+          eqLogic.removeClass('eqLogic_layout_table');
+        }
+        if(!html.hasClass('eqLogic_default_table')){
+          eqLogic.removeClass('eqLogic_default_table');
+        }
+        eqLogic.empty().html(html.children()).trigger('change');
         if ($.mobile) {
           $('.eqLogic[data-eqLogic_id=' + i + ']').trigger("create");
           setTileSize('.eqLogic');
@@ -407,9 +410,6 @@ jeedom.eqLogic.refreshValue = function (_params) {
             editWidgetMode();
           }
         }
-      }
-      if(jeedom.eqLogic.displayObjectName){
-        $('.object_name').show();
       }
     }
   };

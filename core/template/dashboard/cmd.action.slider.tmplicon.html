@@ -1,4 +1,4 @@
-<div style="width:90px;" class="cmd #history# tooltips cmd-widget" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+<div class="cmd cmd-widget #history#" data-type="action" data-subtype="numeric" data-template="tmplicon" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
   <div class="title #hide_name#">
     <div class="cmdName">#name_display#</div>
   </div>
@@ -6,15 +6,20 @@
     <span class="cursor iconCmd#uid# iconCmd"></span>
   </div>
   <div class="value">
-    <div>
-      <div class="slider" value="#state#">
-        <span class="value#uid# sliderValue"></span>
-      </div>
+    <div class="slider" value="#state#">
+      <span class="value#uid# sliderValue"></span>
     </div>
+    <span class="timeCmd#uid# timeCmd label label-default"></span>
   </div>
   <script>
     jeedom.cmd.update['#id#'] = function(_options){
-      $(".cmd[data-cmd_id=#id#] .slider").slider({
+      var cmd = $('.cmd[data-cmd_id=#id#]');
+      if('#_time_widget_#' == '1'){
+        jeedom.cmd.displayDuration(_options.valueDate,  cmd.find('.timeCmd'));
+      }else{
+        cmd.find('.timeCmd').remove();
+      }
+      cmd.find('.slider').slider({
         min: ('#minValue#' == '') ? 0 : parseInt('#minValue#'),
         max: ('#maxValue#' == '') ? 100 : parseInt('#maxValue#'),
         value: ('#state#' == '') ? 0 : parseInt(_options.display_value),
@@ -24,14 +29,12 @@
         }
       });
       if (parseInt(_options.display_value) > 0) {
-        $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append("#_icon_on_#");
-        $('.cmd[data-cmd_id=#id#] .iconCmd').attr('data-state', 'on');
+        cmd.find('.iconCmd').empty().append("#_icon_on_#").attr('data-state', 'on');
       }else {
-        $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append("#_icon_off_#");
-        $('.cmd[data-cmd_id=#id#] .iconCmd').attr('data-state', 'off');
+        cmd.find('.iconCmd').empty().append("#_icon_off_#").attr('data-state', 'off');
       }
     }
-    jeedom.cmd.update['#id#']({display_value:'#state#'});
+    jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
     $('.iconCmd#uid#').off().on('click', function() {
       if ($(this).attr('data-state') == 'on') {
         var value = ('#minValue#' == '') ? 0 : parseInt('#minValue#');

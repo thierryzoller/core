@@ -321,6 +321,16 @@ class user {
 		);
 		$user->setOptions('registerDevice', $registerDevice);
 		$user->save();
+		try {
+			$sessions = listSession();
+			foreach ($sessions as $id => $session) {
+				if($session['user_id'] == $user->getId()){
+					deleteSession($id);
+				}
+			}
+		} catch (\Exception $e) {
+			
+		}
 		return $user->getHash() . '-' . $key;
 	}
 	
@@ -355,6 +365,7 @@ class user {
 	}
 	
 	public static function deadCmd() {
+		$return = array();
 		foreach (user::all() as $user) {
 			$cmd = $user->getOptions('notification::cmd');
 			if ($cmd != '') {
@@ -364,6 +375,20 @@ class user {
 			}
 		}
 		return $return;
+	}
+	
+	public static function regenerateHash(){
+		foreach (user::all() as $user) {
+			if($user->getProfils() != 'admin' || $user->getOptions('doNotRotateHash',0) == 1 || $user->getEnable() == 0){
+				continue;
+			}
+			if(strtotime($user->getOptions('hashGenerated')) > strtotime('now -3 month')){
+				continue;
+			}
+			$user->setHash('');
+			$user->getHash();
+			$user->save();
+		}
 	}
 	
 	/*     * *********************Méthodes d'instance************************* */
@@ -379,11 +404,13 @@ class user {
 			throw new Exception(__('Le nom d\'utilisateur ne peut pas être vide', __FILE__));
 		}
 		$admins = user::byProfils('admin', true);
-		if (count($admins) == 1 && $this->getProfils() == 'admin' && $this->getEnable() == 0) {
-			throw new Exception(__('Vous ne pouvez désactiver le dernier utilisateur', __FILE__));
-		}
-		if (count($admins) == 1 && $admins[0]->getId() == $this->getid() && $this->getProfils() != 'admin') {
-			throw new Exception(__('Vous ne pouvez changer le profil du dernier administrateur', __FILE__));
+		if(count($admins) == 1 && $admins[0]->getId() == $this->getId()){
+			if ($this->getProfils() == 'admin' && $this->getEnable() == 0) {
+				throw new Exception(__('Vous ne pouvez désactiver le dernier utilisateur', __FILE__));
+			}
+			if ($this->getProfils() != 'admin') {
+				throw new Exception(__('Vous ne pouvez changer le profil du dernier administrateur', __FILE__));
+			}
 		}
 	}
 	
@@ -491,6 +518,7 @@ class user {
 				$hash = config::genKey();
 			}
 			$this->setHash($hash);
+			$this->setOptions('hashGenerated',date('Y-m-d H:i:s'));
 			$this->save();
 		}
 		return $this->hash;

@@ -19,13 +19,13 @@
 try {
 	require_once __DIR__ . '/../../core/php/core.inc.php';
 	include_file('core', 'authentification', 'php');
-	
+
 	if (!isConnect()) {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
-	
-	ajax::init();
-	
+
+	ajax::init(array('templateupload'));
+
 	if (init('action') == 'changeState') {
 		$scenario = scenario::byId(init('id'));
 		if (!is_object($scenario)) {
@@ -55,7 +55,7 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'listScenarioHtml') {
 		$return = array();
 		foreach (scenario::all() as $scenario) {
@@ -65,7 +65,7 @@ try {
 		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'setOrder') {
 		unautorizedInDemo();
 		$scenarios = json_decode(init('scenarios'), true);
@@ -82,11 +82,11 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'testExpression') {
 		$return = array();
 		$scenario = null;
-		$return['evaluate'] = scenarioExpression::setTags(jeedom::fromHumanReadable(init('expression')), $scenario, true);
+		$return['evaluate'] = scenarioExpression::setTags(jeedom::fromHumanReadable(init('expression')), $scenario,true);
 		$return['result'] = evaluate($return['evaluate']);
 		$return['correct'] = 'ok';
 		if (trim($return['result']) == trim($return['evaluate'])) {
@@ -94,17 +94,17 @@ try {
 		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'getTemplate') {
 		ajax::success(scenario::getTemplate());
 	}
-	
+
 	if (init('action') == 'convertToTemplate') {
 		$scenario = scenario::byId(init('id'));
 		if (!is_object($scenario)) {
 			throw new Exception(__('Scénario ID inconnu : ', __FILE__) . init('id'));
 		}
-		$path = __DIR__ . '/../config/scenario';
+		$path = __DIR__ . '/../../data/scenario';
 		if (!file_exists($path)) {
 			mkdir($path);
 		}
@@ -118,23 +118,25 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'removeTemplate') {
 		unautorizedInDemo();
-		$path = __DIR__ . '/../config/scenario';
+		$path = __DIR__ . '/../../data/scenario';
 		if (file_exists($path . '/' . init('template'))) {
 			unlink($path . '/' . init('template'));
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'loadTemplateDiff') {
-		$path = __DIR__ . '/../config/scenario';
+		$path = __DIR__ . '/../../data/scenario';
 		if (!file_exists($path . '/' . init('template'))) {
 			throw new Exception('Fichier non trouvé : ' . $path . '/' . init('template'));
 		}
 		$return = array();
-		foreach (preg_split("/((\r?\n)|(\r\n?))/", file_get_contents($path . '/' . init('template'))) as $line) {
+		$fileContent = file_get_contents($path . '/' . init('template'));
+		$fileLines = preg_split("/((\r?\n)|(\r\n?))/", $fileContent);
+		foreach ($fileLines as $line) {
 			preg_match_all("/#\[(.*?)\]\[(.*?)\]\[(.*?)\]#/", $line, $matches, PREG_SET_ORDER);
 			if (count($matches) > 0) {
 				foreach ($matches as $match) {
@@ -146,24 +148,26 @@ try {
 							$return[$match[0]] = '#' . $cmd->getHumanName() . '#';
 						}
 					} catch (Exception $e) {
-						
+
 					}
 				}
-			}
-			preg_match_all("/#\[(.*?)\]\[(.*?)\]#/", $line, $matches, PREG_SET_ORDER);
-			if (count($matches) > 0) {
-				foreach ($matches as $match) {
-					$return[$match[0]] = '';
-					try {
-						$eqLogic = eqLogic::byString($match[0]);
-						if(is_object($cmd)){
-							$return[$match[0]] = '#' . $eqLogic->getHumanName() . '#';
+			} else {
+				preg_match_all("/#\[(.*?)\]\[(.*?)\]#/", $line, $matches, PREG_SET_ORDER);
+				if (count($matches) > 0) {
+					foreach ($matches as $match) {
+						$return[$match[0]] = '';
+						try {
+							$eqLogic = eqLogic::byString($match[0]);
+							if(is_object($cmd)){
+								$return[$match[0]] = '#' . $eqLogic->getHumanName() . '#';
+							}
+						} catch (Exception $e) {
+
 						}
-					} catch (Exception $e) {
-						
 					}
 				}
 			}
+
 			preg_match_all("/variable\((.*?)\)/", $line, $matches, PREG_SET_ORDER);
 			if (count($matches) > 0) {
 				foreach ($matches as $match) {
@@ -173,10 +177,10 @@ try {
 		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'applyTemplate') {
 		unautorizedInDemo();
-		$path = __DIR__ . '/../config/scenario';
+		$path = __DIR__ . '/../../data/scenario';
 		if (!file_exists($path . '/' . init('template'))) {
 			throw new Exception('Fichier non trouvé : ' . $path . '/' . init('template'));
 		}
@@ -188,6 +192,7 @@ try {
 		}
 		$content = str_replace(array_keys($converts), $converts, file_get_contents($path . '/' . init('template')));
 		$scenario_ajax = json_decode($content, true);
+      	$scenario_ajax['order'] = 9999;
 		if (isset($scenario_ajax['name'])) {
 			unset($scenario_ajax['name']);
 		}
@@ -215,7 +220,7 @@ try {
 		$scenario_db->save();
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'all') {
 		$scenarios = scenario::all();
 		$return = array();
@@ -226,7 +231,7 @@ try {
 		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'saveAll') {
 		unautorizedInDemo();
 		$scenarios = json_decode(init('scenarios'), true);
@@ -242,7 +247,7 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'autoCompleteGroup') {
 		if (!isConnect('admin')) {
 			throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -253,7 +258,7 @@ try {
 		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'toHtml') {
 		if (init('id') == 'all' || is_json(init('id'))) {
 			if (is_json(init('id'))) {
@@ -278,7 +283,7 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'remove') {
 		if (!isConnect('admin')) {
 			throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -294,7 +299,7 @@ try {
 		$scenario->remove();
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'emptyLog') {
 		if (!isConnect('admin')) {
 			throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -311,7 +316,7 @@ try {
 		}
 		ajax::success();
 	}
-	
+
 	if (init('action') == 'copy') {
 		if (!isConnect('admin')) {
 			throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -323,7 +328,7 @@ try {
 		}
 		ajax::success(utils::o2a($scenario->copy(init('name'))));
 	}
-	
+
 	if (init('action') == 'get') {
 		$scenario = scenario::byId(init('id'));
 		if (!is_object($scenario)) {
@@ -336,10 +341,24 @@ try {
 		foreach ($scenario->getElement() as $element) {
 			$return['elements'][] = $element->getAjaxElement();
 		}
-		
+		$return['scenario_link'] = array('scenario' => array());
+		$usedBy = $scenario->getUsedBy();
+		foreach ($usedBy['scenario'] as $scenarioLink) {
+			if($scenarioLink->getId() == $scenario->getId()){
+				continue;
+			}
+			$return['scenario_link']['scenario'][$scenarioLink->getId()] = array('name' => $scenarioLink->getHumanName(),'isActive' => $scenarioLink->getIsActive());
+		}
+		$use = $scenario->getUse();
+		foreach ($use['scenario'] as $scenarioLink) {
+			if($scenarioLink->getId() == $scenario->getId()){
+				continue;
+			}
+			$return['scenario_link']['scenario'][$scenarioLink->getId()] = array('name' => $scenarioLink->getHumanName(),'isActive' => $scenarioLink->getIsActive());
+		}
 		ajax::success($return);
 	}
-	
+
 	if (init('action') == 'save') {
 		if (!isConnect('admin')) {
 			throw new Exception(__('401 - Accès non autorisé', __FILE__));
@@ -355,7 +374,7 @@ try {
 				break;
 			}
 		}
-		
+
 		$has_return = 0;
 		foreach (array('scenario_return') as $keyword) {
 			if (strpos(init('scenario'), $keyword) !== false) {
@@ -363,7 +382,7 @@ try {
 				break;
 			}
 		}
-		
+
 		$scenario_ajax = json_decode(init('scenario'), true);
 		if (isset($scenario_ajax['id'])) {
 			$scenario_db = scenario::byId($scenario_ajax['id']);
@@ -392,7 +411,7 @@ try {
 		$scenario_db->save();
 		ajax::success(utils::o2a($scenario_db));
 	}
-	
+
 	if (init('action') == 'actionToHtml') {
 		if (init('params') != '' && is_json(init('params'))) {
 			$return = array();
@@ -401,7 +420,7 @@ try {
 				if (!isset($param['options'])) {
 					$param['options'] = array();
 				}
-				$html = scenarioExpression::getExpressionOptions($param['expression'], $param['options']);
+				$html =scenarioExpression::getExpressionOptions($param['expression'], $param['options']);
 				if (!isset($html['html']) || $html['html'] == '') {
 					continue;
 				}
@@ -414,10 +433,10 @@ try {
 		}
 		ajax::success(scenarioExpression::getExpressionOptions(init('expression'), init('option')));
 	}
-	
+
 	if (init('action') == 'templateupload') {
 		unautorizedInDemo();
-		$uploaddir = __DIR__ . '/../../core/config/scenario/';
+		$uploaddir = __DIR__ . '/../../data/scenario';
 		if (!file_exists($uploaddir)) {
 			mkdir($uploaddir);
 		}
@@ -441,9 +460,8 @@ try {
 			throw new Exception(__('Impossible de téléverser le fichier (limite du serveur web ?)', __FILE__));
 		}
 		ajax::success();
-		
+
 	}
-	
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 	/*     * *********Catch exeption*************** */
 } catch (Exception $e) {

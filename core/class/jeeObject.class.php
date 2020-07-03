@@ -37,7 +37,7 @@ class jeeObject {
 	/*     * ***********************Méthodes statiques*************************** */
 	
 	public static function byId($_id) {
-		if ($_id == '') {
+		if ($_id == '' || $_id == -1) {
 			return;
 		}
 		$values = array(
@@ -179,7 +179,7 @@ class jeeObject {
 	
 	public static function checkSummaryUpdate($_cmd_id) {
 		$objects = self::searchConfiguration('#' . $_cmd_id . '#');
-		if (count($objects) == 0) {
+		if (!is_array($objects) || count($objects) == 0) {
 			return;
 		}
 		$toRefreshCmd = array();
@@ -462,6 +462,8 @@ class jeeObject {
 	public function checkTreeConsistency($_fathers = array()) {
 		$father = $this->getFather();
 		if (!is_object($father)) {
+			$this->setFather_id(null);
+			$this->save(true);
 			return;
 		}
 		if (in_array($this->getFather_id(), $_fathers)) {
@@ -487,17 +489,19 @@ class jeeObject {
 		if ($this->getConfiguration('mobile::summaryTextColor') == '') {
 			$this->setConfiguration('mobile::summaryTextColor', '');
 		}
+		if ($this->getDisplay('icon') == '') {
+			$this->setConfiguration('icon', '<i class="far fa-lemon"></i>');
+		}
 	}
 	
-	public function save() {
+	public function save($_direct = false) {
 		if($this->_changed){
 			cache::set('globalSummaryHtmldashboard', '');
 			cache::set('globalSummaryHtmlmobile', '');
 			$this->setCache('summaryHtmldashboard', '');
 			$this->setCache('summaryHtmlmobile', '');
 		}
-		DB::save($this);
-		return true;
+		return DB::save($this, $_direct);
 	}
 	
 	public function getChild($_visible = true) {
@@ -556,7 +560,7 @@ class jeeObject {
 		$eqLogics = eqLogic::byObjectId($this->getId(), $_onlyEnable, $_onlyVisible, $_eqType_name, $_logicalId);
 		$eqLogics_id = array();
 		foreach ($summaries[$_summary] as $infos) {
-			if($infos['enable'] != 1){
+			if(isset($infos['enable']) && $infos['enable'] != 1){
 				continue;
 			}
 			$cmd = cmd::byId(str_replace('#', '', $infos['cmd']));
@@ -628,6 +632,18 @@ class jeeObject {
 		} else {
 			return '['. $this->getName().']';
 		}
+	}
+	
+	public function cleanSummary(){
+		$def = config::byKey('object:summary');
+		$summaries = $this->getConfiguration('summary');
+		foreach ($summaries as $key => $value) {
+			if(!isset($def[$key])){
+				unset($summaries[$key]);
+			}
+		}
+		$this->setConfiguration('summary',$summaries);
+		$this->save();
 	}
 	
 	public function getSummary($_key = '', $_raw = false) {
@@ -795,7 +811,7 @@ class jeeObject {
 	}
 	
 	public function setName($_name) {
-		$_name = cleanComponanteName($_name);
+		$_name = substr(cleanComponanteName($_name),0,127);
 		$this->_changed = utils::attrChanged($this->_changed,$this->name,$_name);
 		$this->name = $_name;
 		return $this;

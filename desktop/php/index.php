@@ -86,11 +86,14 @@ if (init('rescue', 0) == 0) {
 	}
 }
 
+global $homeLogoSrc;
 function setTheme() {
-	global $jeedom_theme;
+	global $jeedom_theme, $homeLogoSrc;
+	$homeLogoSrc = config::byKey('logo_light');
 	$dataNoChange = false;
 	$themeCss = '<link id="bootstrap_theme_css" href="core/themes/core2019_Light/desktop/core2019_Light.css?md5='.md5(__DIR__ . '/../../core/themes/core2019_Light/desktop/core2019_Light.css').'" rel="stylesheet">';
 	$themeJs = 'core2019_Light/desktop/core2019_Light';
+
 	$themeDefinition = $jeedom_theme['current_desktop_theme'];
 	if (isset($_COOKIE['currentTheme'])) {
 		if ($_COOKIE['currentTheme'] == 'alternate') {
@@ -108,6 +111,9 @@ function setTheme() {
 		}
 	}
 	$jeedom_theme['currentTheme'] = $themeDefinition;
+	if ( substr($themeDefinition, -5) == '_Dark' ) {
+		$homeLogoSrc = '../../'.config::byKey('logo_dark');
+	}
 	echo $themeCss;
 	if (!isset($jeedom_theme['interface::advance::enable']) || !isset($jeedom_theme['widget::shadow']) || $jeedom_theme['interface::advance::enable'] == 0 || $jeedom_theme['widget::shadow'] == 0) {
 		$shdPath = __DIR__ . '/../../core/themes/' . $themeDefinition . '/desktop/shadows.css';
@@ -138,6 +144,7 @@ function setTheme() {
 	<?php
 	include_file('core', 'icon.inc', 'php');
 	include_file('3rdparty', 'roboto/roboto', 'css');
+	include_file('3rdparty', 'text-security/text-security-disc', 'css');
 	include_file('3rdparty', 'jquery.toastr/jquery.toastr.min', 'css');
 	include_file('3rdparty', 'jquery.ui/jquery-ui-bootstrap/jquery-ui', 'css');
 	include_file('3rdparty', 'jquery.utils/jquery.utils', 'css');
@@ -145,13 +152,7 @@ function setTheme() {
 	?>
 	<script>
 	JEEDOM_PRODUCT_NAME='<?php echo $configs['product_name'] ?>';
-	JEEDOM_AJAX_TOKEN='<?php echo ajax::getToken() ?>';
-	$.ajaxSetup({
-		type: "POST",
-		data: {
-			jeedom_token: '<?php echo ajax::getToken() ?>'
-		}
-	})
+	JEEDOM_AJAX_TOKEN='';
 	</script>
 	<?php
 	include_file('3rdparty', 'jquery.utils/jquery.utils', 'js');
@@ -159,6 +160,7 @@ function setTheme() {
 	include_file('3rdparty', 'bootstrap/bootstrap.min', 'js');
 	include_file('3rdparty', 'jquery.ui/jquery-ui.min', 'js');
 	include_file('3rdparty', 'jquery.ui/jquery.ui.datepicker.fr', 'js');
+	include_file('3rdparty', 'jquery.ui-touch-punch/jquery.ui.touch-punch.min', 'js');
 	include_file('core', 'js.inc', 'php');
 	include_file('3rdparty', 'bootbox/bootbox.min', 'js');
 	include_file('3rdparty', 'highstock/highstock', 'js');
@@ -202,10 +204,12 @@ function setTheme() {
 	include_file('3rdparty', 'jquery.contextMenu/jquery.contextMenu.min', 'js');
 	include_file('3rdparty', 'autosize/autosize.min', 'js');
 	include_file('desktop', 'bootstrap', 'css');
+	include_file('desktop', 'coreWidgets', 'css');
 	include_file('desktop', 'desktop.main', 'css');
-	
+
+
 	setTheme();
-	
+
 	if(init('report') == 1){
 		include_file('desktop', 'report', 'css');
 	}
@@ -247,7 +251,7 @@ function setTheme() {
 			<header class="navbar navbar-fixed-top navbar-default reportModeHidden">
 				<div class="container-fluid">
 					<div class="navbar-header">
-						<a class="navbar-brand" href="<?php echo $homeLink; ?>"></a>
+						<a class="navbar-brand" href="<?php echo $homeLink; ?>"><img id="homeLogoImg" src="<?php echo $homeLogoSrc; ?>" height="30px"></a>
 						<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
 							<span class="sr-only">{{Toggle navigation}}</span>
 							<span class="icon-bar"></span>
@@ -265,7 +269,7 @@ function setTheme() {
 										<a class="dropdown-toggle" data-toggle="dropdown" id="bt_gotoDashboard" href="index.php?v=d&p=dashboard"><i class="fas fa-tachometer-alt"></i> {{Dashboard}}</a>
 										<ul class="dropdown-menu scrollable-menu" role="menu" style="height: auto;max-height: 600px; overflow-x: hidden;">
 											<?php foreach (jeeObject::buildTree(null, false) as $object_li) {
-												echo '<li><a href="index.php?v=d&p=dashboard&object_id=' . $object_li->getId() . '">' . $object_li->getHumanName(true) . '</a></li>';
+												echo '<li><a href="index.php?v=d&p=dashboard&object_id=' . $object_li->getId() . '">'.str_repeat('&nbsp;&nbsp;', $object_li->getConfiguration('parentNumber')).$object_li->getHumanName(true) . '</a></li>';
 											} ?>
 										</ul>
 									</li>
@@ -324,6 +328,7 @@ function setTheme() {
 										<li><a href = "index.php?v=d&p=scenario"><i class = "fas fa-cogs"></i> {{Scénarios}}</a></li>
 										<li><a href="index.php?v=d&p=interact"><i class="far fa-comments"></i> {{Interactions}}</a></li>
 										<li><a href="index.php?v=d&p=widgets"><i class="fas fa-camera-retro"></i> {{Widgets}}</a></li>
+										<li role="separator" class="divider"></li>
 										<li><a id="bt_showNoteManager"><i class="fas fa-sticky-note"></i> {{Notes}}</a></li>
 										<li><a id="bt_showExpressionTesting"><i class="fas fa-check"></i> {{Testeur expression}}</a></li>
 										<li><a id="bt_showDatastoreVariable"><i class="fas fa-eye"></i> {{Variables}}</a></li>
@@ -339,53 +344,53 @@ function setTheme() {
 										<?php echo $plugin_menu; ?>
 									</ul>
 								</li>
-								<li class="dropdown cursor">
-									<a class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fas fa-cog"></i>  <span class="hidden-sm hidden-md">{{Réglages}}</span>
-										<span class="caret"></span>
-									</a>
-									<?php if (isConnect('admin')) { ?>
-										<ul class="dropdown-menu">
-											<li class="dropdown-submenu"><a class="dropdown-toggle" data-toggle="dropdown"><i class="fas fa-cog"></i> {{Système}}</a>
-												<ul class="dropdown-menu">
-													<li><a href="index.php?v=d&p=administration" tabindex="0"><i class="fas fa-wrench"></i> {{Configuration}}</a></li>
-													<li><a href="index.php?v=d&p=backup"><i class="fas fa-save"></i> {{Sauvegardes}}</a></li>
-													<li><a href="index.php?v=d&p=update"><i class="fas fa-sync-alt"></i> {{Centre de mise à jour}}</a></li>
-													<?php if(jeedom::getHardwareName() == 'smart'){
-														echo '<li><a href="index.php?v=d&p=migrate"><i class="fas fa-hdd"></i> {{Restauration Image}}</a></li>';
-													} ?>
-													<li><a href="index.php?v=d&p=cron"><i class="fas fa-tasks"></i> {{Moteur de tâches}}</a></li>
-													<li><a href="index.php?v=d&p=custom"><i class="fas fa-pencil-alt"></i> {{Personnalisation avancée}}</a></li>
-													<li><a href="index.php?v=d&p=user"><i class="fas fa-users"></i> {{Utilisateurs}}</a></li>
-													<li class="divider"></li>
-													<?php	if (jeedom::isCapable('sudo') && isConnect('admin')) {
-														echo '<li class="cursor"><a id="bt_rebootSystem" state="0"><i class="fas fa-redo"></i> {{Redémarrer}}</a></li>';
-														echo '<li class="cursor"><a id="bt_haltSystem" state="0"><i class="fas fa-power-off"></i> {{Eteindre}}</a></li>';
-													} ?>
-												</ul>
-											</li>
-										<?php } ?>
-										<li><a href="index.php?v=d&p=profils"><i class="fas fa-briefcase"></i> {{Préférences}}</a></li>
-										<li role="separator" class="divider"></li>
-										<?php if ($jeedom_theme['default_bootstrap_theme'] != $jeedom_theme['default_bootstrap_theme_night']){ ?>
-											<li><a id="bt_switchTheme"><i class="fas fa-sync-alt"></i> {{Thème alternatif}}</a></li>
-										<?php } ?>
-										<li><a href="index.php?v=m" class="noOnePageLoad"><i class="fas fa-mobile"></i> {{Version mobile}}</a></li>
-										<li role="separator" class="divider"></li>
-										<?php if (isConnect('admin')) { ?>
-											<li>
-												<?php if (isset($plugin) && is_object($plugin) && $plugin->getIssue() != '') { ?>
-													<a target="_blank" href="<?php echo $plugin->getIssue() ?>"><i class="fas fa-exclamation-circle" ></i> {{Rapport de bug}}</a>
-												<?php } else {?>
-													<a class="bt_reportBug"><i class="fas fa-exclamation-circle" ></i> {{Demande de support}}</a>
-												<?php } ?>
-											</li>
-										<?php } ?>
-										<li><a href="index.php?v=d&logout=1" class="noOnePageLoad"><i class="fas fa-sign-out-alt"></i> {{Se déconnecter}}</a></li>
-										<li><a id="bt_jeedomAbout"><i class="fas fa-info-circle"></i> {{Version}} v<?php echo jeedom::version(); ?></a></li>
-									</ul>
-								</li>
 							<?php } ?>
+							<li class="dropdown cursor">
+								<a class="dropdown-toggle" data-toggle="dropdown">
+									<i class="fas fa-cog"></i>  <span class="hidden-sm hidden-md">{{Réglages}}</span>
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<?php if (isConnect('admin')) { ?>
+										<li class="dropdown-submenu"><a class="dropdown-toggle" data-toggle="dropdown"><i class="fas fa-cog"></i> {{Système}}</a>
+											<ul class="dropdown-menu">
+												<li><a href="index.php?v=d&p=administration" tabindex="0"><i class="fas fa-wrench"></i> {{Configuration}}</a></li>
+												<li><a href="index.php?v=d&p=backup"><i class="fas fa-save"></i> {{Sauvegardes}}</a></li>
+												<li><a href="index.php?v=d&p=update"><i class="fas fa-sync-alt"></i> {{Centre de mise à jour}}</a></li>
+												<?php if(jeedom::getHardwareName() == 'smart'){
+													echo '<li><a href="index.php?v=d&p=migrate"><i class="fas fa-hdd"></i> {{Restauration Image}}</a></li>';
+												} ?>
+												<li><a href="index.php?v=d&p=cron"><i class="fas fa-tasks"></i> {{Moteur de tâches}}</a></li>
+												<li><a href="index.php?v=d&p=custom"><i class="fas fa-pencil-alt"></i> {{Personnalisation avancée}}</a></li>
+												<li><a href="index.php?v=d&p=user"><i class="fas fa-users"></i> {{Utilisateurs}}</a></li>
+												<li class="divider"></li>
+												<?php	if (jeedom::isCapable('sudo') && isConnect('admin')) {
+													echo '<li class="cursor"><a href="index.php?v=d&p=reboot"><i class="fas fa-redo"></i> {{Redémarrer}}</a></li>';
+													echo '<li class="cursor"><a href="index.php?v=d&p=shutdown"><i class="fas fa-power-off"></i> {{Eteindre}}</a></li>';
+												} ?>
+											</ul>
+										</li>
+									<?php } ?>
+									<li><a href="index.php?v=d&p=profils"><i class="fas fa-briefcase"></i> {{Préférences}}</a></li>
+									<li role="separator" class="divider"></li>
+									<?php if ($jeedom_theme['default_bootstrap_theme'] != $jeedom_theme['default_bootstrap_theme_night']){ ?>
+										<li><a id="bt_switchTheme"><i class="fas fa-sync-alt"></i> {{Thème alternatif}}</a></li>
+									<?php } ?>
+									<li><a href="index.php?v=m" class="noOnePageLoad"><i class="fas fa-mobile"></i> {{Version mobile}}</a></li>
+									<li role="separator" class="divider"></li>
+									<?php if (isConnect('admin')) { ?>
+										<li>
+											<?php if (isset($plugin) && is_object($plugin) && $plugin->getIssue() != '') { ?>
+												<a target="_blank" href="<?php echo $plugin->getIssue() ?>"><i class="fas fa-exclamation-circle" ></i> {{Rapport de bug}}</a>
+											<?php } else {?>
+												<a class="bt_reportBug"><i class="fas fa-exclamation-circle" ></i> {{Demande de support}}</a>
+											<?php } ?>
+										</li>
+									<?php } ?>
+									<li><a href="index.php?v=d&logout=1" class="noOnePageLoad"><i class="fas fa-sign-out-alt"></i> {{Se déconnecter}}</a></li>
+									<li><a id="bt_jeedomAbout"><i class="fas fa-info-circle"></i> {{Version}} v<?php echo jeedom::version(); ?></a></li>
+								</ul>
+							</li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<?php
@@ -413,7 +418,7 @@ function setTheme() {
 								<?php } ?>
 								<li class="hidden-xs"><a style="cursor:default;"><?php echo jeeObject::getGlobalHtmlSummary(); ?></a></li>
 								<li class="hidden-xs navTime">
-									<a href="index.php?v=d&p=log">
+									<a href="index.php?v=d&p=history#timelinetab">
 										<span id="horloge"><?php echo date('H:i:s'); ?></span>
 									</a>
 									<a href="index.php?v=d&p=administration#generaltab">
@@ -462,7 +467,7 @@ function setTheme() {
 					<?php
 					try {
 						if (!jeedom::isStarted()) {
-							echo '<div class="alert alert-danger">{{Jeedom est en cours de démarrage, veuillez patienter. La page se rechargera automatiquement une fois le démarrage terminé.}}</div>';
+							echo '<div class="alert alert-danger">'.config::byKey('product_name').' {{est en cours de démarrage, veuillez patienter. La page se rechargera automatiquement une fois le démarrage terminé.}}</div>';
 						}
 						if (isset($plugin) && is_object($plugin)) {
 							include_file('desktop', $page, 'php', $plugin->getId());
@@ -485,19 +490,11 @@ function setTheme() {
 				<div id="md_modal"></div>
 				<div id="md_modal2"></div>
 				<div id="md_modal3"></div>
-				<div id="md_pageHelp" style="display: none;" title="Aide">
-					<ul class="nav nav-tabs">
-						<li class="active"><a href="#div_helpWebsite" data-toggle="tab">{{Générale}}</a></li>
-						<li><a href="#div_helpSpe" data-toggle="tab">{{Détaillée}}</a></li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane active" id="div_helpWebsite" ></div>
-						<div class="tab-pane" id="div_helpSpe" ></div>
-					</div>
-				</div>
 				<div id="md_reportBug" title="{{Demande de support}}"></div>
 			</main>
 		<?php } 	?>
+			<?php if(init('report') == 1 && init('delay',-1) != -1){ ?>
+			<iframe src='/core/php/sleep.php?delay=<?php echo init('delay') ?>' width=0 height=0></iframe>
+		<?php } ?>
 	</body>
 	</html>
-	

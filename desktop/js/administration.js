@@ -468,10 +468,12 @@ $("body").delegate('.bt_removeAction', 'click', function () {
 $('body').delegate('.cmdAction.expressionAttr[data-l1key=cmd]', 'focusout', function (event) {
   var expression = $(this).closest('.actionOnMessage').getValues('.expressionAttr');
   var el = $(this);
-  jeedom.cmd.displayActionOption($(this).value(), init(expression[0].options), function (html) {
-    el.closest('.actionOnMessage').find('.actionOptions').html(html);
-    taAutosize();
-  })
+  if (expression[0] && expression[0].options) {
+    jeedom.cmd.displayActionOption($(this).value(), init(expression[0].options), function (html) {
+      el.closest('.actionOnMessage').find('.actionOptions').html(html);
+      taAutosize();
+    })
+  }
 });
 
 $("body").delegate(".listCmdAction", 'click', function () {
@@ -815,6 +817,10 @@ $('#bt_accessDbAdministration').on('click',function(){
   .load('index.php?v=d&modal=db.action').dialog('open');
 });
 
+$('#bt_checkPackage').on('click',function(){
+  $('#md_modal').dialog({title: "{{Vérification des packages}}"}).load('index.php?v=d&modal=package.check').dialog('open');
+});
+
 $('#bt_checkDatabase').on('click',function(){
   $('#md_modal').dialog({title: "{{Vérification base de données}}"})
   .load('index.php?v=d&modal=db.check').dialog('open');
@@ -1014,13 +1020,13 @@ $('#bt_cleanFileSystemRight').off('click').on('click',function(){
   });
 });
 
-$('#bt_consitency').off('click').on('click',function(){
+$('#bt_consistency').off('click').on('click',function() {
   jeedom.consistency({
-    error: function (error) {
-      $('#div_alert').showAlert({message: error.message, level: 'danger'});
+    error: function(error) {
+      $('#div_alert').showAlert({message: error.message, level: 'danger'})
     },
-    success: function (data) {
-      $('#div_alert').showAlert({message: '{{Vérification effectuée, afficher le log consistency pour le résultat.}}', level: 'success'});
+    success: function(data) {
+      $('#md_modal2').dialog({title: "{{Log consistency}}"}).load('index.php?v=d&modal=log.display&log=consistency').dialog('open')
     }
-  });
-});
+  })
+})
